@@ -1,0 +1,35 @@
+implement __init__ that handles all imports
+overwork all file accesess acordingly (root changes)
+
+logs in plotting functions
+update methodnames, _ only where appropriate
+restructure config to let user edit values through functions
+color legend function
+update save file function (pdf /png)
+add default output folder option in config
+
+test target data with up and down genelists
+write more extensive tests 
+
+ranked_similarity_barplot: update the whole thing
+ranked_similarity_barplot: option to show least similar too
+
+gene_similarity_heatmap: norm proportional values option (complex)
+gene_similarity_heatmap: overwork most shifting genes option
+
+always return data, axes, figure for plot functions
+always have nested fucntions for data, setup, draw for all plots fucntions
+
+
+
+
+-----
+
+documentation and tutorial
+
+-----
+
+
+
+
+DONE

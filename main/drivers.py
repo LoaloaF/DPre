@@ -1,12 +1,9 @@
-from _differential import _differential
-import pandas as pd
-import _dpre_util as util
-from logger import logger, spacer
-import config
-import sys
-import numpy as np
+import sys, os
 
-import _dpre_util as util
+from DPre.main._differential import _differential
+import DPre.main._dpre_util as util
+
+
                                                                        
 
 class Drivers(_differential):

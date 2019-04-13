@@ -1,7 +1,30 @@
 from matplotlib.colors import LinearSegmentedColormap
 import matplotlib as mpl
 from scipy.cluster.hierarchy import set_link_color_palette
+import os
 
+
+# DPI to from 100 to 300
+mpl.rcParams['figure.dpi'] = 300.0
+mpl.rcParams['savefig.dpi'] = 300.0
+mpl.rcParams['font.size'] = FONTS = 2.66
+mpl.rcParams['lines.linewidth'] = 0.49995
+mpl.rcParams['hatch.linewidth'] = 0.3333
+mpl.rcParams['patch.linewidth'] = 0.3333
+mpl.rcParams['axes.linewidth'] = 0.26664
+mpl.rcParams['xtick.major.size'] = 1.16655
+mpl.rcParams['xtick.major.width'] = 0.26664
+mpl.rcParams['ytick.major.size'] = 1.16655
+mpl.rcParams['ytick.major.width'] = 0.26664
+mpl.rcParams['grid.linewidth'] = 0.26664
+mpl.rcParams['xtick.major.pad'] = 1.16655
+mpl.rcParams['ytick.major.pad'] = 1.16655
+
+DPRE_PATH =  os.path.dirname(__file__) + '/../'
+SAVE_FORMAT = 'pdf'
+UNDETECTED_MARKERGENES_BEHAVIOR = 'substitute' # 'drop'
+DESEQ2_P = .05
+LOG_DEFAULT_TARGET_INIT_REDUCED = True
 
 NORM_PROP_BAHVIOuR = {
     'min_abs_effect'
@@ -15,94 +38,102 @@ NORM_PROP_BAHVIOuR = {
 #     'change_prop_value': 0
 # }
 
-mpl.rcParams['font.size'] = 8
-log_emphz = '=|=|=|=|=|=|=|=|=|=|=|=|=|=|=|=|=|=|=|=|=|=|=|=|=|=|=|='
+log_emphz = '=|=|=|=|=|=|=|=|====INITIATION====|=|=|=|=|=|=|=|=|='
+log_plot = '=|=|=|=|=|=|=|=|====PLOT====|=|=|=|=|=|=|=|=|='
 
-LOG_DEFAULT_TARGET_INIT_REDUCED = True
 
-DPI = 300
-SAVE_FORMAT = 'pdf'
-# UNDETECTED_MARKERGENES_BEHAVIOR = 'drop'
-UNDETECTED_MARKERGENES_BEHAVIOR = 'substitute'
-DESEQ2_SIGNIFICANCE_THRESHOLD = .05
-
-GREY1 = '#898989'
-RED = '#8a0b25'
-BLUE = '#0a3b70'
-
-default_colors = ['#4daf4a', '#984ea3', '#ff7f00', '#ffff33', '#a65628', 
-                  '#f781bf', '#999999', '#00ffff', '#5f0029', '#4f4e51',
-                  '#b499ff', '#984ea3', '#00806c', '#27ff91', '#6a6c00', 
-                  '#e1c78b', '#63c1fe', '#d90083', '#5a3500', '#42bba9',
-                  '#b29a00','#f203ff','#004f74', '#ffa63a']
+colors = ['#e6194B', #    0 = red
+          '#3cb44b', #    1 = green
+          '#ffe119', #    2 = yellow
+          '#4363d8', #    3 = blue
+          '#f58231', #    4 = orange
+          '#911eb4', #    5 = purple
+          '#42d4f4', #    6 = cyan
+          '#f032e6', #    7 = magenta
+          '#bfef45', #    8 = lime
+          '#fabebe', #    9 = pink
+          '#469990', #    10 = teal
+          '#e6beff', #    11 = lavender
+          '#9A6324', #    12 = brown
+          '#fffac8', #    13 = beige
+          '#8a0b25', #    14 = deep red
+          '#aaffc3', #    15 = mint
+          '#808000', #    16 = olive
+          '#ffd8b1', #    17 = apricot
+          '#0a3b70', #    18 = deep blue
+          '#a9a9a9', #    19 = grey
+          '#ffffff', #    20 = white
+          '#000000'  #    21 = black
+]
 
 default_targets_colors = {
-    'blood mesoderm': '#e1c78b', 
-    'embryonic': '#63c1fe', 
-    'endoderm': '#d90083', 
-    'germ cells': '#5a3500',
-    'mesoderm': '#42bba9', 
-    'neural crest': '#b29a00', 
-    'neuroectoderm': '#f203ff', 
-    'surface ectoderm': '#004f74'  
+    'embryonic': 'fbcc8c', 
+    'germ cells': '#f0f0a6',
+    'neural crest': '#cap1cd', 
+    'surface ectoderm': '#9edce4',
+    'neuroectoderm': '#5888c2', 
+    'mesoderm': '#64bb79', 
+    'endoderm': '#843487', 
+    'blood mesoderm': '#fe7e81', 
 }
 
 RdBu_bin = LinearSegmentedColormap.from_list(
-            'RdBu_binary', [RED, '#f6f7f7',BLUE], 3
+            'RdBu_binary', [colors[14], '#f6f7f7', colors[18]], 3
 )
-dendrogram_colors = [GREY1, '#589909', '#0c9691', '#13bf63']
+# dendrogram_colors = [colors[19], '#589909', '#0c9691', '#13bf63']
+dendrogram_colors = ['#000000', '#000000', '#000000', '#000000']
 set_link_color_palette(dendrogram_colors[1:])
 
 
 
-HMS_LEFT = .4
-HMS_TOP = .6
-HMS_RIGHT = .2
-HMS_BOTTOM = .25
-HMS_WSPACE = .04
-HMS_HSPACE = .02
+GSH_LEFT = .4
+GSH_TOP = .6
+GSH_RIGHT = .2
+GSH_BOTTOM = .25
+GSH_WSPACE = .04
+GSH_HSPACE = .02
 
-HMS_UP_DOWN_SPACE = .3
-HMS_DRIVERS_COLORBAR = .03
-HMS_GENES_COLORBAR = .03
-HMS_DRIVERS_DENDROGRAM = .3
-HMS_GENE_DENDROGRAM = .3
-HMS_MAX_POSS_BAR = .04
-HMS_SQUARESIZE = .006
-HMS_SQUARESIZE = .05
-HMS_SUMPLOT_SIZE = .9
-
-
-
-HM_DRIVERS_COLORBAR = .03
-HM_TARGETS_COLORBAR = .03
-HM_DRIVER_DENDROGRAM = .3
-HM_TARGET_DENDROGRAM = .3
-HM_MAX_POSS_BAR = .04
-HM_SQUARESIZE = .05
-
-HM_LEFT = .6
-HM_TOP = .6
-HM_RIGHT = .01
-HM_BOTTOM = .7
-HM_WSPACE = .02
-HM_HSPACE = .02
+GSH_UP_DOWN_SPACE = .3
+GSH_DRIVERS_COLORBAR = .03
+GSH_GENES_COLORBAR = .03
+GSH_DRIVERS_DENDROGRAM = .3
+GSH_GENE_DENDROGRAM = .3
+GSH_MAX_POSS_BAR = .04
+GSH_SQUARESIZE = .006
+GSH_SQUARESIZE = .05
+GSH_SUMPLOT_SIZE = .9
 
 
 
-SE_YLABELSPACE = .9
-SE_TARGETS_COLORBAR = .03
-SE_BARSPACE = .8
-SE_BARWIDTH_SIZE = .05
-SE_BETWEEN_BARS_SIZE = .01
-SE_XLIM = 3
+TSH_LEFT = .6
+TSH_TOP = .6
+TSH_RIGHT = .01
+TSH_BOTTOM = .7
+TSH_WSPACE = .02
+TSH_HSPACE = .02
 
-SE_LEFT = .1
-SE_TOP = .3
-SE_RIGHT = .1
-SE_BOTTOM = .2
-SE_WSPACE = .02
-SE_HSPACE = .2
+TSH_DRIVERS_COLORBAR = .03
+TSH_TARGETS_COLORBAR = .03
+TSH_DRIVER_DENDROGRAM = .3
+TSH_TARGET_DENDROGRAM = .3
+TSH_MAX_POSS_BAR = .04
+TSH_SQUARESIZE = .05
+
+
+
+RSB_LEFT = .1
+RSB_TOP = .3
+RSB_RIGHT = .1
+RSB_BOTTOM = .2
+RSB_WSPACE = .02
+RSB_HSPACE = .2
+
+RSB_YLABELSPACE = .9
+RSB_TARGETS_COLORBAR = .03
+RSB_BARSPACE = .8
+RSB_BARWIDTH_SIZE = .05
+RSB_BETWEEN_BARS_SIZE = .01
+RSB_XLIM = 3
 
 
 
@@ -115,55 +146,29 @@ CB_HEIGHT = .06
 
 
 
-def get_plot_args(of_plot, get_which=None):
-    if of_plot == 'max_possible_bar':
-        return MAX_POSSIBLE_BAR_args(get_which)
-    elif of_plot == 'accuracy_heatmap':
-        return ACCURACY_HEATMAP_args(get_which)
-    elif of_plot == 'target_similarity_heatmap':
-        return TARGET_SIMILARITY_HEATMAP_args(get_which)
-    elif of_plot == 'sum_plot':
-        return SUM_PLOT_args(get_which)
-    elif of_plot == 'single_gene_heatmap':
-        return SINGLE_GENE_HEATMAP_args(get_which)
-    elif of_plot == 'color_bar':
-        return COLOR_BAR_args(get_which)
 
+# def MAX_POSSIBLE_BAR_args(get_which):
+#     # abs. mean euclidean distance --- number of intersect markergenes 
+#     cmap =   ['afmhot', 'afmhot_r']
+#     vmin =   [0,         100]
+#     vmax =   [4,         1150]
+#     aspect = ['auto',   'auto']
 
-def MAX_POSSIBLE_BAR_args(get_which):
-    # abs. mean euclidean distance --- number of intersect markergenes 
-    cmap =   ['afmhot', 'afmhot_r']
-    vmin =   [0,         100]
-    vmax =   [4,         1150]
-    aspect = ['auto',   'auto']
+#     ret = [{'cmap': cmap[i], 'vmax': vmax[i], 'vmin': vmin[i], 'aspect': aspect[i]} 
+#            for i in range(len(cmap))]
+#     return ret[get_which] if get_which is not None else ret
 
-    ret = [{'cmap': cmap[i], 'vmax': vmax[i], 'vmin': vmin[i], 'aspect': aspect[i]} 
-           for i in range(len(cmap))]
-    return ret[get_which] if get_which is not None else ret
+# def TARGET_SIMILARITY_HEATMAP_args(get_which):
+#     # euclidean distance - propotional euclidean distance
+#     # markergene intersect - proportional markergene intersect
+#     cmap =   ['RdBu_r', 'RdBu_r', 'RdBu_r', 'RdBu_r']
+#     vmin =   [-.5,       -.15,     -65,      -.1]
+#     vmax =   [.5,       .15,       65,       .1]
+#     aspect = ['auto',  'auto',  'auto',    'auto']
 
-def ACCURACY_HEATMAP_args(get_which):
-    # euclidean distance - propotional euclidean distance
-    # markergene intersect - proportional markergene intersect
-    cmap =   ['viridis', 'viridis_r', 'viridis']
-    vmin =   [0,         -1,           0]
-    vmax =   [.8,         1,            65]
-    aspect = ['auto',    'auto',       'auto']
-
-    ret = [{'cmap': cmap[i], 'vmax': vmax[i], 'vmin': vmin[i], 'aspect': aspect[i]} 
-           for i in range(len(cmap))]
-    return ret[get_which] if get_which is not None else ret
-
-def TARGET_SIMILARITY_HEATMAP_args(get_which):
-    # euclidean distance - propotional euclidean distance
-    # markergene intersect - proportional markergene intersect
-    cmap =   ['RdBu_r', 'RdBu_r', 'RdBu_r', 'RdBu_r']
-    vmin =   [-.5,       -.15,     -65,      -.1]
-    vmax =   [.5,       .15,       65,       .1]
-    aspect = ['auto',  'auto',  'auto',    'auto']
-
-    ret = [{'cmap': cmap[i], 'vmax': vmax[i], 'vmin': vmin[i], 'aspect': aspect[i]} 
-           for i in range(len(cmap))]
-    return ret[get_which] if get_which is not None else ret
+#     ret = [{'cmap': cmap[i], 'vmax': vmax[i], 'vmin': vmin[i], 'aspect': aspect[i]} 
+#            for i in range(len(cmap))]
+#     return ret[get_which] if get_which is not None else ret
 
 
 def SUM_PLOT_args(get_which):
@@ -199,26 +204,17 @@ def COLOR_BAR_args(get_which):
 
 
 
-
-
-def set_dpi(dpi, adjust_plot_sizes=True):
-    dpi_rat = mpl.rcParams['figure.dpi'] /dpi
-    mpl.rcParams['figure.dpi'] = dpi
-    mpl.rcParams['savefig.dpi'] = dpi
-    mpl.rcParams['font.size'] *=  dpi_rat
-    mpl.rcParams['lines.linewidth'] *=  dpi_rat
-    mpl.rcParams['hatch.linewidth'] *=  dpi_rat
-    mpl.rcParams['patch.linewidth'] *=  dpi_rat
-    mpl.rcParams['axes.linewidth'] *=  dpi_rat
-    mpl.rcParams['xtick.major.size'] *= dpi_rat
-    mpl.rcParams['xtick.major.width'] *= dpi_rat
-    mpl.rcParams['ytick.major.size'] *= dpi_rat
-    mpl.rcParams['ytick.major.width'] *= dpi_rat
-    mpl.rcParams['grid.linewidth'] *= dpi_rat
-    mpl.rcParams['xtick.major.pad'] *= dpi_rat
-    mpl.rcParams['ytick.major.pad'] *= dpi_rat
-set_dpi(DPI, False)
-
-FS = mpl.rcParams['font.size']
-
+def get_plot_args(of_plot, get_which=None):
+    if of_plot == 'max_possible_bar':
+        return MAX_POSSIBLE_BAR_args(get_which)
+    elif of_plot == 'accuracy_heatmap':
+        return ACCURACY_HEATMAP_args(get_which)
+    elif of_plot == 'target_similarity_heatmap':
+        return TARGET_SIMILARITY_HEATMAP_args(get_which)
+    elif of_plot == 'sum_plot':
+        return SUM_PLOT_args(get_which)
+    elif of_plot == 'single_gene_heatmap':
+        return SINGLE_GENE_HEATMAP_args(get_which)
+    elif of_plot == 'color_bar':
+        return COLOR_BAR_args(get_which)
 

@@ -6,7 +6,7 @@ update methodnames, _ only where appropriate
 restructure config to let user edit values through functions
 color legend function
 update save file function (pdf /png)
-add default output folder option in config
+
 
 test target data with up and down genelists
 write more extensive tests 
@@ -20,6 +20,7 @@ gene_similarity_heatmap: overwork most shifting genes option
 always return data, axes, figure for plot functions
 always have nested fucntions for data, setup, draw for all plots fucntions
 
+assert input
 
 
 

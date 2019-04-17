@@ -1,7 +1,9 @@
 # Custom
 .DS_Store
-.txt.gz
-.png
+*.txt.gz
+*.png
+*.tsv
+*.glb
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -4,6 +4,9 @@
 *.png
 *.tsv
 *.glb
+DPreeee.py	
+default_targets
+test_data
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

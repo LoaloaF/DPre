@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import os
+import sys
 from matplotlib.backends.backend_pdf import PdfPages
 from matplotlib import pyplot as plt
 from scipy.cluster.hierarchy import distance, linkage, dendrogram, optimal_leaf_ordering
@@ -8,6 +9,7 @@ from scipy.spatial.distance import pdist
 
 import DPre.main.config as config
 from DPre.main._logger import logger, spacer
+
 
 
 
@@ -20,11 +22,13 @@ def _add_mg_types(expr, down):
         expr.columns = add_level(expr.columns, updown_idx)
         return expr.reindex(orig_order, axis=1, level=1)
 
-def _diff_to_int_updown_notation(_diff):
-        int_diff = pd.DataFrame(0, _diff.index, _diff.columns.unique(1))
-        int_diff[_diff['up'].values] = 1
+def _diff_to_int_updown_notation(_diff, merge_updown=True):
+        int_diff = _diff.astype(int)
         if 'down' in _diff.columns.unique(0):
-            int_diff[_diff['down'].values] = -1
+            int_diff['down'] *= -1
+        if merge_updown and 'down' in _diff.columns.unique(0):
+            int_diff['up'] = int_diff['up'].mask(_diff['down'], -1)
+            int_diff['down'] = int_diff['down'].mask(_diff['up'], 1)
         return int_diff
 
 def add_updown_mean(agg):
@@ -59,13 +63,17 @@ def annotate(index):
         return pd.Index(ref.reindex(index).name.values)
     except KeyError as e:
         logger.error(e)
+        sys.exit(1)
+
 
 def get_ensgs(names):
     ref = pd.read_pickle(config.DPRE_PATH + 'mm10/mm10_ensembl_v92_ensg.gzip')
     try:
-        return ref.loc[names].ensg.tolist()
+        return ref.reset_index().set_index('name').loc[names].ensg.values
     except KeyError as e:
         logger.error(e)
+        sys.exit(1)
+
 
 def align_indices(data, order, axis=1):
     for i in range(len(data)):
@@ -85,11 +93,27 @@ def filter_trgs(d, max_n, val_th, single_mean=False, ascending=False):
         d = keep
     return d
 
+def check_which(which, trg, drv):
+    msg = 'The {} were initiated without {} data. Cannot use `{}` similarity.'
+    if (which == 'euclid') and not trg._has_expr:
+        logger.error(msg.format('targets', 'expression', 'euclid'))
+        sys.exit(1)
+    elif (which == 'euclid') and not drv._has_expr:
+        logger.error(msg.format('drivers', 'expression', 'euclid'))
+        sys.exit(1)
+    elif (which == 'intersect') and not drv._has_diff:
+        logger.error(msg.format('drivers', 'differential', 'intersect'))
+        sys.exit(1)
+    elif which not in ('euclid', 'intersect'):
+        logger.error('Invalid `which` input: `{}`. Valid are `euclid` and '
+                     '`intersect`'.format(which))
+        sys.exit(1)
+
+    
 
 
 
-
-def plot_max_possible_bar(axes, data, ctrl_lbl, bar_args, 
+def plot_required_effect_bar(axes, data, ctrl_lbl, bar_args, 
                         draw_colorbar=False, cb_lbl=None, fig=None, 
                         w=None, h=None):
     axes[0].tick_params(labelleft=True)
@@ -148,20 +172,44 @@ def _init_figure(fig_widths, fig_heights, nplts, spacers):
 
     return fig, axes
 
+def setup_heatmap_xy(x_y, ax, lbls, show_lbls, trg_lbl_size, colorbar, colors):
+    
+    dim = len(lbls)
+    if x_y == 'x':
+        # X-axis setup, colorbar bottom
+        ax.set_xlim(0, dim)
+        ticks = np.arange(.5, dim)
+        ax.set_xticks(ticks)
+        if show_lbls:
+            ax.tick_params(labelbottom=True)
+            fs = trg_lbl_size*config.FONTS if trg_lbl_size else config.FONTS
+            ax.set_xticklabels(lbls, rotation=45, ha='right', fontsize=fs, 
+                               rotation_mode='anchor', y=.5)
+        if colorbar:
+            ax.bar(ticks, 1, 1, color=colors)
+    
+    elif x_y == 'y':
+        ax.set_ylim((-.1, dim +.01))
+        ax.set_yticks(np.arange(.5, dim))
+        if show_lbls:
+            ax.tick_params(labelleft=True) 
+            ax.set_yticklabels(lbls, x=.5)
+        if colorbar:
+            ax.bar(0, 1, color=colors, bottom=np.arange(len(lbls)))
 
 def open_file(filename):
     if not (filename.endswith('.png') or filename.endswith('.pdf')):
-        filename += config.SAVE_FORMAT
+        filename += '.'+config.SAVE_FORMAT
     if filename.endswith('.pdf'):
-        return PdfPages(filename)
+        return filename, PdfPages(filename)
+    else:
+        return filename, None
 
-def save_file(fig, filename=None, pp=None, last=False):
+def save_file(fig, filename=None, pp=None):
     if pp:
         fig.savefig(pp, format='pdf')
     elif filename:
         fig.savefig(filename, format='png')
-    logger.info('Plot saved at {}/{}'.format(os.path.abspath(os.curdir), 
-                                             filename))
 
 def clean_axes(axes):
     for ax in axes.flatten():
@@ -169,7 +217,6 @@ def clean_axes(axes):
         ax.tick_params(bottom=False, left=False, labelbottom=False, 
                        labelleft=False)
     return axes
-
 
 
 

@@ -1,8 +1,12 @@
 import pandas as pd
 import numpy as np
+import sys
+import os
+import copy
 
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
+from matplotlib.colors import is_color_like
 
 
 from DPre.main._differential import _differential
@@ -13,9 +17,7 @@ import DPre.main.config as config
 import DPre.main._dpre_util as util
 
 class Targets(_differential):
-
     n_insts = 0
-
     def __init__(self, diff_genes, expression=None, ctrl=None, use_down_mgs=True, 
                  override_diff_names=False, name=None, log=True):
         
@@ -34,7 +36,7 @@ class Targets(_differential):
                         'purpose in a Target instance.'.format(self._name))
 
         _diff_mgs = self._diff[self._diff.any(1)]
-        self._diff_mgs = util._diff_to_int_updown_notation(_diff_mgs)
+        self._diff_mgs = util._diff_to_int_updown_notation(_diff_mgs, False)
 
         if self._has_expr:
             expr_mgs = util._add_mg_types(self._expr.copy(), self._down_mgs)
@@ -47,7 +49,7 @@ class Targets(_differential):
 
 
     def _overlap_drivers(self, drivers, which):
-        logger.info('Overlappping ({}) Drivers:`{}` on Targets: `{}` ... '
+        logger.info('Overlappping Drivers ({}): `{}` on Targets: `{}` ... '
                     .format(which, drivers._name, self._name))
 
         if (which == 'euclid') and self._has_expr and drivers._has_expr:
@@ -55,19 +57,18 @@ class Targets(_differential):
             drv_data = drivers._expr.xs('z', 1, 1)
             drv_data = util._add_mg_types(drv_data, self._down_mgs)
             subst = drivers._min_zval
-            
         elif (which == 'intersect') and self._has_diff and drivers._has_diff:
-            trg_data = util._add_mg_types(self._diff_mgs, self._down_mgs)
+            drv_data = drivers._diff_eff[self._mg_types]
+            trg_data = self._diff_mgs
             trg_data.mask(trg_data == 0, inplace=True)
-            drv_data = util._add_mg_types(drivers._diff_eff, self._down_mgs)
             subst = 0
-
         drv_data = drv_data.reindex(trg_data.index)
-        drv_exts = [d for _, dd in drv_data.iteritems() for d in [dd]*len(self)]
-        drv_ext = pd.concat(drv_exts, axis=1)
-        lvls = (self._mg_types, drv_ext.columns.unique(1), self._names)
-        drv_ext.columns = pd.MultiIndex.from_product(lvls).swaplevel()
 
+        drv_exts = [d for _, dd in drv_data.iteritems() 
+                    for d in [dd]*len(self._names_noctrl)]
+        drv_ext = pd.concat(drv_exts, axis=1)
+        lvls = (self._mg_types, drv_ext.columns.unique(1), self._names_noctrl)
+        drv_ext.columns = pd.MultiIndex.from_product(lvls).swaplevel()
         if config.UNDETECTED_MARKERGENES_BEHAVIOR == 'substitute':
             drv_ext.fillna(subst, inplace=True)
         elif config.UNDETECTED_MARKERGENES_BEHAVIOR == 'drop':
@@ -76,28 +77,26 @@ class Targets(_differential):
 
         eucl_dist = lambda drv_d: drv_d -trg_data[drv_d.columns.unique(0)].values 
         def mg_inters(drv_d):
-            trg_d = trg_data[drv_d.columns[0][0]]
-            return drv_d.mask(drv_d == trg_d.values, 1).mask(trg_d.isna().values)
+            m = abs(drv_d + trg_data[drv_d.columns[0][0]].values)
+            return m.mask(m == 2, 1).mask(m == 1, 0).mask(m == 0, -1)
         do_ovp = eucl_dist if which == 'euclid' else mg_inters
         ovp = drv_ext.groupby(axis=1, level=(0,2), sort=False).apply(do_ovp)
+        
 
         self._overlaps['{}-{}'.format(id(drivers), which)] = ovp
         return ovp
-
 
 
     def _get_from_overlap(self, drivers, which, genes_diff=False, genes_prop=False,
                           norm_prop_genes=True,
                           genes_agg_diff=False, genes_agg_prop=False, 
                           idx_slice=pd.IndexSlice[:, :, :], 
-                          drop_ctrl=True, get_max_possible_only=False):
+                          drop_ctrl=True, inters_to_updown_not=True):
 
         # ==============================CHECK ARGS==============================
         if which == 'euclid':
             if idx_slice[2] != slice(None) and drivers._ctrl not in idx_slice[2]:
                 idx_slice = (*idx_slice[:2], idx_slice[2]+[drivers._ctrl])
-            if get_max_possible_only and genes_agg_diff:
-                genes_agg_diff = False
             if genes_agg_prop and not genes_agg_diff:
                 genes_agg_prop = False
         try:
@@ -109,8 +108,6 @@ class Targets(_differential):
         if which == 'euclid':
             ctrl_genes = ovp.xs(drivers._ctrl, 1, 2, False)
             ctrl_agg = util.add_updown_mean(ctrl_genes.abs().mean().unstack().T)
-            if get_max_possible_only:
-                return ctrl_genes, ctrl_agg
 
             if not genes_diff:
                 genes = ovp
@@ -121,46 +118,11 @@ class Targets(_differential):
                     diff = drv_ovp.apply(to_diff)
                     if genes_prop:
                         to_prop = lambda drv: drv / ctrl.abs()
-                        diff = ((diff.apply(to_prop)-1).abs() *-1) +1
-                        # if norm_prop_genes:
-                        #     cpv = config.NORM_PROP_BAHVIOuR['change_prop_value']
-                        #     alt = alter.xs(diff.columns[0][1], 1, 1, False)
-                        #     alt_mask = np.repeat(alt.notna().values, diff.shape[1], 1)
-                        #     if cpv == 'min_found':
-                        #         subst = diff[alt.isna()].min().min()
-                        #     elif isinstance(cpv, (int, float)):
-                        #         subst = cpv
-                        #     elif cpv == 'drop':
-                        #         subst = np.nan
-                        #     elif cpv == 'none':
-                        #         return diff
-                        #     diff = diff.mask((alt_mask), subst)
-                        #     # plt.hist(diff.unstack().dropna(), density=True, bins=400, color='green', alpha=.6)
-                        #     return diff
+                        prop_interpr = ((diff.apply(to_prop)-1).abs() *-1) +1
+                        return prop_interpr.mask(prop_interpr < -3, -3)
                     return diff
-
                 genes = ovp.groupby(level=(0,1), axis=1, sort=False).apply(gene_diff)
-                
-                # genes_grp = ovp.groupby(level=(0,1), axis=1, sort=False)
-                # if not (genes_prop and norm_prop_genes):
-                #     genes = genes_grp.apply(gene_diff)
-                # else:
-                #     cap_type = config.NORM_PROP_BAHVIOuR['cap_type']
-                #     cap = config.NORM_PROP_BAHVIOuR['cap']
-                #     ctrls = ovp.xs(drivers._ctrl, 1, 2, False).abs()
-                #     cumsum, vals = plt.hist(ctrls.dropna().unstack(), bins=250,
-                #                             cumulative=1, density=True,)[:-1]
-                #     plt.close()
-                #     if cap_type == 'proportion':
-                #         cap = vals[len(cumsum[cumsum <= cap])]
-                #     alter = ctrls.mask(ctrls>cap)
-                #     genes = genes_grp.apply(gene_diff, alter)
-
-                    # print(len(genes.unstack().dropna().values))
-                    # plt.hist(genes.unstack().dropna().values, density=False, bins=300)
-                    # plt.show()
-
-
+               
             if not genes_agg_diff:
                 agg = ovp.abs().mean().unstack((0,1)).reindex(ovp.columns.unique(2))
                 agg = util.add_updown_mean(agg)
@@ -182,12 +144,11 @@ class Targets(_differential):
             return genes, agg, ctrl_genes, ctrl_agg
         
         elif which == 'intersect':
-
+            if inters_to_updown_not and self._down_mgs:
+                ovp['down'] *= -1
             n_mgs = ovp.notna().sum().xs(ovp.columns.unique(2)[0], level=2)
             n_mgs.index = util.add_level(n_mgs.index, 'n_mgs', at=2)
             n_mgs = util.add_updown_mean(n_mgs.unstack((0,1))).astype(int)
-            if get_max_possible_only:
-                return None, n_mgs
 
             agg = ovp.sum().unstack((0,1)).reindex(ovp.columns.unique(2))
             agg = util.add_updown_mean(agg)
@@ -200,18 +161,6 @@ class Targets(_differential):
             return ovp, agg, None, n_mgs
 
 
-
-
-
-
-
-
-
-
-
-
-
-
     def target_similarity_heatmap(self, 
                                   drivers, 
                                   which, 
@@ -221,16 +170,16 @@ class Targets(_differential):
                                   heatmap_width = None,
                                   heatmap_height = None,
    
-                                  show_max_possible_bar = True,
-                                  reorder_to_max_possible_bar = False,
-                                  max_possible_bar_range = None,
+                                  show_required_effect_bar = True,
+                                  reorder_to_required_effect_bar = False,
+                                  required_effect_bar_range = None,
                                   
                                   cluster_targets = True,
                                   show_target_dendrogram = True,
-                                  targets_colorbar = False,
+                                  show_targets_colorbar = False,
                                   cluster_drivers = True,
                                   show_driver_dendrogram = True,
-                                  drivers_colorbar = False,
+                                  show_drivers_colorbar = False,
                                   
                                   show_targetlabels = True,
                                   targetlabels_space = None,
@@ -240,32 +189,48 @@ class Targets(_differential):
                                   title = True, 
                                   show_colorbar_legend = True,
                                   filename = 'target_similarity_hm.png'):
-          
+
+        # check user input for errors and incompatibilities
         def check_args():
-            if reorder_to_max_possible_bar:
-                cluster_targets = False
-            assert which in ('euclid', 'intersect'), '`which` invalid '
-        
+            nonlocal cluster_targets
+            nonlocal reorder_to_required_effect_bar
+            nonlocal show_required_effect_bar
+
+            util.check_which(which, self, drivers)
+            if reorder_to_required_effect_bar and not show_required_effect_bar:
+                reorder_to_required_effect_bar = False
+                logger.warning('When `reorder_to_required_effect_bar` is True, '
+                               '`show_required_effect_bar` cannot be False. Set '
+                               'to False.')
+            if reorder_to_required_effect_bar and cluster_genes:
+                cluster_genes = False
+                logger.warning('Both `reorder_to_required_effect_bar` and '
+                               '`cluster_genes` were set as True. '
+                               '`cluster_genes` will be ignored.')
+
+        # get the specific overlap data, plot the mean of up and down mgs
         def get_data():
             _, sim, _, ctrl_sim = self._get_from_overlap(drivers, which, 
                                                     genes_agg_diff=True, 
                                                     genes_agg_prop=proportional)
             return [sim.xs('mean', 1, 0), ctrl_sim.xs('mean', 1, 0)]
 
+        # get plot lims
         def get_caps():
             mini = abs(data[0].min().min())
             maxi = abs(data[0].max().max())
             cap = round(max((mini, maxi)), 1)
-            max_poss_cap = round(data[1].iloc[0].max(), 1)
-            return cap, max_poss_cap
+            re_cap = round(data[1].iloc[0].max(), 1)
+            return cap, re_cap
         
+        # built 2 lists with widths and heights in inches of every axes
         def get_plot_sizes():
             nplts = [4,3]
 
             fig_widths = [.0001] *(nplts[1] +3)
             fig_widths[0] = driverlabels_space if driverlabels_space \
                             else config.TSH_LEFT
-            if drivers_colorbar:
+            if show_drivers_colorbar:
                 fig_widths[1] = config.TSH_DRIVERS_COLORBAR
             fig_widths[2] = config.TSH_SQUARESIZE * len(self)
             if heatmap_width:
@@ -279,12 +244,12 @@ class Targets(_differential):
             fig_heights[0] = config.TSH_TOP
             if cluster_targets and show_target_dendrogram:
                 fig_heights[1] = config.TSH_TARGET_DENDROGRAM
-            if show_max_possible_bar:
-                fig_heights[2] = config.TSH_MAX_POSS_BAR
-            fig_heights[3] = config.TSH_SQUARESIZE * len(drivers)
+            if show_required_effect_bar:
+                fig_heights[2] = config.TSH_REQU_EFF_BAR
+            fig_heights[3] = config.TSH_SQUARESIZE * len(drivers._names_noctrl)
             if heatmap_height:
                 fig_heights[3] *= heatmap_height
-            if targets_colorbar:
+            if show_targets_colorbar:
                 fig_heights[4] = config.TSH_TARGETS_COLORBAR
             fig_heights[5] = config.TSH_HSPACE * (nplts[0]-1)
             fig_heights[6] = targetlabels_space if targetlabels_space \
@@ -292,21 +257,23 @@ class Targets(_differential):
 
             return nplts, fig_widths, fig_heights
 
+        # draw plot
         def do_plot():
             width, height = sum(fig_widths), sum(fig_heights)
             fig, axes = util._init_figure(fig_widths, fig_heights, nplts, 
                                        (config.TSH_WSPACE, config.TSH_HSPACE))
             sim, ctrl_sim = data
 
+            # set plot title
             if title:
                 if title and type(title) is not str:
                     this_title = ('transcriptinoal similarity\nof {} and {} '
                                   .format(drivers._name, self._name))
                 fig.suptitle(this_title, fontsize=config.FONTS *1.2,
-                             y=1-((config.GSH_TOP/height *.25)))
+                             y=1-((config.GSH_TOP/height *.1)))
 
 
-            # cluster, reorder data and plot dendograms
+            # cluster targets/ drivers and draw dendrograms
             if cluster_targets:
                 at = axes[0, 1] if show_target_dendrogram else axes[0, 0]
                 order = util._heatmap_cluster(sim, 'top', at, 'columns')
@@ -314,83 +281,56 @@ class Targets(_differential):
             if cluster_drivers:
                 at = axes[2, 2] if show_driver_dendrogram else axes[0, 0]
                 order = util._heatmap_cluster(sim, 'right', at, 'rows')
-                sim, ctrl_sim = util.align_indices([sim, ctrl_sim], order, 0)
+                # sim, ctrl_sim = util.align_indices([sim, ctrl_sim], order, 0)
             axes[0, 0].set_visible(False)
             
-            if show_max_possible_bar:
-                if reorder_to_max_possible_bar:
+            # draw required effect bar
+            if show_required_effect_bar:
+                if reorder_to_required_effect_bar:
                     order = ctrl_sim.iloc[0].sort_values().index
                     sim, ctrl_sim = util.align_indices([sim, ctrl_sim], order)
 
                 ctrl_lbl = drivers._ctrl if show_driverlabels else ''
                 draw_cb = True if show_colorbar_legend else False
-                bar_args = {'cmap': 'afmhot', 'vmin': 0, 'vmax': max_poss_cap}
-                cb_lbl = 'number of markergenes' if which == 'intersect' else \
-                         'base similarity\n[abs. mean eucl. distance]'
-                if max_possible_bar_range is not None:
-                    bar_args.update({'vmin': max_possible_bar_range[0], 
-                                     'vmax': max_possible_bar_range[1]})
-
-                util.plot_max_possible_bar(axes[1, :2], ctrl_sim,
+                bar_args = {'cmap': 'afmhot', 'vmin': 0, 'vmax': re_cap}
+                cb_lbl = 'number of markergenes\n' if which == 'intersect' else \
+                         'base expr. similarity\n[mean abs. eucl. distance]'
+                if required_effect_bar_range is not None:
+                    bar_args.update({'vmin': required_effect_bar_range[0], 
+                                     'vmax': required_effect_bar_range[1]})
+                util.plot_required_effect_bar(axes[1, :2], ctrl_sim,
                                             ctrl_lbl, bar_args, draw_cb, 
                                             cb_lbl, fig, width, height)
 
-            # Y-axis setup, colorbar left
-            y_ax = axes[2, 0]
-            y_ax.set_ylim((-.1, sim.shape[0] +.01))
-            y_ax.set_yticks(np.arange(.5, sim.shape[0]))
-            ylbls = sim.index[::-1]
+            # setup heatmap x,y axis, including the colorbars
+            util.setup_heatmap_xy('x', axes[3, 1], sim.columns, show_targetlabels, 
+                                  targetlabel_size, show_targets_colorbar, 
+                                  self.get_colors(sim.columns))
+            util.setup_heatmap_xy('y', axes[2, 0], sim.index[::-1], show_driverlabels, 
+                                  targetlabel_size, show_drivers_colorbar, 
+                                  drivers.get_colors(sim.index[::-1]))
 
-            if show_driverlabels:
-                y_ax.tick_params(labelleft=True) 
-                y_ax.set_yticklabels(ylbls, x=.5)
-            if drivers_colorbar:
-                prv = 0
-                bar_args = config.get_plot_args('color_bar', 0)
-                for col in drivers.get_colors(ylbls):
-                    y_ax.bar(0, 1, color=col, bottom=prv, **bar_args)
-                    prv += 1
-            
-            # X-axis setup, colorbar bottom
-            x_ax = axes[3, 1]
-            x_ax.set_xlim(0, sim.shape[1])
-            x_ax.set_xticks(np.arange(.5, sim.shape[1]))
-            if show_targetlabels:
-                x_ax.tick_params(labelbottom=True)
-                fs = targetlabel_size*config.FONTS if targetlabel_size \
-                     else config.FONTS
-                x_ax.set_xticklabels(sim.columns, rotation=45, ha='right',
-                                     fontsize=fs, rotation_mode='anchor', y=.5)
-            if targets_colorbar:
-                prv = 0
-                bar_args = config.get_plot_args('color_bar', 1)
-                for col in self.get_colors(sim.columns):
-                    x_ax.barh(0, 1, color=col, left=prv, **bar_args)
-                    prv += 1
-                
-            # HEATMAP
+            # draw heatmap
             ax = axes[2, 1]
             ax.set_yticks(np.arange(0, sim.shape[0]))
             ax.set_xticks(np.arange(0, sim.shape[1]))
-
             hm_args = {'cmap': 'RdBu_r', 'vmin': -cap, 'vmax': cap}
             if which == 'euclid':
                 if not proportional:
-                    cb_lbl = 'mean change in similarity\n[mean eulc. dist.]'
+                    cb_lbl = config.AGG_EUCL_DIFF_NOPROP
                 elif proportional:
-                    cb_lbl = 'prop. of changed target similarity'
+                    cb_lbl = config.AGG_EUCL_DIFF_PROP
             elif which == 'intersect':
                 if not proportional:
-                    cb_lbl = ('markergene intersect\n[sum of matches(1) & '
-                              'mism.(-1)]')
+                    cb_lbl = config.AGG_INTE_DIFF_NOPROP
                 elif proportional:
-                    cb_lbl = 'prop. markergene intersect'
+                    cb_lbl = config.AGG_INTE_DIFF_PROP
             if heatmap_range is not None:
                 hm_args.update({'vmin': heatmap_range[0], 
                                 'vmax': heatmap_range[1]})
             im = ax.imshow(sim.values, aspect='auto', **hm_args)
             
-            # colorbar setup
+            # setup heatmap colorbar legend and draw
             if show_colorbar_legend:
                 at = (config.CB_LEFT/width, 1-config.CB_TOP/height, 
                     config.CB_WIDTH/width, config.CB_HEIGHT/height)
@@ -398,410 +338,602 @@ class Targets(_differential):
                 cb = ax.figure.colorbar(im, cax=cax, orientation='horizontal') 
                 
                 bar_ticks = [hm_args['vmin'], hm_args['vmax']]
-                if which == 'intersect':
+                if which == 'intersect' and not proportional:
                     bar_ticks = [int(bar_ticks[0]), int(bar_ticks[1])]
                 cb.set_ticks(bar_ticks)
                 cb.ax.set_xticklabels(bar_ticks)
                 cb.ax.set_xlabel(cb_lbl)
                 cb.ax.get_xaxis().set_label_position('top')
 
-            plt.show()
             return fig, axes, (sim, ctrl_sim)
 
         spacer.info('\n\n' + config.log_plot)
         check_args()
         logger.info('Processing data...')
         data = get_data()
-        cap, max_poss_cap = get_caps()
+        cap, re_cap = get_caps()
 
         nplts, fig_widths, fig_heights = get_plot_sizes()
         logger.info('Drawing plot: {} & {}'.format(self._name, drivers._name))
         pp = util.open_file(filename)
         fig, axes, data = do_plot()
-        util.save_file(fig, filename, pp)
-        if pp:
+        # plt.show()
+        if filename.endswith('.pdf'):
+            util.save_file(fig, pp)
             pp.close()
-
+        elif filename.endswith('.png'):
+            util.save_file(fig, filename)
+        logger.info('Plot saved at {}'.format(os.path.abspath(os.curdir)))
         return fig, axes, data
         
-
-
-
-
-
 
     def gene_similarity_heatmap(self, 
                                 drivers,  
                                 which,
+                                display_genes = 'increasing',
+                                gene_number = 60,
+                                specific_genes = None,
+                                custom_target_genelist = None,
                                 differential = True,
                                 proportional = False, 
-                                norm_prop = True,
-                                gene_number = None,
-                                specific_markergenes = None,
-                                custom_target_genelist = None,
                                 
                                 heatmap_range = None,
                                 heatmap_width = None,
                                 heatmap_height = None,
             
-                                show_max_possible_bar = True,
-                                reorder_to_max_possible_bar = False,
-                                max_possible_bar_range = False,
+                                show_required_effect_bar = True,
+                                reorder_to_required_effect_bar = False,
+                                required_effect_bar_range = None,
             
                                 show_sum_plot = True,
-                                sum_plot_xlim = None,
+                                sum_plot_range = None,
                                 sum_plot_central_metric = 'mean',
+                                show_driverlabels_sum_plot = False,
                                 
                                 cluster_genes = True,
                                 show_gene_dendrogram = True,
                                 genes_colorbar = None,
                                 cluster_drivers = True,
                                 show_driver_dendrogram = False,
-                                drivers_colorbar = True,
+                                show_drivers_colorbar = False,
                                 
                                 show_genelabels = True,
-                                genelabels_space = None,
-                                genelabels_size = .8,
+                                genelabel_space = None,
+                                genelabel_size = None,
                                 bold_emphz_genes = None,
                                 show_driverlabels = True,
                                 driverlabels_space = None,
                                 title = True, 
                                 show_colorbar_legend = True,
                                 filename = 'gene_similarity_hm.pdf'):
+        
+        # check user input for errors and incompatibilities
+        def check_args():
+            nonlocal display_genes
+            nonlocal specific_genes
+            nonlocal custom_target_genelist
+            nonlocal differential
+            nonlocal proportional
 
-        def check_args():            
-            if reorder_to_max_possible_bar:
+            nonlocal show_required_effect_bar
+            nonlocal reorder_to_required_effect_bar
+            nonlocal sum_plot_central_metric
+            nonlocal cluster_genes
+            nonlocal genes_colorbar
+        
+            # check main data input
+            util.check_which(which, self, drivers)
+            if display_genes:
+                val = ['variant', 'greatest', 'increasing', 'decreasing']
+                if not differential:
+                     val = ['variant', 'distant', 'similar']
+                if display_genes not in val:
+                    logger.error('The passed value for `display_genes`: {} is'
+                                 'invalid. Valid options are {}'
+                                 .format(display_genes, val))
+                    sys.exit(1)
+                if custom_target_genelist is not None:
+                    custom_target_genelist = None
+                    logger.info('Both `display_genes` and '
+                                '`custom_target_genelist` were passed. '
+                                '`custom_target_genelist` will be ignored.')
+            elif custom_target_genelist is None and specific_genes is None:
+                logger.error('None of `display_genes`, `specific_genes` or '
+                             '`custom_target_genelist` were passed')
+                sys.exit(1)
+            elif custom_target_genelist is not None and specific_genes is not None:
+                custom_target_genelist = None
+                msg = ('Both `specific_genes` and `custom_target_genelist` were'
+                       ' passed. `custom_target_genelist` will be ignored.')
+                logger.info(msg)
+
+            # inform user of smaller input incompatibilities 
+            if which == 'intersect' and not differential:
+                differential = True
+                logger.warning('For the `intersect` similarity metric, '
+                               'differential cannot be False. Was set to True.')
+                if custom_target_genelist is not None and show_required_effect_bar:
+                    show_required_effect_bar = False
+                    msg = ('For the `intersect` similarity metric and a '
+                           '`custom_target_genelist`, the `required_effect_bar`'
+                           ' cannot be drawn. Set to False.')
+                    logger.warning(msg)
+            if proportional and not differential:
+                proportional = False
+                logger.warning('`proportional` can only be used if '
+                               '`differential` is True aswell. Set to False.')
+            if proportional and sum_plot_central_metric == 'mean':
+                sum_plot_central_metric = 'median'
+                msg = ('`proportional` and `sum_plot_central_metric` = mean'
+                       'is not meaningful because outlaying negative values '
+                       'are capped at -3. The median is used instead.')
+                logger.warning(msg)
+            if reorder_to_required_effect_bar and not show_required_effect_bar:
+                reorder_to_required_effect_bar = False
+                logger.warning('When `reorder_to_required_effect_bar` is True, '
+                               '`show_required_effect_bar` cannot be False. Set '
+                               'to False.')
+
+            if reorder_to_required_effect_bar and cluster_genes:
                 cluster_genes = False
-            if custom_target_genelist and specific_markergenes:
-                specific_markergenes = None
-            assert which in ('euclid', 'intersect'), '`which` invalid '
-            assert isinstance(drivers, Drivers), '`drivers` invalid'
+                logger.warning('Both `reorder_to_required_effect_bar` and '
+                               '`cluster_genes` were set as True. '
+                               '`cluster_genes` will be ignored.')
             
-            if custom_target_genelist is None:
-                genes = pd.DataFrame({'name': util.annotate(self._diff_mgs.index), 
-                                      'ensg': self._diff_mgs.index })
-                if specific_markergenes is not None:
-                    inv = list(filter(g not in genes.name, specific_markergenes))
-                    specific_markergenes = list(filter(g in genes.name, 
-                                                       specific_markergenes))
-                    if inv:
-                        logger.warning('{} are not markergenes in any of the '
-                                       'targets in `{}`. These genes will not '
-                                       'be included.'.format(inv, self._name))
+            # modify arguments for convneience 
+            if which == 'euclid' and not differential:
+                if display_genes == 'distant':
+                    display_genes = 'increasing'
+                elif display_genes == 'similar':
+                    display_genes = 'decreasing'
+            if genes_colorbar == True:
+                if specific_genes:
+                    genes_colorbar = dict.fromkeys(specific_genes, 
+                                                   config.colors[1])
+                else:
+                    genes_colorbar = None
 
-            elif custom_target_genelist is not None:
-                detec_genes = util.annotate(self._detec_genes)
-                inv = list(filter(g not in detec_genes, custom_target_genelist))
-                val_genes = list(filter(g in detec_genes, custom_target_genelist))
-                if inv:
-                    logger.warning('{} are not detected genes in any of the '
-                                   'targets in `{}`. These genes will not be '
-                                   'included.'.format(inv, self._name))
-                    genes = pd.DataFrame({'name': val_genes, 
-                                          'ensg': util.get_ensgs(val_genes)})
-            return genes
-                                   
-
-        if not custom_target_genelist:
-            trg = self
-        else:
-
-            cust_gl_expr = self._expr.copy().loc[genes.ensg]
-            cust_gl_diff = self._diff.copy().loc[genes.ensg]
-            cust_gl_diff.loc[:, :] = True
-            trg = Targets(cust_gl_diff, cust_gl_expr, log=False,
-                               name='custom genelist')
-
-        sim, _, ctrl_sim, _ = trg._get_from_overlap(drivers, which, 
-                                genes_diff=differential, genes_prop=proportional, 
-                                norm_prop_genes=norm_prop)
-        ctrl_sim = ctrl_sim.abs()
-
-        data = {}
-        def org_data(trg_sim, genes):
-            trg = trg_sim.columns[0][1]
-            mgt = trg_sim.columns[0][0]
-            if gene_number:
-                trg_sim.dropna(inplace=True)
-                half = int(gene_number/2) 
+            # get a list of generally valid annotated genes
+            genes = pd.DataFrame({'name': util.annotate(self._diff_mgs.index), 
+                                  'ensg': self._diff_mgs.index })
+            if specific_genes is not None or custom_target_genelist is not None:
+                # for gene input check if genes are detected in the target data
+                if specific_genes is not None:
+                    inp_gl = pd.Index(specific_genes).drop_duplicates()
+                    val_gl = pd.Index(genes.name.values)
+                    isin = 'markergenes'
+                elif custom_target_genelist is not None:
+                    inp_gl = pd.Index(custom_target_genelist).drop_duplicates()
+                    val_gl = self._detec_genes
+                    isin = 'detected genes'
+                    # if the overlap contains only driver-detected genes:
+                    if config.UNDETECTED_MARKERGENES_BEHAVIOR == 'drop':
+                        val_gl = val_gl.intersection(drivers._detec_genes)
+                        isin = 'valid genes'
+                    val_gl = pd.Index(util.annotate(val_gl))
                 
+                inv = [g for g in inp_gl if g not in val_gl]
+                inp_gl = inp_gl.drop(inv) 
+                if inv:
+                    logger.warning('{} ({}/{}) are not {} in any of the targets'
+                                   ' in `{}`. These genes will not be included.'
+                                   .format(inv, len(inv), len(inv)+len(inp_gl), 
+                                           isin, self._name))
+                    if len(inv) == (len(inv)+len(inp_gl)):
+                        sys.exit(1)
+                # update passed list
+                if specific_genes is not None:
+                    specific_genes = inp_gl
+                elif custom_target_genelist is not None:
+                    genes = pd.DataFrame({'name': inp_gl, 
+                                          'ensg': util.get_ensgs(inp_gl)})
+            return genes                   
+
+        # get the specific overlap data and pick out the genes to display
+        def get_data():
+            # init a new target where all genes are markergenes all targets
+            if custom_target_genelist:
+                nonlocal self
+                diff = pd.DataFrame(True, genes.ensg, self._diff.columns)
+                args = {'diff_genes': diff}
                 if which == 'euclid':
-                    mins = trg_sim.min(axis=1).sort_values().index[:half]
-                    maxs = trg_sim.max(axis=1).sort_values().index[-half:]
-                    this_genes = genes.set_index('ensg').reindex(mins.union(maxs))
-                    ts = trg_sim.reindex(this_genes.index)
+                    expr = self._expr.loc[genes.ensg].copy()
+                    args.update({'expression': expr})
+                self = Targets(name='custom genelist', use_down_mgs=False, 
+                               log=False, **args)
+            sim, _, ctrl_sim, _ = self._get_from_overlap(drivers, which, 
+                                                      genes_diff=differential, 
+                                                      genes_prop=proportional, 
+                                                      norm_prop_genes=True)
+            if which == 'euclid':
+                ctrl_sim = ctrl_sim.abs()
+                if not differential:
+                    sim = sim.abs()
+
+            # init mutable dict with target and markegene type keys
+            data = dict((trg, dict((mgt, None) for mgt in self._mg_types))
+                        for trg in self._names_noctrl)
+            # select genes, form the 3 data elements target simlarity (heatmap), 
+            # ctrl_sim (required_effect_bar), agg_sim (sumplot)
+            def sel_genes(trg_sim, genes):
+                mgt = trg_sim.columns[0][0]
+                trg = trg_sim.columns[0][1]
+                get_genes = pd.Index([])
+                trg_sim.dropna(inplace=True)
+                
+                if display_genes:
+                    # sort overlap based on passed metric, slice to gene number
+                    if display_genes == 'variant':
+                        idx = trg_sim.var(1).sort_values().index[::-1]
+                    elif display_genes == 'greatest' and which == 'euclid':
+                        idx = trg_sim.abs().max(1).sort_values().index[::-1]
+                    elif display_genes == 'greatest' and which == 'intersect':
+                        idx = trg_sim.abs().sum(1).sort_values().index[::-1]
+                    elif display_genes == 'increasing' and (which == 'euclid'):
+                        idx = trg_sim.max(1).sort_values().index[::-1]
+                    elif display_genes == 'decreasing' and (which == 'euclid'):
+                        idx = trg_sim.min(1).sort_values().index
+                    elif which == 'intersect':
+                        if display_genes.startswith('in') and mgt == 'down' or \
+                        display_genes.startswith('de') and mgt == 'up':
+                            asc = True
+                        elif display_genes.startswith('in') and mgt == 'up' or \
+                        display_genes.startswith('de') and mgt == 'down':
+                            asc = False
+                        idx = trg_sim.sum(1).sort_values(ascending=asc).index
+                    get_genes = idx[:gene_number]
+                    
+                if specific_genes is not None:
+                    # check if passed genelist in target markergenes add them 
+                    # if not already in 
+                    inp_ensg = util.get_ensgs(specific_genes)
+                    not_mg = filter(lambda ie: ie not in trg_sim.index, inp_ensg)
+                    inv = genes.set_index('ensg').loc[not_mg].name
+                    if not inv.empty:
+                        logger.info('{} not included: not markergenes of `'
+                                    '{}-{}`'.format(inv.tolist(), mgt, trg))
+                    add = lambda ie: not (ie in get_genes or ie in inv)
+                    add_genes = pd.Index(filter(add, inp_ensg))
+                    if not add_genes.empty:
+                        get_genes = get_genes.append(add_genes)
+                elif custom_target_genelist:
+                    get_genes = genes.ensg
+                
+                # index overlap data to genelist
+                if get_genes.empty:
+                    logger.error('No genes were picked for {}-{}.'
+                                 .format(mgt, trg))
+                    sys.exit(1)
+                ts = trg_sim.reindex(get_genes)
+                ctrl_name = mgt, trg, drivers._ctrl
+                if which == 'euclid':
+                    cs = ctrl_sim.loc[get_genes, ctrl_name]
+                elif which == 'intersect':
+                    mgt_int = 1 if mgt == 'up' else -1
+                    cs = pd.Series(mgt_int, get_genes, name=ctrl_name)
+                    agg_sim = ts.sum() *mgt_int
+                    if proportional:
+                        agg_sim /= cs.shape
+                if (which == 'euclid'):
                     if sum_plot_central_metric == 'mean':
                         agg_sim = ts.mean()
                     elif sum_plot_central_metric == 'median':
                         agg_sim = ts.median()
-                    cs = ctrl_sim.loc[this_genes.index, (mgt, trg, drivers._ctrl)]
-                
-            else:
-                ts = trg_sim.reindex(genes.ensg)
-                if sum_plot_central_metric == 'mean':
-                    agg_sim = ts.mean()
-                elif sum_plot_central_metric == 'median':
-                    agg_sim = ts.median()
-                cs = ctrl_sim.reindex(genes.ensg)
-                cs = cs.loc(1)[(mgt, trg, drivers._ctrl)]
-                if not specific_markergenes_show_none:
-                    ts.dropna(inplace=True)
-                    cs.dropna(inplace=True)
-                ord_ann_genes = genes.set_index('ensg').loc[ts.index, 'name']
-            data.update({trg: {mgt: [ts.T, cs.to_frame().T, agg_sim]}})
-        sim.groupby(axis=1, level=1, sort=False).apply(org_data, genes)
-        data_l = [d for dat in list(data.values()) for d in list(dat.values())]
-
-        mini = min([d.min().min() for dat in data_l for d in dat[::3]])
-        maxi = max([d.max().max() for dat in data_l for d in dat[::3]])
-        cap = round(max((abs(mini), abs(maxi))), 1)
-        mini = min([d.min() for dat in data_l for d in dat[2::3]])
-        maxi = max([d.max() for dat in data_l for d in dat[2::3]])
-        agg_cap = [round(mini, 1), round(maxi, 1)]
-        max_poss_cap = round(max([d.max().max() for dat in data_l 
-                                 for d in dat[1::3]]), 1)
-        if not differential:
-            cap = max_poss_cap = max((cap, max_poss_cap))
-
-
-
-        # =================================PLOT=================================
-        pp = util.open_file(filename)
-        nplts = [4, 4]
-        
-        fig_widths = [.0001] *(nplts[1] +3)
-        fig_widths[0] = driverlabels_space if driverlabels_space else config.GSH_LEFT
-        if drivers_colorbar:
-            fig_widths[1] = config.GSH_DRIVERS_COLORBAR
-        if cluster_drivers and show_driver_dendrogram:
-            fig_widths[3] = config.GSH_DRIVERS_DENDROGRAM
-        if show_sum_plot:
-            fig_widths[4] = config.GSH_SUMPLOT_SIZE
-        fig_widths[5] = config.GSH_WSPACE * (nplts[1]-1)
-        fig_widths[6] = config.GSH_RIGHT
-
-        fig_heights = [.0001] *(nplts[0] +3)
-        fig_heights[0] = config.GSH_TOP
-        if cluster_genes and show_gene_dendrogram:
-            fig_heights[1] = config.GSH_GENE_DENDROGRAM
-        if (which == 'euclid') and show_max_possible_bar:
-            fig_heights[2] = config.GSH_MAX_POSS_BAR
-        fig_heights[3] = config.GSH_SQUARESIZE *len(drivers) 
-        if heatmap_height:
-            fig_heights[3] *= heatmap_height
-        if genes_colorbar:
-            fig_heights[4] = config.GSH_GENES_COLORBAR
-        fig_heights[5] = config.GSH_HSPACE * (nplts[0]-1)
-        fig_heights[6] = genelabels_space if genelabels_space else config.GSH_BOTTOM
-
-        # duplicate height sizes and insert a spacer axis with the size of top
-        # if self._down_mgs:
-        #     nplts[0] = nplts[0] *2 +1
-        #     hs = fig_heights
-        #     fig_heights = hs[:-2] +[config.GSH_UP_DOWN_SPACE] +hs[1:-2] +[hs[-2:]]
-        #     fig_heights[-2] = config.GSH_HSPACE * (nplts[0]-1)
-        
-        for t_name, dat in data.items():
+                # store plot data in nested dict
+                data[trg][mgt] = (ts.T, cs.to_frame().T, agg_sim)
             
-            fig_widths[2] = config.GSH_SQUARESIZE *dat['up'][0].shape[1]
-            if heatmap_width:
-                fig_widths[2] *= heatmap_width
-            width, height = sum(fig_widths), sum(fig_heights)
-            fig, axes = util._init_figure(fig_widths, fig_heights, nplts, 
-                                          (config.GSH_WSPACE, config.GSH_HSPACE))
-            if trg._down_mgs:
-                [ax.set_visible(False) for ax in axes[4,:]]
+            # iterate target+markergene type
+            spacer.info('') 
+            sim.groupby(axis=1, level=(0,1), sort=False).apply(sel_genes, genes)
+            return data
 
+        # get data limits across all targets and markergene types to plot with 
+        # one consistent heatmap range 
+        def get_caps():
+             # unpack nested dict into the 3 plot data elements       
+            data_l = [e for dat in list(data.values())
+                      for d in list(dat.values()) for e in d]
+            tss, css, agss = [data_l[get::3] for get in (0,1,2)]
+            
+             # get number of genes per plot
+            n_genes = [ts.shape[1] for ts in tss]
+            if self._down_mgs:
+                n_genes = [max(tss[i].shape[1], tss[i+1].shape[1]) 
+                           for i in range(0, len(tss), 2)]
+
+             # get sum plot limits
+            agg_min = min([ags.min() for ags in agss])
+            agg_max = max([ags.max() for ags in agss])
+            agg_lim = [agg_min -abs(agg_min*.15), agg_max +abs(agg_max*.15)]
+            if which == 'euclid':
+                # get sum heatmap range
+                mini = [ts.min().sort_values()[int(ts.shape[1]*.05)] for ts in tss]
+                maxi = [ts.max().sort_values()[int(ts.shape[1]*.95)] for ts in tss]
+                cap = round(max((abs(min(mini)), abs(max(maxi)))), 1)
+                # get required_effect bar range
+                re_cap = round(max([cs.iloc[0].sort_values()[int(cs.shape[1]*.95)]
+                                   for cs in css]), 1)
+                if not differential:
+                    cap = re_cap = max((cap, re_cap))
+                cap = 1 if proportional and (cap >1) else cap
+                return cap, re_cap, agg_lim, n_genes
+                
+            if which == 'intersect' and not proportional:
+                agg_lim = int(agg_lim[0]), int(agg_lim[1])
+            return None, None, agg_lim, n_genes
+        
+        # built 2 lists with widths and heights in inches of every axes
+        def get_plot_sizes():
+            nplts = [4, 4]
+            # default size of an exes is 0
+            fig_widths = [.0001] *(nplts[1] +3)
+            # based on parameters and config constants, set all sizes
+            fig_widths[0] = driverlabels_space if driverlabels_space \
+                            else config.GSH_LEFT
+            if show_drivers_colorbar:
+                fig_widths[1] = config.GSH_DRIVERS_COLORBAR
+            # heatmap width varies across plots, a nested list stores widths
+            fig_widths[2] = [n_gs*config.GSH_SQUARESIZE for n_gs in n_genes]
+            if heatmap_width:
+                fig_widths[2] = [heatmap_width*f_ws2 for f_ws2 in fig_widths[2]]
+            if cluster_drivers and show_driver_dendrogram:
+                fig_widths[3] = config.GSH_DRIVERS_DENDROGRAM
+            if show_sum_plot:
+                fig_widths[4] = config.GSH_SUMPLOT_SIZE
+            fig_widths[5] = config.GSH_WSPACE * (nplts[1]-1)
+            fig_widths[6] = config.GSH_RIGHT
+
+            fig_heights = [.0001] *(nplts[0] +3)
+            fig_heights[0] = config.GSH_TOP
+            if cluster_genes and show_gene_dendrogram:
+                fig_heights[1] = config.GSH_GENE_DENDROGRAM
+            if show_required_effect_bar:
+                fig_heights[2] = config.GSH_REQU_EFF_BAR
+            fig_heights[3] = config.GSH_SQUARESIZE *len(drivers) 
+            if heatmap_height:
+                fig_heights[3] *= heatmap_height
+            if genes_colorbar:
+                fig_heights[4] = config.GSH_GENES_COLORBAR
+            fig_heights[5] = config.GSH_HSPACE * (nplts[0]-1)
+            fig_heights[6] = genelabel_space if genelabel_space \
+                             else config.GSH_BOTTOM
+
+            # duplicate height sizes and insert a spacer axis with size of top
+            if self._down_mgs:
+                nplts[0] = nplts[0] *2 +1
+                hs = fig_heights
+                fig_heights = hs[:-2]+[config.GSH_UP_DOWN_SPACE]+hs[1:-2]+hs[-2:]
+                fig_heights[-2] = config.GSH_HSPACE * (nplts[0]-1)
+            return nplts, fig_widths, fig_heights
+
+        # draw plot
+        def do_plot(i):
+            # get final width list for specific number of genes in plot
+            this_fig_widths = fig_widths[:2] +[fig_widths[2][i]] +fig_widths[3:]
+            width, height = sum(this_fig_widths), sum(fig_heights)
+            fig, axes = util._init_figure(this_fig_widths, fig_heights, nplts, 
+                                          (config.GSH_WSPACE, config.GSH_HSPACE))
+            if self._down_mgs:
+                [ax.set_visible(False) for ax in axes[4, :]]
+
+            # set plot title
             if title:
                 if title and type(title) is not str:
-                    this_title = ('single-gene transcriptinoal similarity\nof '
+                    this_title = ('single-gene transcriptional similarity\nof '
                                  '{} and {} '.format(drivers._name, t_name))
+                else:
+                    this_title = title
                 fig.suptitle(this_title, fontsize=config.FONTS *1.2,
-                             y=1-((config.GSH_TOP/height *.25)))
+                             y=1-((config.GSH_TOP/height *.15)))
                 
+            # iterate over up and down plot-halfs
+            for mgt, r in zip(self._mg_types, (0, 5)):
+                sim, ctrl_sim, sim_agg = dat[mgt]
 
-            # iterate over 'up' and 'down' plot-halfs
-            for (mgt, (sim, ctrl_sim, sim_agg)), r in zip(dat.items(), (0, 5)):
-
-                # cluster and draw dendrogram
+                # cluster genes/ drivers and draw dendrograms
                 if cluster_genes:
                     at = axes[r, 1] if show_gene_dendrogram else axes[r, 0]
-                    clst = sim if not specific_markergenes_show_none else sim.dropna(1)
-                    order = util._heatmap_cluster(clst, 'top', at, 'columns')
-                    if specific_markergenes_show_none:
-                        na_order = sim.columns[sim.isna().all(0)].tolist()
-                        new_pos = list(at.get_position().bounds)
-                        new_pos[2] -= len(na_order)*config.GSH_SQUARESIZE /width
-                        at.set_position(new_pos)
-                        order.extend(na_order)
+                    order = util._heatmap_cluster(sim, 'top', at, 'columns')
                     sim, ctrl_sim = util.align_indices([sim, ctrl_sim], order)
                 if cluster_drivers:
                     at = axes[2+r, 2] if show_driver_dendrogram else axes[r, 0]
-                    clst = sim if not specific_markergenes_show_none else sim.dropna(1)
-                    order = util._heatmap_cluster(clst, 'right', at, 'rows')
+                    order = util._heatmap_cluster(sim, 'right', at, 'rows')
                     sim, sim_agg = util.align_indices([sim, sim_agg], order, 0)
                 axes[r, 0].set_visible(False)
 
-                if which == 'euclid' and show_max_possible_bar:
-                    if reorder_to_max_possible_bar:
+                # draw the required_effect bar
+                if show_required_effect_bar:
+                    if reorder_to_required_effect_bar:
                         order = ctrl_sim.iloc[0].sort_values().index
                         sim, ctrl_sim = util.align_indices([sim, ctrl_sim], order)
+                    draw_cb = False
+                    if which == 'euclid':
+                        if show_colorbar_legend and (mgt == 'up') and differential:
+                            draw_cb = True
+                        cb_lbl = ('base expr. similarity\n'
+                                  '[absolute eucl. distance]')
+                        ctrl_lbl = drivers._ctrl if show_driverlabels else ''
+                        bar_args = {'vmin': 0, 'vmax': re_cap,
+                                    'cmap': 'afmhot'}
+                    elif which == 'intersect':
+                        draw_cb = False
+                        cb_lbl = None
+                        ctrl_lbl = 'target markergenes' if show_driverlabels else ''
+                        bar_args = {'vmin': -1, 'vmax': 1,
+                                    'cmap': config.RdBu_bin}
+                    if required_effect_bar_range is not None:
+                        bar_args.update({'vmin': required_effect_bar_range[0], 
+                                         'vmax': required_effect_bar_range[1]})
+                    util.plot_required_effect_bar(axes[1+r, :2], ctrl_sim, 
+                                                  ctrl_lbl, bar_args, draw_cb, 
+                                                  cb_lbl, fig, width, height)
 
-                    bar_args = config.MAX_POSSIBLE_BAR_args(0)
-                    if not max_possible_bar_range_from_config:
-                        bar_args.update({'vmin': 0, 'vmax': max_poss_cap})
-                    ctrl_lbl = drivers._ctrl if show_driverlabels else ''
-                    draw_cb = True if show_colorbar_legend else False
-                    cb_lbl = 'base similarity\n[abs. mean eucl. distance]'
-                    util.plot_max_possible_bar(axes[1+r, :2], ctrl_sim,
-                                               ctrl_lbl, bar_args, draw_cb, 
-                                               cb_lbl, fig, width, height)
-
-                # Y-axis setup, colorbar left
-                y_ax = axes[2+r, 0]
-                y_ax.set_ylim((-.1, sim.shape[0] +.01))
-                y_ax.set_yticks(np.arange(.5, sim.shape[0]))
-                ylbls = sim.index.unique(2)[::-1]
-                if show_driverlabels:
-                    y_ax.tick_params(labelleft=True)
-                    y_ax.set_yticklabels(ylbls, x=.5)
-                if drivers_colorbar:
-                    prv = 0
-                    bar_args = config.get_plot_args('color_bar', 0)
-                    for col in drivers.get_colors(ylbls):
-                        y_ax.bar(0, 1, color=col, bottom=prv, **bar_args)
-                        prv += 1
-                # if self._down_mgs:
-                #     mgt_header = '{}-regulated genes'.format(mgt)
-                #     pad = 6 if which == 'euclid' and show_max_possible_bar else 3
-                #     y_ax.set_title(mgt_header, loc='right', fontweight='bold', 
-                #                    pad=pad)
-
-
-                # X-axis setup, annotate genes, colorbar bottom (genes)
-                x_ax = axes[3+r, 1]
-                x_ax.set_xlim(0, sim.shape[1])
-                x_ax.set_xticks(np.arange(.5, sim.shape[1]))
-                gene_ns = genes.set_index('ensg').reindex(sim.columns).name.values
-                sim.columns = gene_ns
-                ctrl_sim.columns = gene_ns
-                if show_genelabels:
-                    x_ax.tick_params(labelbottom=True)
-                    fs = genelabels_size*config.FONTS if genelabels_size else config.FONTS
-                    x_ax.set_xticklabels(sim.columns, rotation=45, ha='right',
-                                         fontsize=fs, rotation_mode='anchor', y=.5)
-                # mark_genes = self._diff_mgs.index[self._diff_mgs[(mgt, t_name)]]
-                # gene_ns = genes.set_index('ensg').reindex(mark_genes).name.values
-                # if specific_markergenes_show_none:
-                #     [(ytl.set_fontweight('bold'), ytl.set_fontsize(config.FONTS *.9))
-                #     for ytl in x_ax.get_xticklabels() if ytl.get_text() in gene_ns]
-
+                # setup heatmap x axis, including the colorbar
+                xlbl = genes.set_index('ensg').reindex(sim.columns).name.values
                 if genes_colorbar:
-                    cols = []
-                    if 'default' not in genes_colorbar:
-                        genes_colorbar['default'] = '#ffffff'
-                    get_gene = lambda g: g if g in genes_colorbar else 'default'
-                    cols = [genes_colorbar[get_gene(g)] for g in sim.columns]
-                    prv = 0
-                    bar_args = config.get_plot_args('color_bar', 1)
-                    for col in cols:
-                        x_ax.barh(0, 1, color=col, left=prv, **bar_args)
-                        prv += 1
+                    default = genes_colorbar.get('default', 'w') 
+                    cols = [genes_colorbar.get(g, default) for g in xlbl]
+                    cols = [c if is_color_like(c) else default for c in cols]
+                else:
+                    cols = None
+                util.setup_heatmap_xy('x', axes[3+r, 1], xlbl, show_genelabels, 
+                                      genelabel_size, genes_colorbar, cols) 
 
-                # SUM PLOT
+                # setup heatmap y axis, including the colorbar
+                ylbl = sim.index.unique(2)[::-1]
+                util.setup_heatmap_xy('y', axes[2+r, 0], ylbl, show_driverlabels, 
+                                      genelabel_size, show_drivers_colorbar, 
+                                      drivers.get_colors(ylbl))
+                if self._down_mgs:
+                    tit = '{} markergenes'.format(mgt)
+                    axes[2+r, 0].set_title(tit, loc='right', fontweight='bold', 
+                                           fontsize=config.FONTS)
+
+                # draw sum plot on the right
                 if show_sum_plot:
+                    # general setup
+                    metric = sum_plot_central_metric
                     ax = axes[2+r, 3]
                     ax.tick_params(labelbottom=True, bottom=True)
                     axes[3+r, 3].set_visible(False)
+                    axes[1+r, 3].set_visible(False)
                     ax.set_axisbelow(True)
                     ax.xaxis.grid(alpha=0.8, linestyle='dashed')
-                    
-                    get_which = 0 if mgt == 'up' else 1
-                    bar_args = config.get_plot_args('sum_plot', get_which)
-                    xlim = bar_args.pop('xlim') 
-                    if not sum_plot_xlim_from_config:
-                        xlim = agg_cap
+
+                    # setup x axes
+                    xlim = agg_lim if not sum_plot_range else sum_plot_range
                     ax.set_xlim(xlim)
-                    ax.set_ylim(0, sim_agg.shape[0])
-                    yts = np.arange(.5, len(sim_agg))
-                    ax.set_yticks(yts)
-
-                    # get the correct label based on the data
-                    cen = sum_plot_central_metric
-                    if which == 'euclid' and differential:
-                        lbl = ('{0} change in similarity\n[{0} eulc. dist.]'
-                              .format(sum_plot_central_metric))
-                        if proportional:
-                            lbl = 'prop. of changed target similarity' 
+                    if which == 'euclid' and differential and not proportional:
+                        lbl = config.AGG_EUCL_DIFF_NOPROP
+                    if which == 'euclid' and differential and proportional:
+                        lbl = config.AGG_EUCL_DIFF_PROP
                     elif which == 'euclid' and not differential:
-                        lbl = ('abs. {} eucl. distance'
-                               .format(sum_plot_central_metric))
-                    elif which == 'intersect':
-                        lbl = 'markergene intersect\n[sum; match=1, mismatch=-1]'
-                        if proportional:
-                            lbl = ('prop. markergene intersect\n'
-                                   '[sum; match=1, mismatch=-1]')
+                        lbl = config.AGG_EUCL_NODIFF
+                    elif which == 'intersect' and not proportional:
+                        lbl = config.AGG_INTE_DIFF_NOPROP
+                    elif which == 'intersect' and proportional:
+                        lbl = config.AGG_INTE_DIFF_PROP
+                    if sum_plot_central_metric == 'median':
+                        lbl = lbl.replace('mean', 'median')
                     ax.set_xlabel(lbl)
+                    
+                    # setup y axes
+                    ndrvs = sim_agg.shape[0]
+                    ax.set_ylim(-.1, ndrvs+.1)
+                    yts = np.arange(ndrvs-.5, -.5, -1)
+                    ax.set_yticks(yts)
+                    if show_driverlabels_sum_plot:
+                        ax.tick_params(labelright=True)
+                        ax.set_yticklabels(sim_agg.index.unique(2))
 
-                    if differential:
-                        f = lambda cen: config.colors[18] if cen < 0 else \
-                                        config.color[14]
-                        colors = list(map(f, sim_agg.values[::-1]))
+                    if (which == 'euclid') and not differential:
+                        base = ctrl_sim.mean(1) if metric == 'mean' \
+                               else ctrl_sim.median(1)
+                        ax.vlines(base, 0, ndrvs)
+                    if (which == 'euclid') and differential:
+                        blue = config.colors[18] 
+                        red = config.colors[14]
+                        cols = [blue if v <0 else red for v in sim_agg.values]
                     else:
-                        colors = config.colors[19]
-                    if 'color' not in bar_args:
-                        bar_args['color'] = colors
-                    ax.barh(y=yts, width=sim_agg[::-1], **bar_args)
-
-                # HEATMAP
+                        cols = config.colors[19]
+                    ax.barh(y=yts, width=sim_agg, color=cols)
+                
+                # draw heatmap
                 ax = axes[2+r, 1]
                 ax.set_yticks(np.arange(0, sim.shape[0]))
                 ax.set_xticks(np.arange(0, sim.shape[1]))
-
-                # get lims, cmap and aspect ratio from config
                 if which == 'euclid':
                     if differential and not proportional:
-                        get_which = 0
-                        cb_lbl = 'change in similarity\n[diff. eucl. dist.]'
+                        hm_args = {'cmap': 'RdBu_r', 'vmin': -cap, 'vmax': cap}
+                        cb_lbl = ('change in expr. similarity\n'
+                                  '[differential eucl. distance]')
                     if differential and proportional:
-                        get_which = 1
-                        cb_lbl = ('prop. of changed target similarity\n'
-                                  '[prop. diff. mean eucl. dist.]')
+                        hm_args = {'cmap': 'RdBu_r', 'vmin': -cap, 'vmax': cap}
+                        cb_lbl = ('prop. of changed expr. similarity\n'
+                                  '[prop. differential eucl. dist.]')
                     if not differential:
-                        get_which = 2
-                        cb_lbl = ('absolute similarity\n'
-                                  '[abs. mean eucl. dist.]')
+                        hm_args = {'cmap': 'afmhot', 'vmin': -0, 'vmax': cap}
+                        cb_lbl = ('absolute expr. similarity\n'
+                                  '[absolute eucl. distance]')
                 elif which == 'intersect':
-                    get_which = 3
-                    cb_lbl = 'similarity\n[marker gene intersects]'
+                    hm_args = {'cmap': config.RdBu_bin, 'vmin': -1, 'vmax': 1}
+                    cb_lbl = ('differential genes similarity\n'
+                              '[target markergene intersect]')
                 
-                hm_args  = config.get_plot_args('single_gene_heatmap', get_which)
-                if not heatmap_range_from_config:
-                    hm_args.update({'vmax': cap, 'vmin': -cap})
-                im = ax.imshow(sim.values, **hm_args)
+                if heatmap_range is not None:
+                    hm_args.update({'vmin': heatmap_range[0], 
+                                    'vmax': heatmap_range[1]})
+                im = ax.imshow(sim.values, aspect='auto', **hm_args)
 
-                # colorbar setup
+                # setup heatmap colorbar legend and draw
                 if mgt == 'up' and show_colorbar_legend:
+                    # add a new axis for the colorbar
                     at = (config.CB_LEFT/width, 1-config.CB_TOP/height, 
                           config.CB_WIDTH/width, config.CB_HEIGHT/height)
                     cax = fig.add_axes(at)
                     cb = ax.figure.colorbar(im, cax=cax, orientation='horizontal') 
-                    if which == 'intersect':
-                        cb.ax.set_xticklabels(['down-regul.', 'None', 'up-regul.'])
     
-                    bar_ticks = (hm_args['vmin'], hm_args['vmax'])
-                    cb.set_ticks(bar_ticks)
-                    cb.ax.set_xticklabels(bar_ticks)
                     cb.ax.set_xlabel(cb_lbl)
                     cb.ax.get_xaxis().set_label_position('top')
+                    bar_ticks = [hm_args['vmin'], hm_args['vmax']]
+                    cb.set_ticks(bar_ticks)
+                    if which == 'intersect':
+                        bar_ticks = ('down-regul.', 'up-regul.')
+                    elif which == 'euclid' and proportional:
+                        bar_ticks[0] = '< ' + str(bar_ticks[0])
+                    cb.ax.set_xticklabels(bar_ticks)
+                dat[mgt] = sim, ctrl_sim, sim_agg
+            return fig, axes, dat
+      
+      
+        spacer.info('\n\n' + config.log_plot)
+        genes = check_args()
+        logger.info('Processing data...')
+        data = get_data()
+        spacer.info('') 
+        cap, re_cap, agg_lim, n_genes = get_caps()
 
+        logger.info('Drawing plot: {} & {}'.format(self._name, drivers._name))
+        nplts, fig_widths, fig_heights = get_plot_sizes()
+        filename, pp = util.open_file(filename)
+        ret = {}
+        for i, (t_name, dat) in enumerate(data.items()):
+            fig, axes, dat = do_plot(i)
+            logger.info('Drawing plot: {} & {}'.format(t_name, drivers._name))
             # plt.show()
-            last = False if not t_name == list(data.keys())[-1] else True
-            util.save_file(fig, filename, pp, last=last)
-        return fig, axes, data 
-    
+            ret.update({t_name: (fig, axes, dat)})
+            if filename.endswith('.pdf'):
+                util.save_file(fig, filename=filename, pp=pp)
+            elif filename.endswith('.png'):
+                util.save_file(fig, filename=filename[:-4] +'_' +t_name +'.png')
+        if filename.endswith('.pdf'):
+            pp.close()
+        logger.info('Plots saved at {}'.format(os.path.abspath(os.curdir)))
+        return ret 
     
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    # DEPRECATED
+    # DEPRECATED
+    # DEPRECATED
+    # DEPRECATED
+    # DEPRECATED
+    # DEPRECATED
+    # DEPRECATED
 
     def ranked_similarity_barplot(self,
                                   drivers,

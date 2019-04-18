@@ -62,6 +62,13 @@ class _differential:
             self._log_init()
 
     @property
+    def _names_noctrl(self):
+        ns = self._names
+        if self._ctrl and self._ctrl in ns:
+            ns.remove(self._ctrl)
+        return ns
+    
+    @property
     def _names(self):
         name_from, at = (self._expr, 0) if self._has_expr else (self._diff, 1)
         return name_from.columns.unique(at).tolist()
@@ -139,7 +146,7 @@ class _differential:
                 sys.exit(1)
             not_set = list(filter(lambda o: o not in self._colors, order)) 
             if not_set:
-                self.set_colors(dict.fromkeys(not_set, '#ffffff'))
+                self.set_colors(dict.fromkeys(not_set, '#ffffff'), log=False)
                 spacer.warning('')
                 logger.warning('Failed to get some colors of `{}`. The passed '
                                'order contains elements without a set color: {}. '
@@ -184,10 +191,17 @@ class _differential:
 
     def reorder(self, order):
         spacer.info('\n\n')
-        if len(order) != len(self._names):
+        not_ctnd = list(filter(lambda o: o not in self._names, order))
+        missing = list(filter(lambda n: n not in order, self._names))
+        if missing:
             spacer.error('')
-            logger.error('New order of elements ({}) must contain all current '
-                         'element names ({})'.format(len(order), len(self._names)))
+            logger.error('The passed order misses current element names: {}'
+                         .format(missing))
+        if not_ctnd:
+            spacer.error('')
+            logger.error('Invalid element names. Passed elements not contained '
+                         'in current element names:\n{}'.format(not_ctnd))
+        if missing or not_ctnd:
             sys.exit(1)
         self._update_data_columns(order)
         logger.info('`{}` reorderd. New order of elements:\n{}'
@@ -317,11 +331,11 @@ class _differential:
 
         msg = ('{}\nNew {}-instance created: `{}`\n\t{} ({}):\n\t\t{}\n\t'
                'Detected genes: {}{}\n\tDifferential genes loaded: {}\n\t'
-               'Expression data loaded: {}\n{}'
+               'Expression data loaded: {}'
                .format(config.log_emphz, self._type_name, self._name,
                        self._type_name, len(self), ',\n\t\t'.join(self._names), 
                        len(self._detec_genes), uniq_diff, self._has_diff, 
-                       self._has_expr, config.log_emphz))
+                       self._has_expr))
         logger.info(msg)
 
 
@@ -354,15 +368,15 @@ class _differential:
 
             if self._type_name == 'Drivers':
                 if func_name == 'reindex':
-                    self._diff_eff = self._diff_eff.reindex(names, axis=1)
+                    self._diff_eff = self._diff_eff.reindex(names, axis=1, level=1)
                 elif func_name == 'rename':
-                    self._diff_eff = self._diff_eff.rename(names, axis=1)
+                    self._diff_eff = self._diff_eff.rename(names, axis=1, level=1)
 
             elif self._type_name == 'Targets':
                 if func_name == 'reindex':
-                    self._diff_mgs = self._diff_mgs.reindex(names, axis=1)
+                    self._diff_mgs = self._diff_mgs.reindex(names, axis=1, level=1)
                 elif func_name == 'rename':
-                    self._diff_mgs = self._diff_mgs.rename(names, axis=1)
+                    self._diff_mgs = self._diff_mgs.rename(names, axis=1, level=1)
                 self._diff_mgs.dropna(how='all', inplace=True)
 
 

@@ -26,3 +26,9 @@ class Drivers(_differential):
 
         self.__class__.n_insts += 1
     
+    @property
+    def _names_noctrl(self):
+        ns = self._names
+        if self._ctrl and self._ctrl in ns:
+            ns.remove(self._ctrl)
+        return ns

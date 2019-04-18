@@ -8,7 +8,7 @@ import os
 mpl.rcParams['figure.dpi'] = 300.0
 mpl.rcParams['savefig.dpi'] = 300.0
 mpl.rcParams['font.size'] = FONTS = 2.66
-mpl.rcParams['lines.linewidth'] = 0.49995
+mpl.rcParams['lines.linewidth'] = 0.3
 mpl.rcParams['hatch.linewidth'] = 0.3333
 mpl.rcParams['patch.linewidth'] = 0.3333
 mpl.rcParams['axes.linewidth'] = 0.26664
@@ -22,21 +22,16 @@ mpl.rcParams['ytick.major.pad'] = 1.16655
 
 DPRE_PATH =  os.path.dirname(__file__) + '/../'
 SAVE_FORMAT = 'pdf'
-UNDETECTED_MARKERGENES_BEHAVIOR = 'substitute' # 'drop'
+UNDETECTED_MARKERGENES_BEHAVIOR =  'substitute'
+UNDETECTED_MARKERGENES_BEHAVIOR =  'drop'
 DESEQ2_P = .05
 LOG_DEFAULT_TARGET_INIT_REDUCED = True
 
-NORM_PROP_BAHVIOuR = {
-    'min_abs_effect'
-    'cap_type': 'proportion', #'hard_value'
-    'cap': .05, #.3
-    'change_prop_value': 'min_found', #'hard_cap', 'drop', 'none'
+NORM_PROP_SINGGENE_EUCL_BEHAVIOUR = {
+    'min_eucl_dist': .3,
+    'treat': 'to_zero', #'drop'
+    # 'treat': 'drop'
 }
-# NORM_PROP_BAHVIOuR = {
-#     'cap_type': 'hard_value',
-#     'cap': .4,
-#     'change_prop_value': 0
-# }
 
 log_emphz = '=|=|=|=|=|=|=|=|====INITIATION====|=|=|=|=|=|=|=|=|='
 log_plot = '=|=|=|=|=|=|=|=|====PLOT====|=|=|=|=|=|=|=|=|='
@@ -78,7 +73,7 @@ default_targets_colors = {
 }
 
 RdBu_bin = LinearSegmentedColormap.from_list(
-            'RdBu_binary', [colors[14], '#f6f7f7', colors[18]], 3
+            'RdBu_binary', [colors[18], '#f6f7f7', colors[14]], 3
 )
 # dendrogram_colors = [colors[19], '#589909', '#0c9691', '#13bf63']
 dendrogram_colors = ['#000000', '#000000', '#000000', '#000000']
@@ -86,7 +81,7 @@ set_link_color_palette(dendrogram_colors[1:])
 
 
 
-GSH_LEFT = .4
+GSH_LEFT = .6
 GSH_TOP = .6
 GSH_RIGHT = .2
 GSH_BOTTOM = .25
@@ -98,7 +93,7 @@ GSH_DRIVERS_COLORBAR = .03
 GSH_GENES_COLORBAR = .03
 GSH_DRIVERS_DENDROGRAM = .3
 GSH_GENE_DENDROGRAM = .3
-GSH_MAX_POSS_BAR = .04
+GSH_REQU_EFF_BAR = .04
 GSH_SQUARESIZE = .006
 GSH_SQUARESIZE = .05
 GSH_SUMPLOT_SIZE = .9
@@ -116,7 +111,7 @@ TSH_DRIVERS_COLORBAR = .03
 TSH_TARGETS_COLORBAR = .03
 TSH_DRIVER_DENDROGRAM = .3
 TSH_TARGET_DENDROGRAM = .3
-TSH_MAX_POSS_BAR = .04
+TSH_REQU_EFF_BAR = .04
 TSH_SQUARESIZE = .05
 
 
@@ -137,12 +132,24 @@ RSB_XLIM = 3
 
 
 
-CB_LEFT = .1
-CB_LEFT_SEC = .9
-CB_LEFT_TERT = 1.7
-CB_TOP = .5
+CB_LEFT = .2
+CB_LEFT_SEC = 1
+CB_LEFT_TERT = 1.8
+CB_TOP = .4
 CB_WIDTH = .65
-CB_HEIGHT = .06
+CB_HEIGHT = .04
+
+
+AGG_EUCL_DIFF_NOPROP = ('mean change in expr. similarity\n'
+                        '[differential mean eulc. dist.]')
+AGG_EUCL_DIFF_PROP = ('prop. of changed expr. similarity\n'
+                      '[prop. differential mean eucl. dist.]')
+AGG_EUCL_NODIFF = ('mean abs. expr. similarity (line = base)\n'
+                   '[mean abs. eucl. dist.]')
+AGG_INTE_DIFF_NOPROP = ('differential genes similarity\n'
+                        '[sum of matches(1) & mism.(-1)]')
+AGG_INTE_DIFF_PROP = ('prop. of target markergene intersect\n'
+                      '[sum of matches(1) & mism.(-1)]')
 
 
 
@@ -171,50 +178,50 @@ CB_HEIGHT = .06
 #     return ret[get_which] if get_which is not None else ret
 
 
-def SUM_PLOT_args(get_which):
-    # margenetype 'up' --- margenetype 'down'
-    edgecolor = ['k',     'k']
-    height =    [.6,      .6]
-    xlim =      [(-.5, .5), (-2, 2)]
+# def SUM_PLOT_args(get_which):
+#     # margenetype 'up' --- margenetype 'down'
+#     edgecolor = ['k',     'k']
+#     height =    [.6,      .6]
+#     xlim =      [(-.5, .5), (-2, 2)]
     
-    ret = [{'edgecolor': edgecolor[i], 'height': height[i], 'xlim': xlim[i]} 
-           for i in range(len(edgecolor))]
-    return ret[get_which] if get_which is not None else ret
+#     ret = [{'edgecolor': edgecolor[i], 'height': height[i], 'xlim': xlim[i]} 
+#            for i in range(len(edgecolor))]
+#     return ret[get_which] if get_which is not None else ret
 
 
-def SINGLE_GENE_HEATMAP_args(get_which):
-    # eucl. dist. --- eucl. dist. prop. --- eulcl. dist abs. --- intersect --- 
-    cmap =   ['RdBu_r', 'RdBu_r', 'afmhot_r', RdBu_bin]
-    vmin =   [-2.5,       -1,       0,          -1]
-    vmax =   [2.5,         1,       4,          1]
-    aspect = ['auto',   'auto',   'auto',     'auto']
+# def SINGLE_GENE_HEATMAP_args(get_which):
+#     # eucl. dist. --- eucl. dist. prop. --- eulcl. dist abs. --- intersect --- 
+#     cmap =   ['RdBu_r', 'RdBu_r', 'afmhot_r', RdBu_bin]
+#     vmin =   [-2.5,       -1,       0,          -1]
+#     vmax =   [2.5,         1,       4,          1]
+#     aspect = ['auto',   'auto',   'auto',     'auto']
     
-    ret = [{'cmap': cmap[i], 'vmax': vmax[i], 'vmin': vmin[i], 'aspect': aspect[i]} 
-           for i in range(len(cmap))]
-    return ret[get_which] if get_which is not None else ret
+#     ret = [{'cmap': cmap[i], 'vmax': vmax[i], 'vmin': vmin[i], 'aspect': aspect[i]} 
+#            for i in range(len(cmap))]
+#     return ret[get_which] if get_which is not None else ret
     
 
-def COLOR_BAR_args(get_which):
-    # y-colorbar --- x-colorbar
-    edgecolor = ['k', '']
+# def COLOR_BAR_args(get_which):
+#     # y-colorbar --- x-colorbar
+#     edgecolor = ['k', '']
 
-    ret = [{'edgecolor': edgecolor[i]} 
-           for i in range(len(edgecolor))]
-    return ret[get_which] if get_which is not None else ret
+#     ret = [{'edgecolor': edgecolor[i]} 
+#            for i in range(len(edgecolor))]
+#     return ret[get_which] if get_which is not None else ret
 
 
 
-def get_plot_args(of_plot, get_which=None):
-    if of_plot == 'max_possible_bar':
-        return MAX_POSSIBLE_BAR_args(get_which)
-    elif of_plot == 'accuracy_heatmap':
-        return ACCURACY_HEATMAP_args(get_which)
-    elif of_plot == 'target_similarity_heatmap':
-        return TARGET_SIMILARITY_HEATMAP_args(get_which)
-    elif of_plot == 'sum_plot':
-        return SUM_PLOT_args(get_which)
-    elif of_plot == 'single_gene_heatmap':
-        return SINGLE_GENE_HEATMAP_args(get_which)
-    elif of_plot == 'color_bar':
-        return COLOR_BAR_args(get_which)
+# def get_plot_args(of_plot, get_which=None):
+#     if of_plot == 'max_possible_bar':
+#         return MAX_POSSIBLE_BAR_args(get_which)
+#     elif of_plot == 'accuracy_heatmap':
+#         return ACCURACY_HEATMAP_args(get_which)
+#     elif of_plot == 'target_similarity_heatmap':
+#         return TARGET_SIMILARITY_HEATMAP_args(get_which)
+#     elif of_plot == 'sum_plot':
+#         return SUM_PLOT_args(get_which)
+#     elif of_plot == 'single_gene_heatmap':
+#         return SINGLE_GENE_HEATMAP_args(get_which)
+#     elif of_plot == 'color_bar':
+#         return COLOR_BAR_args(get_which)
 

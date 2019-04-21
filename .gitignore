@@ -15,7 +15,7 @@ default_targets
 test_data
 ws.code-workspace
 __pycache__
-main/__pycache__/*pyc
+main/__pycache__/*.pyc
 main/.vimrc
 news.txt
 

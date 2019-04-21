@@ -132,7 +132,7 @@ gl.saveTSV("hg38.fantom5.cancer.tsv")
 print("Number of tss: {:,}".format(len(gl)))
 
 # Some diagnostics:
-gl.tree(filename="tree.png", color_threshold=0.0, label_size=4, size=(5,18))
-gl.correlation_heatmap(filename="corr_heatmap.png", bracket=(0.0,1.0), size=(17,16), heat_wid=0.64, heat_hei=0.927, row_font_size=5)
-gl.network.conditions(filename="ctype_net.png", low_threshold=0.60, hi_threshold=0.80,
+gl.tree(filename="tree.cancer.png", color_threshold=0.0, label_size=4, size=(5,18))
+gl.correlation_heatmap(filename="corr_heatmap.cancer.png", bracket=(0.0,1.0), size=(17,16), heat_wid=0.64, heat_hei=0.927, row_font_size=5)
+gl.network.conditions(filename="ctype_net.cancer.png", low_threshold=0.60, hi_threshold=0.80,
     max_links=10, size=(16,16))

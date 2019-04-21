@@ -349,20 +349,19 @@ class Targets(_differential):
 
         spacer.info('\n\n' + config.log_plot)
         check_args()
-        logger.info('Processing data...')
         data = get_data()
         cap, re_cap = get_caps()
 
         nplts, fig_widths, fig_heights = get_plot_sizes()
         logger.info('Drawing plot: {} & {}'.format(self._name, drivers._name))
-        pp = util.open_file(filename)
+        filename, pp = util.open_file(filename)
         fig, axes, data = do_plot()
         # plt.show()
         if filename.endswith('.pdf'):
-            util.save_file(fig, pp)
+            util.save_file(fig, pp=pp)
             pp.close()
         elif filename.endswith('.png'):
-            util.save_file(fig, filename)
+            util.save_file(fig, filename=filename)
         logger.info('Plot saved at {}'.format(os.path.abspath(os.curdir)))
         return fig, axes, data
         
@@ -888,9 +887,7 @@ class Targets(_differential):
       
         spacer.info('\n\n' + config.log_plot)
         genes = check_args()
-        logger.info('Processing data...')
         data = get_data()
-        spacer.info('') 
         cap, re_cap, agg_lim, n_genes = get_caps()
 
         logger.info('Drawing plot: {} & {}'.format(self._name, drivers._name))
@@ -917,57 +914,203 @@ class Targets(_differential):
 
 
 
-
-
-
-
-
-
-
-
-
-
-    # DEPRECATED
-    # DEPRECATED
-    # DEPRECATED
-    # DEPRECATED
-    # DEPRECATED
-    # DEPRECATED
-    # DEPRECATED
-
     def ranked_similarity_barplot(self,
                                   drivers,
                                   which, 
-                                  plot_celltype_identity = False,
-                                  proportional = False,
-                                  target_numbers = None,
-                                  target_threshhold = None,
-                                  driver_numbers = None,
-      
-                                  show_updown = False,
-                                  plot_layout = None,
-                                  xlim_from_config = False,
-                                  load_overlap = True,
-                                  labelsize = 1,
-                                  show_target_labels = True,
-                                  ylabel_space = None,
-                                  colored = False,
+                                  
+                                  n_targets = 10,
+                                  show_negative = True,
+                                  rank_drivers = True,
+                                  xlim_range = None,
+                                  show_targetlabels = True,
+                                  targetlabel_size = None,
+                                  targetlabels_space = None,
+                                  show_colorbar = False,
+                                  colored_target_bars = False,
                                   title = True,
-                                  colorbar = True,
-                                  filename = 'driver_effects2.pdf'):
+                                  colored_bars = True,
+                                  filename='ranked_similarity_bp.pdf'):
 
-        # ==============================CHECK ARGS==============================
-        if show_updown and not self._down_mgs:
-            show_updown = False
-            logger.warning('No down markergenes in {}. `show_updown` == True '
-                            'is invalid. Set to False.'.format(self.name))
-        if not driver_numbers:
-            driver_numbers = len(drivers)
-        if not target_numbers:
-            target_numbers = len(self)
-        asc = True if plot_celltype_identity else False
 
-        # =================================DATA=================================
+                                #   plot_celltype_identity = False,
+                                #   proportional = False,
+                                #   target_numbers = None,
+                                #   target_threshhold = None,
+                                #   driver_numbers = None,
+                                #   show_updown = False,
+      
+                                #   plot_layout = None,
+                                #   xlim_from_config = False,
+                                #   load_overlap = True,
+                                #   labelsize = 1,
+                                #   show_target_labels = True,
+                                #   ylabel_space = None,
+                                #   colored = False,
+                                #   title = True,
+                                #   colorbar = True,
+                                #   filename = 'driver_effects2.pdf'):
+
+
+
+        def check_args():
+            nonlocal n_targets
+
+            util.check_which(which, self, drivers)
+            if not n_targets:
+                n_targets = len(self)
+                logger.warning('The number of targets `n_targets` was not '
+                               'passed. Set to all target elements ({}).'
+                               .format(len(self)))
+
+        def get_data():
+            diff_prop_ctrl = True if which == 'intersect' else False
+            _, sim, _, _ = self._get_from_overlap(drivers, which, 
+                                                  genes_agg_diff=diff_prop_ctrl, 
+                                                  genes_agg_prop=diff_prop_ctrl,
+                                                  drop_ctrl=diff_prop_ctrl)
+            sim = sim.xs('mean', 1, 0)
+            if rank_drivers and (which == 'euclid'):
+                sim = sim.reindex(sim.min(1).sort_values().index)
+            elif rank_drivers and (which == 'intersect'):
+                sim = sim.reindex(sim.max(1).sort_values(ascending=False).index)
+            
+            drop = slice(int(n_targets/2), -int(n_targets/2)) if show_negative \
+                   else slice(-1, n_targets-1, -1)
+            ascend = True if which == 'euclid' else False
+            data = {}
+            def sel_trgs(drv_row):
+                trgs = drv_row.iloc[0].sort_values(ascending=ascend)
+                data.update({trgs.name: trgs.drop(trgs.index[drop])})
+            sim.groupby(level=0).apply(sel_trgs)
+            return data
+        
+        def get_caps():
+            n_trgs = [trg_vals.shape[0] for trg_vals in list(data.values())]
+            maxi = max([trg_vals.max() for trg_vals in list(data.values())])
+            mini = min([trg_vals.min() for trg_vals in list(data.values())])
+            lims = [mini -abs(mini*.15), maxi +abs(maxi*.15)]
+            if lims[0]>=0 and lims[1]>=0:
+                lims[lims.index(min(lims))] = 0
+            elif lims[0]<=0 and lims[1]<=0:
+                lims[lims.index(max(lims))] = 0
+            return n_trgs, lims
+
+        def get_plot_sizes():
+            fig_widths = [.0001] *5
+            fig_widths[0] = targetlabels_space if targetlabels_space \
+                            else config.RSB_LEFT
+            if show_colorbar:
+                fig_widths[1] = config.TSH_TARGETS_COLORBAR
+            fig_widths[2] = config.RSB_BARSPACE
+            fig_widths[3] = .04
+            fig_widths[4] = config.RSB_RIGHT
+
+            fig_heights = [.0001] *4
+            fig_heights[0] = config.RSB_TOP
+            bs = config.RSB_BARWIDTH_SIZE+config.RSB_BETWEEN_BARS_SIZE *n_targets
+            fig_heights[1] = bs
+            fig_heights[2] = 0
+            fig_heights[3] = config.RSB_BOTTOM
+            return fig_widths, fig_heights
+        
+        def do_plot(i):
+            height, width = sum(fig_heights), sum(fig_widths)
+            fig, axes = util._init_figure(fig_widths, fig_heights, (1, 2), 
+                                          (.04,0))
+
+            ax = axes[1]
+            # main title
+            if title:
+                if title and type(title) is not str:
+                    if which == 'euclid':
+                        this_title = ('{} ranked similarity\nwith {}'
+                                      .format(d_name, self._name))
+                    elif which == 'intersect':
+                        this_title = ('{} ranked similarity change\nwith {}'
+                                      .format(d_name, self._name))
+                fig.suptitle(this_title, fontsize=config.FONTS *1.2, 
+                             y=1-(config.RSB_TOP /height/6))
+
+            # set basics for main plot like spines, grid and title
+            ax.spines['bottom'].set_visible(True)
+            ax.spines['left'].set_visible(True)
+            ax.set_axisbelow(True)
+            ax.xaxis.grid(alpha=0.8, linestyle='dashed')  
+            
+            # y-axis lim, ticks labels (linked to colorbar axes)
+            nonlocal dat
+            n = dat.shape[0] if not show_negative else dat.shape[0] +1
+            ylim = dat.shape[0], -1
+            yts = np.arange(n)
+            [(ax.set_ylim(ylim), ax.set_yticks(yts)) for ax in axes]
+            ylbls = dat.index.tolist()
+            if show_colorbar:
+                cols = self.get_colors(ylbls)
+                if show_negative:
+                    cols.insert(int(len(ylbls)/2), 'w')
+            if show_negative:
+                ylbls.insert(int(len(ylbls)/2), '')
+                dat = dat.append(pd.Series(0, [''])).reindex(ylbls)
+            if show_targetlabels:
+                fs = config.FONTS*targetlabel_size if targetlabel_size \
+                     else config.FONTS
+                axes[0].tick_params(labelleft=True)
+                axes[0].set_yticklabels(ylbls, fontsize=fs)
+            axes[0].bar(0, 1, color=cols, bottom=yts-.5)
+
+            # x axis setup
+            xlim = lims
+            if xlim_range:
+                 xlim = xlim_range
+            ax.tick_params(bottom=True, labelbottom=True)
+            ax.set_xlim(xlim)
+            xlbl = 'ranked transcriptional similarity'
+            if which == 'euclid':
+                xlbl += '\n[mean absolute eucl. distance]'
+            elif which == 'intersect':
+                xlbl += ' changes\n[prop. of target markergene intersect]'
+            ax.set_xlabel(xlbl)
+            
+            # barplot
+            ax.barh(yts, dat, color=config.colors[19])
+
+            return fig, axes
+
+            plt.show()
+
+
+
+
+
+
+
+        spacer.info('\n\n' + config.log_plot)
+        check_args()
+        data = get_data()
+        n_trgs, lims = get_caps()
+
+        fig_widths, fig_heights = get_plot_sizes()
+        logger.info('Drawing plot: {} & {}'.format(self._name, drivers._name))
+        filename, pp = util.open_file(filename)
+        ret = {}
+        for i, (d_name, dat) in enumerate(data.items()):
+            fig, axes = do_plot(i)
+            logger.info('Drawing plot: {} & {}'.format(d_name, drivers._name))
+
+            ret.update({d_name: (fig, axes, dat)})
+            if filename.endswith('.pdf'):
+                util.save_file(fig, filename=filename, pp=pp)
+            elif filename.endswith('.png'):
+                util.save_file(fig, filename=filename[:-4] +'_' +t_name +'.png')
+        if filename.endswith('.pdf'):
+            pp.close()
+        logger.info('Plots saved at {}'.format(os.path.abspath(os.curdir)))
+        return ret 
+
+
+
+
+
         data = self.get_from_overlap(drivers, which, eff_prop=proportional, drop_ctrl=False,
                                      standardize_down_mgs=True, eff_diff=not asc)
         # get sigle effects, slice with passed arguaments to relevent ones
@@ -1009,30 +1152,6 @@ class Targets(_differential):
         btw_bars = config.RSB_BETWEEN_BARS_SIZE /config.RSB_BARWIDTH_SIZE
         bar_width = 1 +btw_bars if not show_updown else 1.5 +btw_bars
 
-        # set widths in inches for every axis element
-        fig_widths = [.0001] *5
-        fig_widths[0] = config.RSB_LEFT
-        fig_widths[1] = ylabel_space if ylabel_space else config.RSB_YLABELSPACE
-        if colorbar:
-            fig_widths[2] = config.RSB_TARGETS_COLORBAR
-        fig_widths[3] = config.RSB_BARSPACE
-        fig_widths[4] = config.RSB_RIGHT
-        f_ws = fig_widths
-        fig_widths = [f_ws[0]] + f_ws[1:-1]*plot_layout[1] + [f_ws[-1]]
-        fig_widths.insert(-1, config.RSB_WSPACE * (nplts[1]-1))
-
-        # set heights in inches for every axis element and the space between
-        fig_heights = [.0001] *(plot_layout[0] +2)
-        fig_heights[0] = config.RSB_TOP
-        fig_heights[1:-1] = [bar_ws *n for n in row_n_trgs]
-        fig_heights[-1] = config.RSB_BOTTOM
-        fig_heights.insert(-1, config.RSB_HSPACE * (nplts[0]-1))
-
-        # init barplot with set size
-        width, height = sum(fig_widths), sum(fig_heights)
-        fig, axes = util._init_figure(fig_widths, fig_heights, nplts, 
-                                       (config.RSB_WSPACE, config.RSB_HSPACE))
-        axes = axes.flatten()
 
         # main title
         if title:

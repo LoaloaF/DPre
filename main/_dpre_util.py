@@ -81,17 +81,7 @@ def align_indices(data, order, axis=1):
             data[i] = data[i].reindex(order, axis=axis)
     return data
 
-# simplify
-def filter_trgs(d, max_n, val_th, single_mean=False, ascending=False):
-    keep = d.xs('mean', level=-1).iloc[0]
-    keep = keep.sort_values(ascending=ascending)[:max_n]
-    if val_th:
-        keep = keep[keep /keep[0] >val_th]
-    if not single_mean:
-        d.loc(1)[~d.columns.isin(keep.index)] = np.nan
-    else:
-        d = keep
-    return d
+
 
 def check_which(which, trg, drv):
     msg = 'The {} were initiated without {} data. Cannot use `{}` similarity.'
@@ -153,11 +143,13 @@ def _init_figure(fig_widths, fig_heights, nplts, spacers):
     width, height = sum(fig_widths), sum(fig_heights)
     ratio = {'width_ratios': list(map(lambda w: w/width, 
                                         fig_widths[1:-2])),
-                'height_ratios': list(map(lambda h: h/height, 
+             'height_ratios': list(map(lambda h: h/height, 
                                         fig_heights[1:-2]))}
     # init figure
     fig, axes = plt.subplots(*nplts, figsize=(width, height), 
                                 gridspec_kw=ratio)
+    if not isinstance(axes, np.ndarray):
+        axes = np.array([axes])
     axes = clean_axes(axes)
     
     wspace_prop = spacers[0] /np.array(fig_widths[1:-2]).mean()

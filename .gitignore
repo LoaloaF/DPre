@@ -2,11 +2,23 @@
 .DS_Store
 *.txt.gz
 *.png
+*.pdf
 *.tsv
 *.glb
-DPreeee.py	
+*.pyc
+
+
+DPreeee.py
+test.py
+tempCodeRunnerFile.py
 default_targets
 test_data
+ws.code-workspace
+__pycache__
+main/__pycache__/*pyc
+main/.vimrc
+news.txt
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

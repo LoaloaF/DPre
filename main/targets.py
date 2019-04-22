@@ -7,7 +7,7 @@ import copy
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 from matplotlib.colors import is_color_like
-
+from matplotlib.lines import Line2D
 
 from DPre.main._differential import _differential
 from DPre.main.drivers import Drivers
@@ -81,29 +81,21 @@ class Targets(_differential):
             return m.mask(m == 2, 1).mask(m == 1, 0).mask(m == 0, -1)
         do_ovp = eucl_dist if which == 'euclid' else mg_inters
         ovp = drv_ext.groupby(axis=1, level=(0,2), sort=False).apply(do_ovp)
-        
 
         self._overlaps['{}-{}'.format(id(drivers), which)] = ovp
         return ovp
 
 
     def _get_from_overlap(self, drivers, which, genes_diff=False, genes_prop=False,
-                          norm_prop_genes=True,
                           genes_agg_diff=False, genes_agg_prop=False, 
-                          idx_slice=pd.IndexSlice[:, :, :], 
                           drop_ctrl=True, inters_to_updown_not=True):
 
-        # ==============================CHECK ARGS==============================
-        if which == 'euclid':
-            if idx_slice[2] != slice(None) and drivers._ctrl not in idx_slice[2]:
-                idx_slice = (*idx_slice[:2], idx_slice[2]+[drivers._ctrl])
-            if genes_agg_prop and not genes_agg_diff:
-                genes_agg_prop = False
+        if genes_agg_prop and not genes_agg_diff:
+            genes_agg_prop = False
         try:
-            ovp = self._overlaps['{}-{}'.format(id(drivers), which)]
+            ovp = self._overlaps['{}-{}'.format(id(drivers), which)].copy()
         except KeyError:
-            ovp = self._overlap_drivers(drivers, which)
-        ovp = ovp.loc(1)[idx_slice].copy()
+            ovp = self._overlap_drivers(drivers, which).copy()
 
         if which == 'euclid':
             ctrl_genes = ovp.xs(drivers._ctrl, 1, 2, False)
@@ -159,7 +151,6 @@ class Targets(_differential):
                 ovp.drop(drivers._ctrl, axis=1, level=2, inplace=True)
                 agg.drop(drivers._ctrl, inplace=True)
             return ovp, agg, None, n_mgs
-
 
     def target_similarity_heatmap(self, 
                                   drivers, 
@@ -269,6 +260,8 @@ class Targets(_differential):
                 if title and type(title) is not str:
                     this_title = ('transcriptinoal similarity\nof {} and {} '
                                   .format(drivers._name, self._name))
+                    if differential:
+                        this_title = 'change in ' +this_title
                 fig.suptitle(this_title, fontsize=config.FONTS *1.2,
                              y=1-((config.GSH_TOP/height *.1)))
 
@@ -542,8 +535,7 @@ class Targets(_differential):
                                log=False, **args)
             sim, _, ctrl_sim, _ = self._get_from_overlap(drivers, which, 
                                                       genes_diff=differential, 
-                                                      genes_prop=proportional, 
-                                                      norm_prop_genes=True)
+                                                      genes_prop=proportional)
             if which == 'euclid':
                 ctrl_sim = ctrl_sim.abs()
                 if not differential:
@@ -887,10 +879,10 @@ class Targets(_differential):
       
         spacer.info('\n\n' + config.log_plot)
         genes = check_args()
+        logger.info('Drawing plot: {} & {}'.format(self._name, drivers._name))
         data = get_data()
         cap, re_cap, agg_lim, n_genes = get_caps()
 
-        logger.info('Drawing plot: {} & {}'.format(self._name, drivers._name))
         nplts, fig_widths, fig_heights = get_plot_sizes()
         filename, pp = util.open_file(filename)
         ret = {}
@@ -907,83 +899,70 @@ class Targets(_differential):
             pp.close()
         logger.info('Plots saved at {}'.format(os.path.abspath(os.curdir)))
         return ret 
-    
-
-
-
-
-
 
     def ranked_similarity_barplot(self,
                                   drivers,
                                   which, 
+                                  differential=True,
+                                  proportional=True,
                                   
-                                  n_targets = 10,
-                                  show_negative = True,
+                                  n_targets = 16,
                                   rank_drivers = True,
+                                  show_negative = True,
                                   xlim_range = None,
                                   show_targetlabels = True,
-                                  targetlabel_size = None,
                                   targetlabels_space = None,
                                   show_colorbar = False,
-                                  colored_target_bars = False,
-                                  title = True,
                                   colored_bars = True,
+                                  title = True,
                                   filename='ranked_similarity_bp.pdf'):
 
-
-                                #   plot_celltype_identity = False,
-                                #   proportional = False,
-                                #   target_numbers = None,
-                                #   target_threshhold = None,
-                                #   driver_numbers = None,
-                                #   show_updown = False,
-      
-                                #   plot_layout = None,
-                                #   xlim_from_config = False,
-                                #   load_overlap = True,
-                                #   labelsize = 1,
-                                #   show_target_labels = True,
-                                #   ylabel_space = None,
-                                #   colored = False,
-                                #   title = True,
-                                #   colorbar = True,
-                                #   filename = 'driver_effects2.pdf'):
-
-
-
+        # check user input for errors and incompatibilities around `which` arg
         def check_args():
             nonlocal n_targets
-
+            nonlocal differential
+            nonlocal proportional
             util.check_which(which, self, drivers)
+            if which == 'intersect' and not differential:
+                differential = True
+                logger.warning('For the `intersect` similarity metric, '
+                               'differential cannot be False. Was set to True.')
+            if proportional and not differential:
+                proportional = False
+                logger.warning('`proportional` can only be used if '
+                               '`differential` is True aswell. Set to False.')
             if not n_targets:
                 n_targets = len(self)
                 logger.warning('The number of targets `n_targets` was not '
                                'passed. Set to all target elements ({}).'
                                .format(len(self)))
 
+        # get the aggrevated overlap data for plotting, pick the targets
         def get_data():
-            diff_prop_ctrl = True if which == 'intersect' else False
-            _, sim, _, _ = self._get_from_overlap(drivers, which, 
-                                                  genes_agg_diff=diff_prop_ctrl, 
-                                                  genes_agg_prop=diff_prop_ctrl,
-                                                  drop_ctrl=diff_prop_ctrl)
+            dr_ctrl = True if differential else False
+            _, sim, _, ctrl_sim = self._get_from_overlap(drivers, which, 
+                                                    genes_agg_diff=differential, 
+                                                    genes_agg_prop=proportional,
+                                                    drop_ctrl=dr_ctrl)
             sim = sim.xs('mean', 1, 0)
-            if rank_drivers and (which == 'euclid'):
-                sim = sim.reindex(sim.min(1).sort_values().index)
-            elif rank_drivers and (which == 'intersect'):
-                sim = sim.reindex(sim.max(1).sort_values(ascending=False).index)
+            if rank_drivers:
+                if differential:
+                    order = sim.max(1).sort_values(ascending=False).index
+                else:
+                    order = sim.min(1).sort_values().index
+                sim = sim.reindex(order)
             
             drop = slice(int(n_targets/2), -int(n_targets/2)) if show_negative \
                    else slice(-1, n_targets-1, -1)
-            ascend = True if which == 'euclid' else False
-            data = {}
+            ascend = False if differential else True
+            data = dict.fromkeys(sim.index, None)
             def sel_trgs(drv_row):
                 trgs = drv_row.iloc[0].sort_values(ascending=ascend)
-                data.update({trgs.name: trgs.drop(trgs.index[drop])})
+                data[trgs.name] = trgs.drop(trgs.index[drop])
             sim.groupby(level=0).apply(sel_trgs)
-            return data
+            return data, ctrl_sim
         
+        # get plot global limits
         def get_caps():
             n_trgs = [trg_vals.shape[0] for trg_vals in list(data.values())]
             maxi = max([trg_vals.max() for trg_vals in list(data.values())])
@@ -995,52 +974,49 @@ class Targets(_differential):
                 lims[lims.index(max(lims))] = 0
             return n_trgs, lims
 
+        # built 2 lists with widths and heights in inches of every axes
         def get_plot_sizes():
             fig_widths = [.0001] *5
             fig_widths[0] = targetlabels_space if targetlabels_space \
                             else config.RSB_LEFT
             if show_colorbar:
-                fig_widths[1] = config.TSH_TARGETS_COLORBAR
+                fig_widths[1] = config.RSB_TARGETS_COLORBAR
             fig_widths[2] = config.RSB_BARSPACE
             fig_widths[3] = .04
             fig_widths[4] = config.RSB_RIGHT
 
             fig_heights = [.0001] *4
             fig_heights[0] = config.RSB_TOP
-            bs = config.RSB_BARWIDTH_SIZE+config.RSB_BETWEEN_BARS_SIZE *n_targets
-            fig_heights[1] = bs
+            fig_heights[1] = config.RSB_BARWIDTH_SIZE *n_targets
             fig_heights[2] = 0
             fig_heights[3] = config.RSB_BOTTOM
             return fig_widths, fig_heights
         
-        def do_plot(i):
+        # draw plot
+        def do_plot(i, dat):
             height, width = sum(fig_heights), sum(fig_widths)
             fig, axes = util._init_figure(fig_widths, fig_heights, (1, 2), 
                                           (.04,0))
-
             ax = axes[1]
-            # main title
+            ax.spines['bottom'].set_visible(True)
+            ax.spines['left'].set_visible(True)
+
+            # set plot title
             if title:
                 if title and type(title) is not str:
-                    if which == 'euclid':
-                        this_title = ('{} ranked similarity\nwith {}'
-                                      .format(d_name, self._name))
-                    elif which == 'intersect':
-                        this_title = ('{} ranked similarity change\nwith {}'
-                                      .format(d_name, self._name))
+                    this_title = ('transcriptinoal similarity\nof {} and {} '
+                                  .format(drivers._name, self._name))
+                    if differential:
+                        this_title = 'change in ' +this_title
+                    this_title = 'ranked ' +this_title
+                else:
+                    this_title = title
                 fig.suptitle(this_title, fontsize=config.FONTS *1.2, 
                              y=1-(config.RSB_TOP /height/6))
 
-            # set basics for main plot like spines, grid and title
-            ax.spines['bottom'].set_visible(True)
-            ax.spines['left'].set_visible(True)
-            ax.set_axisbelow(True)
-            ax.xaxis.grid(alpha=0.8, linestyle='dashed')  
-            
-            # y-axis lim, ticks labels (linked to colorbar axes)
-            nonlocal dat
+            # setup y axis including the colorbar
             n = dat.shape[0] if not show_negative else dat.shape[0] +1
-            ylim = dat.shape[0], -1
+            ylim = n, -1
             yts = np.arange(n)
             [(ax.set_ylim(ylim), ax.set_yticks(yts)) for ax in axes]
             ylbls = dat.index.tolist()
@@ -1048,222 +1024,71 @@ class Targets(_differential):
                 cols = self.get_colors(ylbls)
                 if show_negative:
                     cols.insert(int(len(ylbls)/2), 'w')
+            # if negative, insert a gab between the two groups 
             if show_negative:
                 ylbls.insert(int(len(ylbls)/2), '')
                 dat = dat.append(pd.Series(0, [''])).reindex(ylbls)
+                line_args = {'xdata': (-.02, .02), 'transform': ax.transAxes, 
+                             'clip_on': False, 'color': 'k'}
+                ax.add_line(Line2D(ydata=(.495, .515), **line_args))
+                ax.add_line(Line2D(ydata=(.485, .505), **line_args))
             if show_targetlabels:
-                fs = config.FONTS*targetlabel_size if targetlabel_size \
-                     else config.FONTS
                 axes[0].tick_params(labelleft=True)
-                axes[0].set_yticklabels(ylbls, fontsize=fs)
+                axes[0].set_yticklabels(ylbls, fontsize=config.FONTS)
             axes[0].bar(0, 1, color=cols, bottom=yts-.5)
 
-            # x axis setup
+            # setup x axis
             xlim = lims
             if xlim_range:
                  xlim = xlim_range
             ax.tick_params(bottom=True, labelbottom=True)
             ax.set_xlim(xlim)
-            xlbl = 'ranked transcriptional similarity'
-            if which == 'euclid':
-                xlbl += '\n[mean absolute eucl. distance]'
-            elif which == 'intersect':
-                xlbl += ' changes\n[prop. of target markergene intersect]'
+            ax.set_axisbelow(True)
+            ax.xaxis.grid(alpha=0.8, linestyle='dashed')  
+            if which == 'euclid' and differential and not proportional:
+                xlbl = config.AGG_EUCL_DIFF_NOPROP
+            if which == 'euclid' and differential and proportional:
+                xlbl = config.AGG_EUCL_DIFF_PROP
+            elif which == 'euclid' and not differential:
+                xlbl = config.AGG_EUCL_NODIFF
+            elif which == 'intersect' and not proportional:
+                xlbl = config.AGG_INTE_DIFF_NOPROP
+            elif which == 'intersect' and proportional:
+                xlbl = config.AGG_INTE_DIFF_PROP
             ax.set_xlabel(xlbl)
-            
-            # barplot
-            ax.barh(yts, dat, color=config.colors[19])
 
+            # draw barplot, draw untreated control line if absolute euclid 
+            if which == 'euclid' and not differential:
+                xs = ctrl_sim.loc[drivers._ctrl, 'mean'].reindex(ylbls, axis=1)
+                ax.vlines(xs, yts-.4, yts+.4, linewidth=.5)
+            if not colored_bars:
+                cols = config.colors[19]
+            else:
+                blue = config.colors[18] 
+                red = config.colors[14]
+                cols = [blue if v <0 else red for v in dat.values]
+            ax.barh(yts, dat, color=cols)
             return fig, axes
-
-            plt.show()
-
-
-
-
-
-
 
         spacer.info('\n\n' + config.log_plot)
         check_args()
-        data = get_data()
+        logger.info('Drawing plot: {} & {}'.format(self._name, drivers._name))
+        data, ctrl_sim = get_data()
         n_trgs, lims = get_caps()
 
         fig_widths, fig_heights = get_plot_sizes()
-        logger.info('Drawing plot: {} & {}'.format(self._name, drivers._name))
         filename, pp = util.open_file(filename)
         ret = {}
         for i, (d_name, dat) in enumerate(data.items()):
-            fig, axes = do_plot(i)
+            fig, axes = do_plot(i, dat)
             logger.info('Drawing plot: {} & {}'.format(d_name, drivers._name))
-
+            # plt.show()
             ret.update({d_name: (fig, axes, dat)})
             if filename.endswith('.pdf'):
                 util.save_file(fig, filename=filename, pp=pp)
             elif filename.endswith('.png'):
-                util.save_file(fig, filename=filename[:-4] +'_' +t_name +'.png')
+                util.save_file(fig, filename=filename[:-4] +'_' +d_name +'.png')
         if filename.endswith('.pdf'):
             pp.close()
         logger.info('Plots saved at {}'.format(os.path.abspath(os.curdir)))
         return ret 
-
-
-
-
-
-        data = self.get_from_overlap(drivers, which, eff_prop=proportional, drop_ctrl=False,
-                                     standardize_down_mgs=True, eff_diff=not asc)
-        # get sigle effects, slice with passed arguaments to relevent ones
-        data = data[1].reset_index(level=0, drop=True)
-        if plot_celltype_identity:
-            sor = data.xs('mean', level=1).min(axis=1).sort_values(ascending=asc)
-        else:    
-            sor = data.xs('mean', level=1).max(axis=1).sort_values(ascending=asc)
-            
-        data = data.reindex(sor.index[:driver_numbers], level=0)
-        data[data < 0] = np.nan
-        # print(data)
-        data = data.groupby(level=0).apply(util.filter_trgs, target_numbers, 
-                                           target_threshhold, ascending=asc)
-
-        # =================================PLOT=================================
-        pp = util.open_file(filename)
-        drv_ns = data.index.unique(0)
-
-        # set plotlayout if not passed to 3 columns
-        if not plot_layout:
-            if not len(drv_ns) %3:
-                plot_layout = (int(len(drv_ns)/3), 3)
-            else:
-                plot_layout = (int(len(drv_ns)/3) +1, 3)
-        nplts = plot_layout[0], plot_layout[1] *3
-        
-        # get max targets per plot and plot-row to adjust height accordingly
-        n_trgs = data.xs('mean', level=1).notna().sum(axis=1)
-        n_cols = plot_layout[1]
-        row_n_trgs = [max(n_trgs[i*n_cols: i*n_cols +n_cols]) 
-                      for i in range(len(n_trgs)) if i*n_cols < len(n_trgs)]
-        
-        # `bar_ws` for bar width in inches for defining figure height
-        bar_ws = config.RSB_BARWIDTH_SIZE + config.RSB_BETWEEN_BARS_SIZE
-        if show_updown:
-            bar_ws += config.RSB_BARWIDTH_SIZE *.5
-        # `btw_bars` and `bar_width` define sizes in plot scale
-        btw_bars = config.RSB_BETWEEN_BARS_SIZE /config.RSB_BARWIDTH_SIZE
-        bar_width = 1 +btw_bars if not show_updown else 1.5 +btw_bars
-
-
-        # main title
-        if title:
-            if title and type(title) is not str:
-                if plot_celltype_identity:
-                    title = ('{} cell type identity: {}'
-                            .format(drivers.name, self.name))
-                else:
-                    title = ('{} target prediction: {}'
-                            .format(drivers.name, self.name))
-
-            fig.suptitle(title, fontsize=config.FONTS *1.2, 
-                         y=1-(config.RSB_TOP /height/2))
-
-        # iterate over the single plots
-        row = 0
-        for i in range(len(drv_ns)):
-            axe = axes[i*3:i*3 +3]
-            dat = data.loc[drv_ns[i]].dropna(axis=1)
-            if i and not i % plot_layout[1]:
-                row +=1
-
-            # set basics for main plot like spines, grid and title
-            ax = axe[2]
-            ax.spines['bottom'].set_visible(True)
-            ax.spines['left'].set_visible(True)
-            ax.set_axisbelow(True)
-            ax.xaxis.grid(alpha=0.8, linestyle='dashed')  
-            ax.set_title(drv_ns[i], fontsize=config.FONTS *1.1, pad=1)
-
-            # y-axis lim, ticks labels (linked to colorbar axes)
-            c_yts = np.arange(0, dat.shape[1]*bar_width, bar_width)
-            # occasional floating inaccuracy
-            if len(c_yts) != dat.shape[1]:
-                c_yts = c_yts[:dat.shape[1]]
-            ylim = row_n_trgs[row]*bar_width, -bar_width/2
-            axe[1].set_ylim(ylim)
-            axe[2].set_ylim(ylim)
-            axe[1].set_yticks(c_yts)
-            axe[2].set_yticks(c_yts)
-            ylbls = dat.sort_values(by='mean', ascending=asc, axis=1).columns
-            if show_target_labels:
-                fs = config.FONTS *labelsize
-                axe[1].tick_params(left=True, labelleft=True)
-                axe[1].set_yticklabels(ylbls, fontsize=fs)
-
-            # x axis setup
-            if not xlim_from_config:
-                xlim = data.max().max() + data.max().max()/8
-            else:
-                 xlim = config.RSB_XLIM
-            ax.tick_params(bottom=True, labelbottom=True)
-            ax.set_xlim(0, xlim)
-            # only show xlabel for plots in last respective row
-            if i >= len(data.index.unique(0)) -plot_layout[1]:
-                if which == 'euclid':
-                    xlbl = 'z-trans. eucliden distance'
-                    if not plot_celltype_identity:
-                        xlbl += ' reduction'
-                elif which == 'intersect':
-                    xlbl = 'differential gene intersection'
-                if proportional:
-                    xlbl = 'proportional  ' + xlbl
-                ax.set_xlabel(xlbl)
-
-            # setup colorbar indicating targets
-            if colorbar:
-                bar_args = config.color_bar()
-                bar_width_no_btw = bar_width -btw_bars
-                tick_adj = 0 if not show_updown else .25
-                bottom = [t +tick_adj -bar_width_no_btw/2 for t in c_yts]
-                
-                colors = self.get_colors(ylbls)
-                for j in range(len(colors)):
-                    axe[1].bar(0, bar_width_no_btw, color=colors[j], 
-                               bottom=bottom[j], **bar_args)
-            # draw barplot
-            dat = dat.sort_values(by='mean', ascending=asc, axis=1)
-            bar_args = config.default_single_hbarplot(0)
-            if colored:
-                cols = self.get_colors(ylbls)
-                bar_args['color'] = cols
-            axe[2].barh(y = c_yts, 
-                        width = dat.loc['mean'], 
-                        height = 1, 
-                        **bar_args)
-
-            # up- and down colorbar
-            if show_updown:
-                up = dat.loc['up'] /2
-                down = dat.loc['down'] /2
-                down_neg = (up >0) & (down <0)
-                if any(down_neg.values):
-                    up.loc[down_neg.values] = dat.loc['mean']
-                    down.loc[down_neg.values] = 0
-                
-                up_args = config.default_single_hbarplot(1)
-                ax.barh(y = c_yts +.75, 
-                        width = up, 
-                        height = .5, 
-                        label = 'up-regul. genes', 
-                        **up_args)
-                down_args = config.default_single_hbarplot(2)
-                ax.barh(y = c_yts +.75,
-                        width = down, 
-                        height = .5, 
-                        left = up, 
-                        label = 'down-regul. genes', 
-                        **down_args)
-                if i == 0:
-                    # up and down bar legend
-                    fig.legend(ncol=2, loc='lower center', 
-                               bbox_to_anchor=(.5, config.RSB_BOTTOM/height *1/10))
-        # plt.show()
-        util.save_file(fig, filename, pp, last=True)

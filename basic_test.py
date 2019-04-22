@@ -127,11 +127,16 @@ t = TARGET('embryonic', sort=False, colors_from_file=True)
 
 
 t.ranked_similarity_barplot(c, 'euclid',
-                            rank_drivers=False,
+                            differential=True,
+                            proportional=True,
+                            rank_drivers=True,
                             show_negative=True,
-                            n_targets=20,
+                            
                             show_colorbar=True,
                             colored_bars=True,
+                            show_targetlabels=True,
+                            title=True,
+                            filename='testfiles.png'
 
 
 

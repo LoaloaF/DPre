@@ -9,13 +9,10 @@ import DPre.main.config as config
 from DPre.main._logger import logger, spacer
 
 class _differential:
-    
-
     def __init__(self, diff_genes,  expression, ctrl, override_diff_names,
-                 name, log, use_down_mgs=None):
+                 name, log):
 
-        
-        self._name = name if name else self._type_name+str(self.__class__.n_insts)
+        self._name = name if name else self._type_name
         self._ctrl = ctrl
         self._colors = {}
         self._has_expr = False
@@ -41,7 +38,6 @@ class _differential:
                     self._diff = self._diff.xs('up', 1, 0, False)
                 if 'down' not in self._diff.columns.unique(0):
                     self._down_mgs = False
-                    self._mg_types = ['up']
             if log:
                 spacer.info('')
                 logger.info('Number of differential genes: \n{}'
@@ -50,13 +46,18 @@ class _differential:
             if self._has_expr:
                 self._diff = self._diff.reindex(self._expr.index).fillna(False)
                 self._is_expr_diff_compatible(override_diff_names, log)
-            # self._detec_genes = self._diff.index
+        elif self._type_name == 'Targets':
+            self._down_mgs = False
+            logger.warning('The targets `{}` are initiated without marker '
+                           'genes. Note that comparing against all genes can '
+                           'lead to low accuracy for defining transcr. '
+                           'similarity.'.format(self._name))
+
         
         if not self._has_expr and not self._has_diff:
             spacer.error('')
-            logger.error('One of `expression` | `diff_genes` must be passed.')
+            logger.error('One of `expression` and `diff_genes` must be passed.')
             sys.exit(1)
-
         if log:
             spacer.info('\n\n')
             self._log_init()
@@ -99,7 +100,6 @@ class _differential:
     def get_name(self, name):
         return self._name
 
-
     def get_names(self):
         return self._names
 
@@ -110,7 +110,7 @@ class _differential:
             if len(names) != len(prv_names):
                 spacer.error('\n')
                 logger.error('The passed list of element names ({}) must '
-                             'contain all current names ({}).'
+                             'have the same length as the current one ({}).'
                              .format(len(names), len(prv_names)))
                 sys.exit(1)
             df = pd.DataFrame({'current names: ': prv_names, 
@@ -336,47 +336,50 @@ class _differential:
                        self._type_name, len(self), ',\n\t\t'.join(self._names), 
                        len(self._detec_genes), uniq_diff, self._has_diff, 
                        self._has_expr))
+        if self._type_name == 'Samples':
+            msg += '\n\tPassed control: {}'.format(bool(self._ctrl))
         logger.info(msg)
 
 
     def _update_data_columns(self, names, func_name='reindex'):
+        args = {'labels': names, 'axis':1,}
         # how do I pass a function independent from the caller...?
         if self._has_expr:
             if func_name == 'reindex':
-                self._expr = self._expr.reindex(names, axis=1, level=0)
+                self._expr = self._expr.reindex(**args, level=0)
             elif func_name == 'rename':
-                self._expr = self._expr.rename(names, axis=1, level=0)
+                self._expr = self._expr.rename(**args, level=0)
                 
             if self._type_name == 'Drivers':
                 if func_name == 'reindex':
-                    self._expr_eff = self._expr_eff.reindex(names, axis=1, level=1)
+                    self._expr_eff = self._expr_eff.reindex()
                 elif func_name == 'rename':
-                    self._expr_eff = self._expr_eff.rename(names, axis=1, level=1)
+                    self._expr_eff = self._expr_eff.rename(**args, level=1)
 
             elif self._type_name == 'Targets':
                 if func_name == 'reindex':
-                    self._expr_mgs = self._expr_mgs.reindex(names, axis=1, level=1)
+                    self._expr_mgs = self._expr_mgs.reindex(**args, level=1)
                     self._expr_mgs.dropna(how='all', inplace=True)
                 elif func_name == 'rename':
-                    self._expr_mgs = self._expr_mgs.rename(names, axis=1, level=1)
+                    self._expr_mgs = self._expr_mgs.rename(**args, level=1)
                 
         if self._has_diff:
             if func_name == 'reindex':
-                self._diff = self._diff.reindex(names, axis=1, level=1)
+                self._diff = self._diff.reindex(**args, level=1)
             elif func_name == 'rename':
-                self._diff = self._diff.rename(names, axis=1, level=1)
+                self._diff = self._diff.rename(**args, level=1)
 
             if self._type_name == 'Drivers':
                 if func_name == 'reindex':
-                    self._diff_eff = self._diff_eff.reindex(names, axis=1, level=1)
+                    self._diff_eff = self._diff_eff.reindex(**args, level=1)
                 elif func_name == 'rename':
-                    self._diff_eff = self._diff_eff.rename(names, axis=1, level=1)
+                    self._diff_eff = self._diff_eff.rename(**args, level=1)
 
             elif self._type_name == 'Targets':
                 if func_name == 'reindex':
-                    self._diff_mgs = self._diff_mgs.reindex(names, axis=1, level=1)
+                    self._diff_mgs = self._diff_mgs.reindex(**args, level=1)
                 elif func_name == 'rename':
-                    self._diff_mgs = self._diff_mgs.rename(names, axis=1, level=1)
+                    self._diff_mgs = self._diff_mgs.rename(**args, level=1)
                 self._diff_mgs.dropna(how='all', inplace=True)
 
 

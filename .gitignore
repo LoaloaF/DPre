@@ -8,6 +8,8 @@
 *.pyc
 
 
+liverdata.py
+example_data/*
 DPreeee.py
 test.py
 tempCodeRunnerFile.py

@@ -28,8 +28,9 @@ def TARGET(get, sort=False, colors_from_file=False):
         diff.sort_index(axis=1, inplace=True)
         expr.sort_index(axis=1, inplace=True)
     
-    from DPre.main.targets import Targets
-    t = Targets(diff_genes=diff, expression=expr, name='{} lineages'.format(get),
+    from DPre.main.targets import Targets   
+    t = Targets(diff_genes=diff, expression=expr, name=get+' mouse lineages',
+    # t = Targets(diff_genes=None, expression=expr, name=get+' mouse lineages',
                 log=not config.LOG_DEFAULT_TARGET_INIT_REDUCED)
     if config.LOG_DEFAULT_TARGET_INIT_REDUCED:
         logger.info('Default target `{}` created, name: `{}`, elements: {}'
@@ -65,11 +66,11 @@ def _validate_expression(expr, type_name, ctrl):
                      'datatype `object` (often text).')
         sys.exit(1)
 
-    if type_name == 'Drivers' and not ctrl:
-        spacer.error('\n')
-        logger.error('For Drivers, the name of the contrl must be passed if '
-                     'expression data is loaded.')
-        sys.exit(1)
+    # if type_name == 'Samples' and not ctrl:
+    #     spacer.error('\n')
+    #     logger.error('For Drivers, the name of the contrl must be passed if '
+    #                  'expression data is loaded.')
+        # sys.exit(0)
     
     elif ctrl and (ctrl not in expr.columns.unique(0)):
         spacer.error('\n')

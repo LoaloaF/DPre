@@ -26,6 +26,7 @@ assert input
 single gene proportional: don't add together single values but raw prop values
 flip option for all 3 plots
 option to view only up or only down markergene sims. for agg plots
+comment and log overlap functions
 
 
 -----

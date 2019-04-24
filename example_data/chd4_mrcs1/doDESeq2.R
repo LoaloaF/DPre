@@ -50,7 +50,7 @@ for (i in 1:dim(contrasts)[1]) {
   c2 = contrasts[i,]$c2
   res = results(dds, contrast=c("shrna", c1, c2))
   
-  #write.table(res, file=paste(row.names(contrasts[i,]), ".all.tsv", sep=""), sep="\t", col.names=NA)
+  write.table(res, file=paste(row.names(contrasts[i,]), ".all.tsv", sep=""), sep="\t", col.names=NA)
 
   res = res[complete.cases(res),] # Filter NAs
   pres = res[res$padj<qval,]
@@ -69,9 +69,9 @@ for (i in 1:dim(contrasts)[1]) {
   points(log(dn[, 1]), dn[ ,2], col="green", pch=16, cex=0.9)
   title(row.names(contrasts[i,]), sub=sub_name)
   
-  #write.table(pres, file=paste("", row.names(contrasts[i,]), ".all.tsv", sep=""), sep="\t", col.names=NA)
-  write.table(up, file=paste("", row.names(contrasts[i,]), ".up.tsv", sep=""), sep="\t", col.names=NA)
-  write.table(dn, file=paste("", row.names(contrasts[i,]), ".dn.tsv", sep=""), sep="\t", col.names=NA)
+  write.table(pres, file=paste("", row.names(contrasts[i,]), ".all.tsv", sep=""), sep="\t", col.names=NA)
+  # write.table(up, file=paste("", row.names(contrasts[i,]), ".up.tsv", sep=""), sep="\t", col.names=NA)
+  # write.table(dn, file=paste("", row.names(contrasts[i,]), ".dn.tsv", sep=""), sep="\t", col.names=NA)
 }
 
 dev.off()

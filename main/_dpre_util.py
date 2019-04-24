@@ -11,8 +11,6 @@ import DPre.main.config as config
 from DPre.main._logger import logger, spacer
 
 
-
-
 def _add_mg_types(expr, down):
         orig_order = expr.columns.unique(0)
         updown_idx = ['up']*expr.shape[1]
@@ -83,21 +81,26 @@ def align_indices(data, order, axis=1):
 
 
 
-def check_which(which, trg, drv):
+def check_which(which, trg, smp, diff):
+    if which not in ('euclid', 'intersect'):
+        logger.error('Invalid `which` input: `{}`. Valid are `euclid` and '
+                     '`intersect`'.format(which))
     msg = 'The {} were initiated without {} data. Cannot use `{}` similarity.'
     if (which == 'euclid') and not trg._has_expr:
         logger.error(msg.format('targets', 'expression', 'euclid'))
-        sys.exit(1)
-    elif (which == 'euclid') and not drv._has_expr:
-        logger.error(msg.format('drivers', 'expression', 'euclid'))
-        sys.exit(1)
-    elif (which == 'intersect') and not drv._has_diff:
-        logger.error(msg.format('drivers', 'differential', 'intersect'))
-        sys.exit(1)
-    elif which not in ('euclid', 'intersect'):
-        logger.error('Invalid `which` input: `{}`. Valid are `euclid` and '
-                     '`intersect`'.format(which))
-        sys.exit(1)
+    elif (which == 'euclid') and not smp._has_expr:
+        logger.error(msg.format('samples', 'expression', 'euclid'))
+    elif (which == 'intersect') and not trg._has_diff:
+        logger.error(msg.format('targets', 'merker gene', 'intersect'))
+    elif (which == 'intersect') and not smp._has_diff:
+        logger.error(msg.format('samples', 'differential', 'intersect'))
+    elif which == 'euclid' and diff and not smp._ctrl:
+        logger.error('To plot the changes in transcriptional similarity with '
+                     'which = `euclid`, the samples must be initiated with a '
+                     'control.')
+    else:
+        return
+    sys.exit(1)
 
     
 

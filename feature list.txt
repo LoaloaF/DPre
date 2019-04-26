@@ -1,32 +1,34 @@
-implement __init__ that handles all imports
-overwork all file accesess acordingly (root changes)
+------implement __init__ that handles all imports
+------overwork all file accesess acordingly (root changes)
 
-logs in plotting functions
-update methodnames, _ only where appropriate
-restructure config to let user edit values through functions
+------logs in plotting functions
+------update methodnames, _ only where appropriate
+------restructure config to let user edit values through functions
 color legend function
-update save file function (pdf /png)
+------update save file function (pdf /png)
 
 
-test target data with up and down genelists
-write more extensive tests 
+-----test target data with up and down genelists
+-----write more extensive tests 
 
-ranked_similarity_barplot: update the whole thing
-ranked_similarity_barplot: option to show least similar too
+-----ranked_similarity_barplot: update the whole thing
+-----ranked_similarity_barplot: option to show least similar too
 
-gene_similarity_heatmap: norm proportional values option (complex)
-gene_similarity_heatmap: overwork most shifting genes option
+------gene_similarity_heatmap: norm proportional values option (complex)
+------gene_similarity_heatmap: overwork most shifting genes option
 
-always return data, axes, figure for plot functions
-always have nested fucntions for data, setup, draw for all plots fucntions
+------always return data, axes, figure for plot functions
+------always have nested fucntions for data, setup, draw for all plots fucntions
 
-assert input
+------assert input
 
-
-single gene proportional: don't add together single values but raw prop values
+------single gene proportional: don't add together single values but raw prop values
+------comment and log overlap functions
+------option to view only up or only down markergene sims. for agg plots
+------color legend
+------rework save logging...
 flip option for all 3 plots
-option to view only up or only down markergene sims. for agg plots
-comment and log overlap functions
+comments for all the miscelanious code...
 
 
 -----

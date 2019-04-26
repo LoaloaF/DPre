@@ -31,22 +31,19 @@ def TARGET(get, sort=False, colors_from_file=False):
     from DPre.main.targets import Targets   
     t = Targets(diff_genes=diff, expression=expr, name=get+' mouse lineages',
     # t = Targets(diff_genes=None, expression=expr, name=get+' mouse lineages',
-                log=not config.LOG_DEFAULT_TARGET_INIT_REDUCED)
-    if config.LOG_DEFAULT_TARGET_INIT_REDUCED:
-        logger.info('Default target `{}` created, name: `{}`, elements: {}'
-                    .format(get, t._name, len(t)))
+                log=False)
+    logger.info('Default target `{}` created, name: `{}`, elements: {}'
+                .format(get, t._name, len(t)))
     if colors_from_file:
         try:
             df_colors = pd.read_csv('{}/colors.tsv'.format(get_dir), sep='\t', 
                                     index_col=0)
-            t.set_colors(dict(zip(df_colors.index, df_colors.color)), 
-                         log=not config.LOG_DEFAULT_TARGET_INIT_REDUCED)
+            t.set_colors(dict(zip(df_colors.index, df_colors.color)), log=False)
         except FileNotFoundError as e:
             logger.warning('No colors.tsv file found: {}'.format(e))
     elif get != 'all':
         # does not work for get == 'all'
-        t.set_colors([config.default_targets_colors[get]],
-                     log=not config.LOG_DEFAULT_TARGET_INIT_REDUCED)
+        t.set_colors([config.default_targets_colors[get]], log=False)
     return t
 
 

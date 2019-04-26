@@ -4,6 +4,8 @@ import os
 import sys
 from matplotlib.backends.backend_pdf import PdfPages
 from matplotlib import pyplot as plt
+from matplotlib.patches import Patch
+
 from scipy.cluster.hierarchy import distance, linkage, dendrogram, optimal_leaf_ordering
 from scipy.spatial.distance import pdist
 
@@ -29,7 +31,7 @@ def _diff_to_int_updown_notation(_diff, merge_updown=True):
             int_diff['down'] = int_diff['down'].mask(_diff['up'], 1)
         return int_diff
 
-def add_updown_mean(agg):
+def add_mgtmean(agg):
     agg_mean = agg.groupby(axis=1, level=1, sort=False).mean()
     agg_mean.columns = add_level(agg_mean.columns, 'mean')
     return pd.concat([agg, agg_mean], axis=1)
@@ -207,13 +209,24 @@ def save_file(fig, filename=None, pp=None):
         fig.savefig(filename, format='png')
 
 def clean_axes(axes):
+    np.array([axes])
     for ax in axes.flatten():
         [s.set_visible(False) for s in ax.spines.values()]
         ax.tick_params(bottom=False, left=False, labelbottom=False, 
                        labelleft=False)
     return axes
 
-
+def color_legend(colors, labels, filename='color_legend.png'):
+    assert len(colors) == len(labels), 'colors and labels differ in length'
+    spacer.info('\n\n')
+    logger.info('Creasting a color legend...')
+    fig, ax = plt.subplots(1, 1, figsize=(2, 2))
+    clean_axes(np.array([ax]))
+    ax.legend(handles=[Patch(color=colors[i], label=labels[i]) 
+                for i in range(len(colors))], loc='center')
+    fig.savefig(filename)
+    logger.info('Legend saved at {}/{}\n\n'
+                .format(os.path.abspath(os.curdir), filename))
 
 
 

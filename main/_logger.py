@@ -12,3 +12,6 @@ stream_handler = logging.StreamHandler()
 stream_handler.setFormatter(logging.Formatter(''))
 spacer.setLevel(logging.INFO)
 spacer.addHandler(stream_handler)
+
+log_init = '=|=|=|=|=|=|=|=|====INITIATION====|=|=|=|=|=|=|=|=|='
+log_plot = '=|=|=|=|=|=|=|=|====PLOT====|=|=|=|=|=|=|=|=|='

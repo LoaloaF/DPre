@@ -6,7 +6,7 @@ import os
 # DPI to from 100 to 300
 mpl.rcParams['figure.dpi'] = 300.0
 mpl.rcParams['savefig.dpi'] = 300.0
-mpl.rcParams['font.size'] = FONTS = 2.66
+mpl.rcParams['font.size'] = FONTS = 3.5
 mpl.rcParams['lines.linewidth'] = 0.3
 mpl.rcParams['hatch.linewidth'] = 0.3333
 mpl.rcParams['patch.linewidth'] = 0.3333
@@ -22,13 +22,10 @@ mpl.rcParams['ytick.major.pad'] = 1.16655
 mpl.rcParams['figure.max_open_warning'] = 30
 DPRE_PATH =  os.path.dirname(__file__) + '/../'
 SAVE_FORMAT = 'pdf'
-UNDETECTED_MARKERGENES_BEHAVIOR =  'substitute'
-UNDETECTED_MARKERGENES_BEHAVIOR =  'drop'
+UNDETECTED_MARKERGENES_BEHAVIOR = 'ignore'
+UNDETECTED_MARKERGENES_BEHAVIOR = 'substitute'
+DROP_TARGET_DETEC_THR = .15
 DESEQ2_P = .05
-LOG_DEFAULT_TARGET_INIT_REDUCED = True
-
-log_emphz = '=|=|=|=|=|=|=|=|====INITIATION====|=|=|=|=|=|=|=|=|='
-log_plot = '=|=|=|=|=|=|=|=|====PLOT====|=|=|=|=|=|=|=|=|='
 
 colors = ['#e6194B', #    0 = red
           '#3cb44b', #    1 = green
@@ -72,59 +69,36 @@ RdBu_bin = LinearSegmentedColormap.from_list('RdBu_binary',
 dendrogram_colors = ['#000000', '#000000', '#000000', '#000000']
 set_link_color_palette(dendrogram_colors[1:])
 
-GSH_LEFT = .6
-GSH_TOP = .6
-GSH_RIGHT = .2
-GSH_BOTTOM = .25
-GSH_WSPACE = .04
-GSH_HSPACE = .02
 
-GSH_UP_DOWN_SPACE = .3
-GSH_SAMPLES_COLORBAR = .03
-GSH_GENES_COLORBAR = .03
-GSH_SAMPLES_DENDROGRAM = .3
-GSH_GENE_DENDROGRAM = .3
-GSH_REQU_EFF_BAR = .04
-GSH_SQUARESIZE = .006
-GSH_SQUARESIZE = .05
-GSH_SUMPLOT_SIZE = .9
+HM_LEFT = .8
+HM_TOP = .6
+HM_RIGHT = .1
+HM_BOTTOM = 1
+HM_WSPACE = .04
+HM_HSPACE = .02
+HM_Y_COLORBAR = .04
+HM_X_COLORBAR = .04
+HM_REQU_EFF_BAR = .06
+HM_Y_DENDROGRAM = .3
+HM_X_DENDROGRAM = .3
+HM_SQUARE_SIZE = .07
 
-
-
-TSH_LEFT = .6
-TSH_TOP = .6
-TSH_RIGHT = .01
-TSH_BOTTOM = .7
-TSH_WSPACE = .02
-TSH_HSPACE = .02
-
-TSH_SAMPLES_COLORBAR = .03
-TSH_TARGETS_COLORBAR = .03
-TSH_SAMPLE_DENDROGRAM = .3
-TSH_TARGET_DENDROGRAM = .3
-TSH_REQU_EFF_BAR = .04
-TSH_SQUARESIZE = .05
-
-
-
-RSB_LEFT = .9
-RSB_TOP = .3
-RSB_RIGHT = .1
-RSB_BOTTOM = .3
-
-RSB_TARGETS_COLORBAR = .03
-RSB_BARSPACE = 1
-RSB_BARWIDTH_SIZE = .06
-
-
+G_HM_SUMPLOT_SIZE = .9
+G_HM_UPDOWN_SPACE_SIZE = .3
 
 CB_LEFT = .2
 CB_LEFT_SEC = 1
-CB_LEFT_TERT = 1.8
 CB_TOP = .4
 CB_WIDTH = .65
-CB_HEIGHT = .04
+CB_HEIGHT = .06
 
+BP_LEFT = 1
+BP_TOP = .3
+BP_RIGHT = .1
+BP_BOTTOM = .3
+BP_Y_COLORBAR = .04
+BP_BARSPACE = .8
+BP_BARWIDTH_SIZE = .07
 
 AGG_EUCL_DIFF_NOPROP = ('mean change in expr. similarity\n'
                         '[differential mean eulc. dist.]')

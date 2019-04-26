@@ -2,11 +2,12 @@ import pandas as pd
 import sys
 import copy
 import matplotlib.colors as mpl_colors
+import matplotlib.pyplot as plt
 
 import DPre.main._dpre_util as util
 import DPre.main._format_input as _format_input
 import DPre.main.config as config
-from DPre.main._logger import logger, spacer
+from DPre.main._logger import logger, spacer, log_init
 
 class _differential:
     def __init__(self, diff_genes,  expression, ctrl, override_diff_names,
@@ -88,8 +89,8 @@ class _differential:
     
     def __repr__(self):
         return ('\n=|=|= {}-instance =|=|=\nname = {};\nelements = {};\n'
-                'differential data = {};\nexpression data = {};\n'
-                .format(self._type_name, self._name, self._names, 
+                'differential data = {};\nexpression data = {} (n={});\n'
+                .format(self._type_name, self._name, self._names, len(self),
                         self._has_diff, self._has_expr))
 
 
@@ -133,10 +134,9 @@ class _differential:
 
     def get_colors(self, order=None):
         if not self._colors:
-            self.set_colors(['#ffffff'])
-            spacer.warning('')
+            self.set_colors(['#ffffff'], log=False)
             logger.warning('Colors have not been set for `{}`. All have been '
-                           'set to default: white\n'.format(self._name))
+                           'set to default: white'.format(self._name))
         if order is not None:
             not_ctnd = list(filter(lambda o: o not in self._names, order)) 
             if not_ctnd:
@@ -147,7 +147,6 @@ class _differential:
             not_set = list(filter(lambda o: o not in self._colors, order)) 
             if not_set:
                 self.set_colors(dict.fromkeys(not_set, '#ffffff'), log=False)
-                spacer.warning('')
                 logger.warning('Failed to get some colors of `{}`. The passed '
                                'order contains elements without a set color: {}. '
                                'Colors for these were set to default: white.'
@@ -207,8 +206,9 @@ class _differential:
         logger.info('`{}` reorderd. New order of elements:\n{}'
                     .format(self._name, self._names))
 
-    def slice_elements(self, elements, name=None):
-        spacer.info('\n\n')
+    def slice_elements(self, elements, name=None, log=True):
+        if log:
+            spacer.info('\n\n')
         not_ctnd = list(filter(lambda e: e not in self._names, elements))
         if not_ctnd:
             spacer.error('')
@@ -216,9 +216,9 @@ class _differential:
                          'in current element names:\n{}'.format(not_ctnd))
             sys.exit(1)
         if self._ctrl and (self._ctrl not in elements):
-            if (self._type_name == 'Drivers') and self._has_expr:
+            if (self._type_name == 'Samples') and self._has_expr:
                 spacer.warning('')
-                logger.warning('When slicing a Drivers-instance holding '
+                logger.warning('When slicing a Samples-instance holding '
                                'expression data, the control must be kept. `{}`'
                                ' was added to passed list of `elements`.'
                                .format(self._ctrl))
@@ -231,12 +231,11 @@ class _differential:
         [slc._colors.pop(k, None) for k in slc._names if k not in elements]
         slc._name = name if name else slc._name
 
-        logger.info('`{}` sliced:'.format(self._name))
-        spacer.info('')
-        slc._log_init()
+        if log:
+            logger.info('`{}` sliced:'.format(self._name))
+            spacer.info('')
+            slc._log_init()
         return slc
-
-
 
 
 
@@ -332,7 +331,7 @@ class _differential:
         msg = ('{}\nNew {}-instance created: `{}`\n\t{} ({}):\n\t\t{}\n\t'
                'Detected genes: {}{}\n\tDifferential genes loaded: {}\n\t'
                'Expression data loaded: {}'
-               .format(config.log_emphz, self._type_name, self._name,
+               .format(log_init, self._type_name, self._name,
                        self._type_name, len(self), ',\n\t\t'.join(self._names), 
                        len(self._detec_genes), uniq_diff, self._has_diff, 
                        self._has_expr))
@@ -343,20 +342,13 @@ class _differential:
 
     def _update_data_columns(self, names, func_name='reindex'):
         args = {'labels': names, 'axis':1,}
-        # how do I pass a function independent from the caller...?
         if self._has_expr:
             if func_name == 'reindex':
                 self._expr = self._expr.reindex(**args, level=0)
             elif func_name == 'rename':
                 self._expr = self._expr.rename(**args, level=0)
                 
-            if self._type_name == 'Drivers':
-                if func_name == 'reindex':
-                    self._expr_eff = self._expr_eff.reindex()
-                elif func_name == 'rename':
-                    self._expr_eff = self._expr_eff.rename(**args, level=1)
-
-            elif self._type_name == 'Targets':
+            if self._type_name == 'Targets':
                 if func_name == 'reindex':
                     self._expr_mgs = self._expr_mgs.reindex(**args, level=1)
                     self._expr_mgs.dropna(how='all', inplace=True)
@@ -368,21 +360,3 @@ class _differential:
                 self._diff = self._diff.reindex(**args, level=1)
             elif func_name == 'rename':
                 self._diff = self._diff.rename(**args, level=1)
-
-            if self._type_name == 'Drivers':
-                if func_name == 'reindex':
-                    self._diff_eff = self._diff_eff.reindex(**args, level=1)
-                elif func_name == 'rename':
-                    self._diff_eff = self._diff_eff.rename(**args, level=1)
-
-            elif self._type_name == 'Targets':
-                if func_name == 'reindex':
-                    self._diff_mgs = self._diff_mgs.reindex(**args, level=1)
-                elif func_name == 'rename':
-                    self._diff_mgs = self._diff_mgs.rename(**args, level=1)
-                self._diff_mgs.dropna(how='all', inplace=True)
-
-
-
-
-    

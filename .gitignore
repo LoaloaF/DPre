@@ -4,14 +4,11 @@
 *.png
 *.pdf
 *.tsv
+*.csv
 *.glb
 *.pyc
 
 
-liverdata.py
-example_data/*
-DPreeee.py
-test.py
 tempCodeRunnerFile.py
 default_targets
 test_data

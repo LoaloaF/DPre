@@ -6,3 +6,4 @@ from .main.samples import Samples
 from .main.targets import Targets
 from .main._format_input import TARGET
 import main.config as config
+from .main._dpre_util import color_legend

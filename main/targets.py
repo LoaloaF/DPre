@@ -74,7 +74,7 @@ class Targets(_differential):
             # drop targets with too few detected genes
             dr = pd.Index(self._names).difference(keep).tolist()
             logger.info('{} target elements dropped due to marker gene detection'
-                        ' proportions lower {} (Set in conifg.DROP_TARGET_'
+                        ' proportions lower {} (Set in config.DROP_TARGET_'
                         'DETEC_THR):\n{}'
                         .format(len(dr), config.DROP_TARGET_DETEC_THR, dr))
             self = self.slice_elements(keep, log=False)
@@ -128,12 +128,11 @@ class Targets(_differential):
             return m.mask(m == 2, 1).mask(m == 1, 0).mask(m == 0, -1)
         do_ovp = eucl_dist if which == 'euclid' else mg_inters
         ovp = smp_ext.groupby(axis=1, level=(0,2), sort=False).apply(do_ovp)
-
         self._overlaps['{}-{}'.format(id(samples), which)] = ovp
         return ovp
 
     def show_detected_genes(self, samples, save_plot=True):
-        # log proportion of detected markergenes
+        # get proportion of detected markergenes
         if samples._has_expr:
             smp_d = samples._expr.reindex(self._mgs).notna().iloc(1)[0]
         elif samples._has_diff:
@@ -141,13 +140,17 @@ class Targets(_differential):
         det = self._diff.reindex(self._mgs).apply(lambda trg: trg & smp_d).sum()
         n_mgs = self._diff.sum()
         order = (det/n_mgs).sort_values().index
+        # log proportion of detected markergenes
         df = pd.DataFrame({'n markergenes': n_mgs.reindex(order), 
                            'detected in samples': det.reindex(order).values, 
                            'proportion': (det/n_mgs).reindex(order).values})
+        n_trgs = 10 if not len(order) <20 else int(len(order)/2)
+        edges = order.droplevel(0)[:n_trgs].append(order.droplevel(0)[-n_trgs:])
         logger.info('Detection of target ({}) marker genes in sample data ({}):'
-                    '\n{}\n{}\nShown are the 40 edge proportion values.'
-                    .format(self._name, samples._name, df.head(10).to_string(), 
-                            df.tail(10).to_string()))
+                    '\n{}\nShown are the {} edge proportion values.'
+                    .format(self._name, samples._name, 
+                            df.loc[(slice(None), edges), :].to_string(), 
+                            len(edges)))
         
         if save_plot:
             fig, ax = plt.subplots()
@@ -165,6 +168,7 @@ class Targets(_differential):
             fig.savefig(fname=filename)
             logger.info('Plot saved at {}/{}\n'
                         .format(os.path.abspath(os.curdir), save_plot))
+            plt.close()
         return df
 
     def _get_from_overlap(self, samples, which, genes_diff=False, genes_prop=False,
@@ -232,8 +236,6 @@ class Targets(_differential):
         elif which == 'intersect':
             # ovp stores matches (1) and mismatches (-1). This option is for 
             # reverting that notation for down mgs, matches -1, mismatches 1
-            if inters_to_updown_not and self._down_mgs:
-                ovp['down'] *= -1
             n_mgs = ovp.notna().sum().xs(s_ord[0], level=2)
             n_mgs.index = util.add_level(n_mgs.index, 'n_mgs', at=2)
             n_mgs = util.add_mgtmean(n_mgs.unstack((0,1))).astype(int)
@@ -246,6 +248,8 @@ class Targets(_differential):
             if samples._ctrl and drop_ctrl:
                 ovp.drop(samples._ctrl, axis=1, level=2, inplace=True)
                 agg.drop(samples._ctrl, inplace=True)
+            if inters_to_updown_not and self._down_mgs:
+                ovp['down'] *= -1
             return ovp, agg, None, n_mgs
 
     def target_similarity_heatmap(self, 
@@ -255,6 +259,7 @@ class Targets(_differential):
                                   proportional = False, 
                                   display_similarity = 'markergenes mean',
    
+                                  pivot = False,
                                   heatmap_range = None,
                                   heatmap_width = None,
                                   heatmap_height = None,
@@ -267,7 +272,7 @@ class Targets(_differential):
                                   show_target_dendrogram = True,
                                   show_targets_colorbar = True,
                                   cluster_samples = True,
-                                  show_driver_dendrogram = True,
+                                  show_sample_dendrogram = True,
                                   show_samples_colorbar = False,
                                   
                                   show_targetlabels = True,
@@ -295,9 +300,9 @@ class Targets(_differential):
                                'for which = `euclid` if the samples data is '
                                'initialized without a control. Set to False.')
             if which == 'intersect' and not differential:
-                differential = True
                 logger.warning('For the `intersect` similarity metric, '
-                               'differential cannot be False. Was set to True.')
+                               'differential cannot be False.')
+                sys.exit(1)
             if proportional and not differential:
                 proportional = False
                 logger.warning('`proportional` can only be used if '
@@ -352,14 +357,14 @@ class Targets(_differential):
             nplts = [4,3]
 
             fig_widths = [.0001] *(nplts[1] +3)
-            fig_widths[0] = driverlabels_space if driverlabels_space \
-                            else config.HM_LEFT
+            l = config.HM_LEFT if not pivot else config.HM_PIVOT_LEFT
+            fig_widths[0] = driverlabels_space if driverlabels_space else l
             if show_samples_colorbar:
                 fig_widths[1] = config.HM_Y_COLORBAR
             fig_widths[2] = config.HM_SQUARE_SIZE * len(self)
             if heatmap_width:
                 fig_widths[2] *= heatmap_width
-            if cluster_samples and show_driver_dendrogram:
+            if cluster_samples and show_sample_dendrogram:
                 fig_widths[3] = config.HM_Y_DENDROGRAM
             fig_widths[4] = config.HM_WSPACE * (nplts[1]-1)
             fig_widths[5] = config.HM_RIGHT
@@ -376,8 +381,8 @@ class Targets(_differential):
             if show_targets_colorbar:
                 fig_heights[4] = config.HM_X_COLORBAR
             fig_heights[5] = config.HM_HSPACE * (nplts[0]-1)
-            fig_heights[6] = targetlabels_space if targetlabels_space \
-                             else config.HM_BOTTOM
+            b = config.HM_BOTTOM if not pivot else config.HM_PIVOT_BOTTOM
+            fig_heights[6] = targetlabels_space if targetlabels_space else b
 
             return nplts, fig_widths, fig_heights
 
@@ -391,12 +396,16 @@ class Targets(_differential):
             # set plot title
             if title:
                 if title and type(title) is not str:
-                    this_title = ('absolute transcriptinoal similarity\nof {} and {} '
-                                  .format(samples._name, self._name))
-                    if differential:
-                        this_title = 'change in ' +this_title
-                fig.suptitle(this_title, fontsize=config.FONTS *1.2,
-                             y=1-((config.HM_TOP/height *.1)))
+                    this_t = util._make_title(differential, proportional, which, 
+                                              samples._name, self._name)
+                else:
+                    this_t = title
+                if not pivot:
+                    fig.suptitle(this_t, fontsize=config.FONTS *1.1,
+                                 y=1-((config.HM_TOP/height *.1)))
+                else:
+                    axes[2, 0].set_ylabel(this_t, fontsize=config.FONTS *1.1,
+                                          labelpad=30)
 
 
             # cluster targets/ samples and draw dendrograms
@@ -405,9 +414,9 @@ class Targets(_differential):
                 order = util._heatmap_cluster(sim, 'top', at, 'columns')
                 sim, ctrl_sim = util.align_indices([sim, ctrl_sim], order)
             if cluster_samples:
-                at = axes[2, 2] if show_driver_dendrogram else axes[0, 0]
+                at = axes[2, 2] if show_sample_dendrogram else axes[0, 0]
                 order = util._heatmap_cluster(sim, 'right', at, 'rows')
-                # sim, ctrl_sim = util.align_indices([sim, ctrl_sim], order, 0)
+                sim = sim.reindex(order)
             axes[0, 0].set_visible(False)
             
             # draw required effect bar
@@ -429,15 +438,15 @@ class Targets(_differential):
                                      'vmax': required_effect_bar_range[1]})
                 util.plot_required_effect_bar(axes[1, :2], ctrl_sim,
                                             ctrl_lbl, bar_args, draw_cb, 
-                                            cb_lbl, fig, width, height)
+                                            cb_lbl, fig, pivot, width, height)
 
             # setup heatmap x,y axis, including the colorbars
-            util.setup_heatmap_xy('x', axes[3, 1], sim.columns, show_targetlabels, 
-                                  targetlabel_size, show_targets_colorbar, 
-                                  self.get_colors(sim.columns))
-            util.setup_heatmap_xy('y', axes[2, 0], sim.index[::-1], show_driverlabels, 
-                                  targetlabel_size, show_samples_colorbar, 
-                                  samples.get_colors(sim.index[::-1]))
+            cols = self.get_colors(sim.columns) if show_targets_colorbar else ''
+            util.setup_heatmap_xy('x', axes[3, 1], sim.columns, pivot,
+                                  show_targetlabels, targetlabel_size, cols)
+            cols = samples.get_colors(sim.index[::-1]) if show_samples_colorbar else ''
+            util.setup_heatmap_xy('y', axes[2, 0], sim.index[::-1], pivot, 
+                                  show_driverlabels, targetlabel_size, cols)
 
             # draw heatmap
             ax = axes[2, 1]
@@ -472,6 +481,8 @@ class Targets(_differential):
                     bar_ticks = [int(bar_ticks[0]), int(bar_ticks[1])]
                 cb.set_ticks(bar_ticks)
                 cb.ax.set_xticklabels(bar_ticks)
+                if pivot:
+                    cb.ax.tick_params(labelrotation=90)
                 cb.ax.set_xlabel(cb_lbl)
                 cb.ax.get_xaxis().set_label_position('top')
 
@@ -507,6 +518,7 @@ class Targets(_differential):
                                 differential = True,
                                 proportional = False, 
                                 
+                                pivot = False,
                                 heatmap_range = None,
                                 heatmap_width = None,
                                 heatmap_height = None,
@@ -524,7 +536,7 @@ class Targets(_differential):
                                 show_gene_dendrogram = True,
                                 genes_colorbar = None,
                                 cluster_samples = True,
-                                show_driver_dendrogram = False,
+                                show_sample_dendrogram = False,
                                 show_samples_colorbar = False,
                                 
                                 show_genelabels = True,
@@ -554,6 +566,11 @@ class Targets(_differential):
         
             # check main data input
             util.check_which(which, self, samples, differential)
+            if custom_target_genelist is not None and display_genes:
+                display_genes = None
+                logger.info('Both `display_genes` and '
+                            '`custom_target_genelist` were passed. '
+                            '`display_genes` will be ignored.')
             if display_genes:
                 val = ['variant', 'greatest', 'increasing', 'decreasing']
                 if not differential:
@@ -564,19 +581,14 @@ class Targets(_differential):
                                  ' {} are {}.'
                                  .format(display_genes, differential, val))
                     sys.exit(1)
-                if custom_target_genelist is not None:
-                    custom_target_genelist = None
-                    logger.info('Both `display_genes` and '
-                                '`custom_target_genelist` were passed. '
-                                '`custom_target_genelist` will be ignored.')
             elif custom_target_genelist is None and specific_genes is None:
                 logger.error('None of `display_genes`, `specific_genes` or '
                              '`custom_target_genelist` were passed')
                 sys.exit(1)
             elif custom_target_genelist is not None and specific_genes is not None:
-                custom_target_genelist = None
+                specific_genes = None
                 msg = ('Both `specific_genes` and `custom_target_genelist` were'
-                       ' passed. `custom_target_genelist` will be ignored.')
+                       ' passed. `specific_genes` will be ignored.')
                 logger.info(msg)
 
             # inform user of input incompatibilities
@@ -586,9 +598,9 @@ class Targets(_differential):
                                'for which = `euclid` if the samples data is '
                                'initialized without a control. Set to False.')
             if which == 'intersect' and not differential:
-                differential = True
                 logger.warning('For the `intersect` similarity metric, '
-                               'differential cannot be False. Was set to True.')
+                               'differential cannot be False.')
+                sys.exit(1)
                 if custom_target_genelist is not None and show_required_effect_bar:
                     show_required_effect_bar = False
                     msg = ('For the `intersect` similarity metric and a '
@@ -797,6 +809,12 @@ class Targets(_differential):
             agg_min = min([ags.min() for ags in agss])
             agg_max = max([ags.max() for ags in agss])
             agg_lim = [agg_min -abs(agg_min*.15), agg_max +abs(agg_max*.15)]
+            # make sure 0 is included
+            if differential:
+                if agg_lim[0]>=0 and agg_lim[1]>=0:
+                    agg_lim[agg_lim.index(min(agg_lim))] = 0
+                elif agg_lim[0]<=0 and agg_lim[1]<=0:
+                    agg_lim[agg_lim.index(max(agg_lim))] = 0
             if which == 'euclid':
                 # get sum heatmap range
                 mini = [ts.min().sort_values()[int(ts.shape[1]*.05)] for ts in tss]
@@ -820,15 +838,16 @@ class Targets(_differential):
             # default size of an exes is 0
             fig_widths = [.0001] *(nplts[1] +3)
             # based on parameters and config constants, set all sizes
+            l = config.HM_LEFT if not pivot else config.HM_PIVOT_LEFT
             fig_widths[0] = driverlabels_space_left if driverlabels_space_left \
-                            else config.HM_LEFT
+                            else l
             if show_samples_colorbar:
                 fig_widths[1] = config.HM_Y_COLORBAR
             # heatmap width varies across plots, a nested list stores widths
             fig_widths[2] = [n_gs*config.HM_SQUARE_SIZE for n_gs in n_genes]
             if heatmap_width:
                 fig_widths[2] = [heatmap_width*f_ws2 for f_ws2 in fig_widths[2]]
-            if cluster_samples and show_driver_dendrogram:
+            if cluster_samples and show_sample_dendrogram:
                 fig_widths[3] = config.HM_Y_DENDROGRAM
             if show_sum_plot:
                 fig_widths[4] = config.G_HM_SUMPLOT_SIZE
@@ -842,14 +861,14 @@ class Targets(_differential):
                 fig_heights[1] = config.HM_X_DENDROGRAM
             if show_required_effect_bar:
                 fig_heights[2] = config.HM_REQU_EFF_BAR
-            fig_heights[3] = config.HM_SQUARE_SIZE *len(samples) 
+            fig_heights[3] = config.HM_SQUARE_SIZE *len(samples._names_noctrl) 
             if heatmap_height:
                 fig_heights[3] *= heatmap_height
             if genes_colorbar:
                 fig_heights[4] = config.HM_X_COLORBAR
             fig_heights[5] = config.HM_HSPACE * (nplts[0]-1)
-            fig_heights[6] = genelabel_space if genelabel_space \
-                             else config.HM_BOTTOM
+            b = config.HM_BOTTOM if not pivot else config.HM_PIVOT_BOTTOM
+            fig_heights[6] = genelabel_space if genelabel_space else b
 
             # duplicate height sizes and insert a spacer axis with size of top
             if self._down_mgs:
@@ -873,14 +892,17 @@ class Targets(_differential):
             # set plot title
             if title:
                 if title and type(title) is not str:
-                    this_title = ('single-gene transcriptional similarity\nof '
-                                 '{} and {} '.format(samples._name, t_name))
-                    if differential:
-                        this_title = 'change in ' + this_title
+                    this_t = util._make_title(differential, proportional, which,
+                                              samples._name, t_name, 
+                                              postf='single gene ')
                 else:
-                    this_title = title
-                fig.suptitle(this_title, fontsize=config.FONTS *1.2,
-                             y=1-((config.HM_TOP/height *.15)))
+                    this_t = title
+                if not pivot:
+                    fig.suptitle(this_t, fontsize=config.FONTS *1.1,
+                                 y=1-((config.HM_TOP/height *.15)))
+                else:
+                    axes[2, 0].set_ylabel(this_t, fontsize=config.FONTS *1.1,
+                                            labelpad=18)
                 
             # iterate over up and down plot-halfs
             for mgt, r in zip(self._mg_types, (0, 5)):
@@ -892,7 +914,7 @@ class Targets(_differential):
                     order = util._heatmap_cluster(sim, 'top', at, 'columns')
                     sim, ctrl_sim = util.align_indices([sim, ctrl_sim], order)
                 if cluster_samples:
-                    at = axes[2+r, 2] if show_driver_dendrogram else axes[r, 0]
+                    at = axes[2+r, 2] if show_sample_dendrogram else axes[r, 0]
                     order = util._heatmap_cluster(sim, 'right', at, 'rows')
                     sim, sim_agg = util.align_indices([sim, sim_agg], order, 0)
                 axes[r, 0].set_visible(False)
@@ -922,7 +944,7 @@ class Targets(_differential):
                                          'vmax': required_effect_bar_range[1]})
                     util.plot_required_effect_bar(axes[1+r, :2], ctrl_sim, 
                                                   ctrl_lbl, bar_args, draw_cb, 
-                                                  cb_lbl, fig, width, height)
+                                                  cb_lbl, fig, pivot, width, height)
 
                 # setup heatmap x axis, including the colorbar
                 xlbl = genes.set_index('ensg').reindex(sim.columns).name.values
@@ -932,14 +954,14 @@ class Targets(_differential):
                     cols = [c if is_color_like(c) else default for c in cols]
                 else:
                     cols = None
-                util.setup_heatmap_xy('x', axes[3+r, 1], xlbl, show_genelabels, 
-                                      genelabel_size, genes_colorbar, cols) 
+                util.setup_heatmap_xy('x', axes[3+r, 1], xlbl, pivot,
+                                      show_genelabels, genelabel_size, cols) 
 
                 # setup heatmap y axis, including the colorbar
                 ylbl = sim.index.unique(2)[::-1]
-                util.setup_heatmap_xy('y', axes[2+r, 0], ylbl, show_driverlabels, 
-                                      genelabel_size, show_samples_colorbar, 
-                                      samples.get_colors(ylbl))
+                cols = samples.get_colors(ylbl) if show_samples_colorbar else ''
+                util.setup_heatmap_xy('y', axes[2+r, 0], ylbl, pivot, 
+                                      show_driverlabels, genelabel_size, cols)
                 if self._down_mgs:
                     tit = '{} markergenes'.format(mgt)
                     axes[2+r, 0].set_title(tit, loc='right', fontweight='bold', 
@@ -951,6 +973,9 @@ class Targets(_differential):
                     metric = sum_plot_central_metric
                     ax = axes[2+r, 3]
                     ax.tick_params(labelbottom=True, bottom=True)
+                    if pivot:
+                        ax.tick_params(labelrotation=90)
+                         
                     axes[3+r, 3].set_visible(False)
                     axes[1+r, 3].set_visible(False)
                     ax.set_axisbelow(True)
@@ -1039,6 +1064,8 @@ class Targets(_differential):
                     elif which == 'euclid' and proportional:
                         bar_ticks[0] = '< ' + str(bar_ticks[0])
                     cb.ax.set_xticklabels(bar_ticks)
+                    if pivot:
+                        cb.ax.tick_params(labelrotation=90)
                 dat[mgt] = sim, ctrl_sim, sim_agg
             return fig, axes, dat
         
@@ -1078,6 +1105,7 @@ class Targets(_differential):
                                   rank_samples = True,
                                   show_negative = True,
                                   xlim_range = None,
+                                  pivot = False,
                                   show_targetlabels = True,
                                   targetlabels_space = None,
                                   show_colorbar = True,
@@ -1094,9 +1122,9 @@ class Targets(_differential):
 
             util.check_which(which, self, samples, differential)
             if which == 'intersect' and not differential:
-                differential = True
                 logger.warning('For the `intersect` similarity metric, '
-                               'differential cannot be False. Was set to True.')
+                               'differential cannot be False.')
+                sys.exit(1)
             if proportional and not differential:
                 proportional = False
                 logger.warning('`proportional` can only be used if '
@@ -1159,13 +1187,14 @@ class Targets(_differential):
         # built 2 lists with widths and heights in inches of every axes
         def get_plot_sizes():
             fig_widths = [.0001] *5
-            fig_widths[0] = targetlabels_space if targetlabels_space \
-                            else config.BP_LEFT
+            l = config.BP_LEFT if not pivot else config.BP_PIVOT_LEFT
+            fig_widths[0] = targetlabels_space if targetlabels_space else l
             if show_colorbar:
                 fig_widths[1] = config.BP_Y_COLORBAR
             fig_widths[2] = config.BP_BARSPACE
             fig_widths[3] = .04
-            fig_widths[4] = config.BP_RIGHT
+            r = config.BP_RIGHT if not pivot else config.BP_PIVOT_RIGHT
+            fig_widths[4] = r
 
             fig_heights = [.0001] *4
             fig_heights[0] = config.BP_TOP
@@ -1180,23 +1209,25 @@ class Targets(_differential):
             fig, axes = util._init_figure(fig_widths, fig_heights, (1, 2), 
                                           (.04,0))
             ax = axes[1]
-            ax.spines['bottom'].set_visible(True)
-            ax.spines['left'].set_visible(True)
 
             # set plot title
             if title:
                 if title and type(title) is not str:
-                    this_title = ('transcriptinoal similarity\nof {} and {} '
-                                  .format(s_name, self._name))
-                    if differential:
-                        this_title = 'change in ' +this_title
-                    this_title = 'ranked ' +this_title
+                    this_t = util._make_title(differential, proportional, which,
+                                              s_name, self._name, 
+                                              pref='ranked ')
                 else:
-                    this_title = title
-                fig.suptitle(this_title, fontsize=config.FONTS *1.2, 
-                             y=1-(config.BP_TOP /height/6))
+                    this_t = title
+                if not pivot:
+                    fig.suptitle(this_t, fontsize=config.FONTS *1.1, 
+                                 y=1-(config.BP_TOP /height/6))
+                else:
+                    ax.get_yaxis().set_label_position('right')
+                    ax.set_ylabel(this_t, rotation=-90, 
+                                  fontsize=config.FONTS *1.1, labelpad=10)
 
             # setup y axis including the colorbar
+            ax.spines['left'].set_visible(True)
             n = dat.shape[0] if not show_negative else dat.shape[0] +1
             ylim = n, -1
             yts = np.arange(n)
@@ -1211,21 +1242,32 @@ class Targets(_differential):
             if show_negative:
                 ylbls.insert(int(len(ylbls)/2), '')
                 dat = dat.append(pd.Series(0, [''])).reindex(ylbls)
-                line_args = {'xdata': (-.02, .02), 'transform': ax.transAxes, 
-                             'clip_on': False, 'color': 'k'}
-                # delta half height of split sline between pos. & neg. group
+                # delta half-height/ width of split line between pos. & neg. group
                 d_hh = (.01/fig_heights[1]) /2
+                d_wh = (.03/fig_widths[2])
+                line_args = {'xdata': (-d_wh, d_wh), 'transform': ax.transAxes, 
+                             'clip_on': False, 'color': 'k'}
                 ax.add_line(Line2D(ydata=(.5-d_hh*1.25, .5-d_hh*.25), **line_args))
                 ax.add_line(Line2D(ydata=(.5+d_hh*.25, .5+d_hh*1.25), **line_args))
             if show_targetlabels:
                 axes[0].tick_params(labelleft=True)
-                axes[0].set_yticklabels(ylbls, fontsize=config.FONTS)
-
+                if not pivot:
+                    axes[0].set_yticklabels(ylbls)
+                else:
+                    axes[0].set_yticklabels(ylbls, rotation=-45, ha='right', 
+                                            x=-.5, rotation_mode='anchor')
+            
             # setup x axis
             xlim = lims
             if xlim_range:
                  xlim = xlim_range
-            ax.tick_params(bottom=True, labelbottom=True)
+            if not pivot:
+                ax.spines['bottom'].set_visible(True)
+                ax.tick_params(bottom=True, labelbottom=True)
+            else:
+                ax.spines['top'].set_visible(True)
+                ax.tick_params(top=True, labeltop=True, labelrotation=-90)
+                ax.xaxis.set_label_position('top')
             ax.set_xlim(xlim)
             ax.set_axisbelow(True)
             ax.xaxis.grid(alpha=0.8, linestyle='dashed')  

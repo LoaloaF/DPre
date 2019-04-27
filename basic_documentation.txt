@@ -24,6 +24,7 @@ True:   Requires differential to be True. Get the differential values as a propo
 
 
 UNDETECTED_MARKERGENE_BAHAVIOUR
+not relevent for intersect differential
 
 Substitute not detected marker genes: Here, not detected genes are substituted with a z score equivalent to a read count of 0.
 				      This provides the most correct description of the C/Ts transcriptional identity. Not detected marker genes

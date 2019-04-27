@@ -4,7 +4,6 @@
 ------logs in plotting functions
 ------update methodnames, _ only where appropriate
 ------restructure config to let user edit values through functions
-color legend function
 ------update save file function (pdf /png)
 
 
@@ -29,7 +28,7 @@ color legend function
 ------rework save logging...
 flip option for all 3 plots
 comments for all the miscelanious code...
-
+unify input checking
 
 -----
 

@@ -209,6 +209,10 @@ class _differential:
     def slice_elements(self, elements, name=None, log=True):
         if log:
             spacer.info('\n\n')
+        if not len(elements):
+            spacer.error('')
+            logger.error('The list of elements cannot be empty.')
+            sys.exit(1)
         not_ctnd = list(filter(lambda e: e not in self._names, elements))
         if not_ctnd:
             spacer.error('')

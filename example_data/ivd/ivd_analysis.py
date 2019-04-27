@@ -7,7 +7,7 @@ from DPre import config     # access to more settings and colors
 from DPre import color_legend   # function to plot a colorlegend
 
 # prepare input expression table with pandas 
-expr = pd.read_csv(config.DPRE_PATH + 'example_data/ivd/genes_cpm_expression.tsv', 
+expr = pd.read_csv('genes_cpm_expression.tsv', 
                    sep = '\t', 
                    index_col = 'ensg')
 keep_columns = [
@@ -34,7 +34,7 @@ expr.columns = new_names
 
 
 # initatie the target to compare against, the default target `all mouse lineages`
-t = TARGET('all', sort=False, colors_from_file=True)
+t = TARGET('all', sort=False, preset_colors=True)
 
 # iniatite multiple sample data instances because of different controls
 # cardiomyocytes
@@ -63,7 +63,7 @@ for i in range(3):
                                 differential = True,
                                 n_targets = 20, 
                                 show_negative = True,
-                                filename = 'ranked_sim_diff.png')
+                                filename = 'IVD_ranked_sim_diff.png')
 
 # make a Samples instance with the 3 samples above to produce one heatmap
 all_expr = expr[['in vitro diff. cardiomyocytes', 'in vitro diff. motor neurons', 'ESCs +retinoic acid']]
@@ -83,4 +83,4 @@ t.target_similarity_heatmap(samples = all_sample,
 # make acolorlegend for the target colors
 color_legend(list(config.default_targets_colors.values()), 
              list(config.default_targets_colors.keys()),
-             filename = 'col_legend.png')
+             filename = 'trg_legend.png')

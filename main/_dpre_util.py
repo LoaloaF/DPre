@@ -58,7 +58,8 @@ def add_level(index, label, at=0, replace=False, name=''):
     return index.set_index(name, append=True).reorder_levels(order).index
 
 def annotate(index):
-    ref = pd.read_pickle(config.DPRE_PATH + 'mm10/mm10_ensembl_v92_ensg.gzip')
+    path = os.path.dirname(__file__)
+    ref = pd.read_pickle(path + '/../mm10/mm10_ensembl_v92_ensg.gzip')
     try:
         return pd.Index(ref.reindex(index).name.values)
     except KeyError as e:
@@ -67,13 +68,9 @@ def annotate(index):
 
 
 def get_ensgs(names):
-    ref = pd.read_pickle(config.DPRE_PATH + 'mm10/mm10_ensembl_v92_ensg.gzip')
-    try:
-        return ref.reset_index().set_index('name').loc[names].ensg.values
-    except KeyError as e:
-        logger.error(e)
-        sys.exit(1)
-
+    path = os.path.dirname(__file__)
+    ref = pd.read_pickle(path + '/../mm10/mm10_ensembl_v92_ensg.gzip')
+    return ref.index[ref.name.isin(names)]
 
 def align_indices(data, order, axis=1):
     for i in range(len(data)):
@@ -81,14 +78,25 @@ def align_indices(data, order, axis=1):
             data[i] = data[i].reindex(order, axis=axis)
     return data
 
+def _make_title(differential, proportional, which, el1, el2, pref='', postf=''):
+    which_title = '(euclidean)' if which == 'euclid' else '(intersection)'
+    if differential:
+        dtype = 'change in '
+        if proportional:
+            dtype = 'proportional ' + dtype
+    elif which == 'euclid' and not differential:
+        dtype = 'absolute '
+        which_title = ''
+    title = '{}{}{}transcriptional similarity {}\nof {} & {}'
+    return title.format(pref, dtype, postf, which_title, el1, el2)
 
 
 def check_which(which, trg, smp, diff):
+    msg = 'The {} were initiated without {} data. Cannot use `{}` similarity.'
     if which not in ('euclid', 'intersect'):
         logger.error('Invalid `which` input: `{}`. Valid are `euclid` and '
                      '`intersect`'.format(which))
-    msg = 'The {} were initiated without {} data. Cannot use `{}` similarity.'
-    if (which == 'euclid') and not trg._has_expr:
+    elif (which == 'euclid') and not trg._has_expr:
         logger.error(msg.format('targets', 'expression', 'euclid'))
     elif (which == 'euclid') and not smp._has_expr:
         logger.error(msg.format('samples', 'expression', 'euclid'))
@@ -109,7 +117,7 @@ def check_which(which, trg, smp, diff):
 
 
 def plot_required_effect_bar(axes, data, ctrl_lbl, bar_args, 
-                        draw_colorbar=False, cb_lbl=None, fig=None, 
+                        draw_colorbar=False, cb_lbl=None, fig=None, pivot=None, 
                         w=None, h=None):
     axes[0].tick_params(labelleft=True)
     axes[0].set_ylim(0, 1)
@@ -128,6 +136,8 @@ def plot_required_effect_bar(axes, data, ctrl_lbl, bar_args,
         bar_ticks = (bar_args['vmin'], bar_args['vmax'])
         cb.set_ticks(bar_ticks)
         cb.ax.set_xticklabels(bar_ticks)
+        if pivot:
+            cb.ax.tick_params(labelrotation=90)
         cb.ax.set_xlabel(cb_lbl)
         cb.ax.get_xaxis().set_label_position('top')
 
@@ -136,13 +146,17 @@ def _heatmap_cluster(dat, where, ax, which):
     d = dat.T if which == 'columns' else dat
     Y = pdist(d, metric='euclidean')
     Z = linkage(Y, method='complete', metric='euclidean')
-    return dendrogram(Z,
+    order = dendrogram(Z,
                         count_sort = True,
                         no_labels = True,
                         orientation = where, 
                         labels = d.index, 
                         above_threshold_color = config.dendrogram_colors[0],
                         ax = ax)['ivl']
+    if which == 'rows':
+        # for some reason reversed?
+        order = order[::-1]
+    return order
 
 def _init_figure(fig_widths, fig_heights, nplts, spacers):
     width, height = sum(fig_widths), sum(fig_heights)
@@ -169,7 +183,7 @@ def _init_figure(fig_widths, fig_heights, nplts, spacers):
 
     return fig, axes
 
-def setup_heatmap_xy(x_y, ax, lbls, show_lbls, trg_lbl_size, colorbar, colors):
+def setup_heatmap_xy(x_y, ax, lbls, pivot, show_lbls, trg_lbl_size, colors):
     
     dim = len(lbls)
     if x_y == 'x':
@@ -180,9 +194,14 @@ def setup_heatmap_xy(x_y, ax, lbls, show_lbls, trg_lbl_size, colorbar, colors):
         if show_lbls:
             ax.tick_params(labelbottom=True)
             fs = trg_lbl_size*config.FONTS if trg_lbl_size else config.FONTS
-            ax.set_xticklabels(lbls, rotation=45, ha='right', fontsize=fs, 
-                               rotation_mode='anchor', y=.5)
-        if colorbar:
+            if not pivot:
+                ax.set_xticklabels(lbls, rotation=45, ha='right', fontsize=fs, 
+                                   rotation_mode='anchor', y=.5)
+            else:
+                ax.set_xticklabels(lbls, rotation=90, ha='right', va='center', 
+                                   fontsize=fs, rotation_mode='anchor', y=.5)
+
+        if colors:
             ax.bar(ticks, 1, 1, color=colors)
     
     elif x_y == 'y':
@@ -190,8 +209,12 @@ def setup_heatmap_xy(x_y, ax, lbls, show_lbls, trg_lbl_size, colorbar, colors):
         ax.set_yticks(np.arange(.5, dim))
         if show_lbls:
             ax.tick_params(labelleft=True) 
-            ax.set_yticklabels(lbls, x=.5)
-        if colorbar:
+            if not pivot:
+                ax.set_yticklabels(lbls, x=.5)
+            else:
+                ax.set_yticklabels(lbls, rotation=45, ha='right', x=.5,
+                                   rotation_mode='anchor')
+        if colors:
             ax.bar(0, 1, color=colors, bottom=np.arange(len(lbls)))
 
 def open_file(filename):

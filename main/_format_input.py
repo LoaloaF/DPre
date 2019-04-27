@@ -6,8 +6,7 @@ from DPre.main._logger import logger, spacer
 import DPre.main.config as config
 import DPre.main._dpre_util as util
 
-
-def TARGET(get, sort=False, colors_from_file=False):
+def TARGET(get, sort=False, preset_colors=False):
     spacer.info('\n\n')
     valid = ['all', 'blood mesoderm', 'embryonic', 'endoderm', 'germ cells',
             'mesoderm', 'neural crest', 'neuroectoderm', 'surface ectoderm']
@@ -15,8 +14,8 @@ def TARGET(get, sort=False, colors_from_file=False):
         logger.error('`{}` is not a valid default target. valid ones are {}'
                      .format(get, valid))
         sys.exit(1)
-
-    get_dir = '{}default_targets/{}'.format(config.DPRE_PATH, get)
+    path = os.path.dirname(__file__)
+    get_dir = '{}/../default_targets/{}'.format(path, get)
     try:         
         diff = pd.read_pickle('{}/differential.gzip'.format(get_dir))
         expr = pd.read_pickle('{}/expression.gzip'.format(get_dir))
@@ -30,20 +29,21 @@ def TARGET(get, sort=False, colors_from_file=False):
     
     from DPre.main.targets import Targets   
     t = Targets(diff_genes=diff, expression=expr, name=get+' mouse lineages',
-    # t = Targets(diff_genes=None, expression=expr, name=get+' mouse lineages',
                 log=False)
-    logger.info('Default target `{}` created, name: `{}`, elements: {}'
-                .format(get, t._name, len(t)))
-    if colors_from_file:
+    if preset_colors:
         try:
             df_colors = pd.read_csv('{}/colors.tsv'.format(get_dir), sep='\t', 
                                     index_col=0)
             t.set_colors(dict(zip(df_colors.index, df_colors.color)), log=False)
         except FileNotFoundError as e:
-            logger.warning('No colors.tsv file found: {}'.format(e))
-    elif get != 'all':
-        # does not work for get == 'all'
-        t.set_colors([config.default_targets_colors[get]], log=False)
+            logger.warning('No colors.tsv file found in default_targets/{}. Set'
+                           ' to color defined in config.default_targets_colors'
+                           .format(get))
+            # does not work for get == 'all'
+            if get != 'all':
+                t.set_colors([config.default_targets_colors[get]], log=False)
+    logger.info('Default target `{}` created, name: `{}`, elements: {}'
+                .format(get, t._name, len(t)))
     return t
 
 
@@ -111,7 +111,7 @@ def _format_diff_genes(diff_genes_dir, has_expr, genelists_mgtype='up'):
             logger.error('No *.tsv files found in {}/{}\nCheck the path.'
                         .format(os.getcwd(), direc))
             sys.exit(1)
-
+            os.sep
     # check if up and down genelist directories are compatible
     def check_up_down_genelists():
         if isinstance(diff_genes_dir, (list, tuple)):
@@ -190,12 +190,10 @@ def _format_diff_genes(diff_genes_dir, has_expr, genelists_mgtype='up'):
     files = glob.glob(direc + '/*.tsv')
     inp_t, index_col = check_input_type()
 
-    f_first = files[0][files[0].rfind('\\')+1:]
-    f_last = files[-1][files[-1].rfind('\\')+1:]
     spacer.info('')
     logger.info('Formatting differential genes from {} files. {} *.tsv '
-                'files in {}:\n{} ... {}'
-                .format(inp_t, len(files), direc, f_first, f_last))
+                'files in {}:\n{}'.format(inp_t, len(files), direc, 
+                                          [f[f.rfind(os.sep):] for f in files]))
     if (inp_t == 'genelist (up)') and not has_expr:
         spacer.warning('')
         logger.warning('You are iniatiating the {} from genelist files ' 

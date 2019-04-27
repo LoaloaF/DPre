@@ -3,28 +3,28 @@ import pandas as pd
 from DPre import Samples, Targets, TARGET, config, color_legend
 
 import os
-# fn = 'C:/Users\LOaLoA\OneDrive\internship_SUSTech\inhibitor_project\emb\original/rsem-genes2/genes_cpm_expression.tsv'
-# expr = pd.read_csv(fn, sep='\t')
-# expr.set_index('ensg', inplace=True)
-# # expr = expr.iloc[1::2]
-# [expr.drop(c, axis=1, inplace=True) for c in expr.columns if 'mean_' not in c]
-# expr = expr.reindex([
-#                 'mean_embryo 2C',
-#                 'mean_embryo 4C',
-#                 'mean_embryo 8C',
-#                'mean_embryo ICM',
-#            'mean_embryo early2C',
-#          'mean_embryo miioocyte',
-#             'mean_embryo zygote'], 
-#    axis=1)
-# expr.columns = ['2C', '4C', '8C',  'ICM', 'early2C', 'miioocyte', 'zygote']
-# dirr = 'C:/Users\LOaLoA\OneDrive\internship_SUSTech\inhibitor_project\emb\emb_inh\deseq2/res'
-# t = Targets(expression=expr, diff_genes=dirr, name='early embryonic fates', use_down_mgs=True)
-# t.reorder(['miioocyte', 'zygote', 'early2C', '2C', '4C', '8C', 'ICM'])
-# t.set_colors(config.colors)
+fn = 'C:/Users\LOaLoA\OneDrive\internship_SUSTech\inhibitor_project\emb\original/rsem-genes2/genes_cpm_expression.tsv'
+expr = pd.read_csv(fn, sep='\t')
+expr.set_index('ensg', inplace=True)
+# expr = expr.iloc[1::2]
+[expr.drop(c, axis=1, inplace=True) for c in expr.columns if 'mean_' not in c]
+expr = expr.reindex([
+                'mean_embryo 2C',
+                'mean_embryo 4C',
+                'mean_embryo 8C',
+               'mean_embryo ICM',
+           'mean_embryo early2C',
+         'mean_embryo miioocyte',
+            'mean_embryo zygote'], 
+   axis=1)
+expr.columns = ['2C', '4C', '8C',  'ICM', 'early2C', 'miioocyte', 'zygote']
+dirr = 'C:/Users\LOaLoA\OneDrive\internship_SUSTech\inhibitor_project\emb\emb_inh\deseq2/res'
+t = Targets(expression=expr, diff_genes=dirr, name='early embryonic fates', use_down_mgs=True)
+t.reorder(['miioocyte', 'zygote', 'early2C', '2C', '4C', '8C', 'ICM'])
+t.set_colors(config.colors)
 
 # prepare input expression table
-expr = pd.read_csv(config.DPRE_PATH + 'test_data/genes_ntc_expression.tsv', sep='\t', 
+expr = pd.read_csv('test_data/genes_ntc_expression.tsv', sep='\t', 
                    index_col='ensg')
 order = ['4C-8C DMIT', '4C BMIT', '4C DBMIT', '4C DBMI','4C DBMT',
          '8C DMVIT', '8C DMVI', '8C DMVT', '8C DVIT', 
@@ -39,7 +39,7 @@ expr.columns = order
 #   the pandas expression table, the name of the control, the object name used 
 #   for headers and logging and finally weather the order differential names 
 #   should be ignored 
-c = Samples(diff_genes = config.DPRE_PATH + 'test_data/deseq2', 
+c = Samples(diff_genes = 'test_data/deseq2', 
             expression = expr, 
             ctrl = 'none', 
             name = 'epigenetic inhihbitor combinations',
@@ -56,10 +56,12 @@ c.reorder(['DMV',  'DVB', 'DVI', 'ICM DITCO', 'ICM DTCO', 'ICM ITCO',
            
 # laod in a default target, don't sort the elements alphabetically, look for a 
 #   preset color file to set default colors (available for `embryonic` and `all`)
-t = TARGET('mesoderm', sort=False, colors_from_file=True)
+t = TARGET('mesoderm', sort=False, preset_colors=False)
 
 # plot the target similarity of the samples, using the `euclid` method
-# t.target_similarity_heatmap(c, 'intersect',  differential=True, proportional=False,
+t.target_similarity_heatmap(c, 'euclid', pivot=True, cluster_samples=True, show_samples_colorbar=False)
+#                           differential=True, 
+#                           proportional=False,
 #               reorder_to_required_effect_bar=True, 
 #               display_similarity = None,
 #               cluster_targets=False, 
@@ -77,7 +79,7 @@ t = TARGET('mesoderm', sort=False, colors_from_file=True)
 
 #               show_samples_colorbar = True, 
 #               show_targets_colorbar = True,
-#               filename='somth.png'
+#               filename='somth.png'mm
 # )
 
 # genes = ['Duxf3', 'Gata2', 'Zscan4b', 'Zscan4a', 'Zscan4d', 'Zscan4c', 'Zscan4e', 'Zscan4f', 'Zscan4a', 'Hsp90aa1', 'Hsp90ab1', # 2C genes
@@ -109,7 +111,7 @@ t = TARGET('mesoderm', sort=False, colors_from_file=True)
 #     "Pecam1", "Dppa5a", 'Dppa2', 
 #     "Rcor2", "Lin28b", "Foxo4", "Ccnd3", "Ccnb1", "Cbx1", "Dab2", "Gli1", "Tbx2", "Tgfb2"], config.colors[17])
 # genes_colorbar = {**cols_stab, **cols_init, **cols_mat}
-# t.gene_similarity_heatmap(c,  'intersect', filename='testfile.png', cluster_genes=False)
+t.gene_similarity_heatmap(c,  'euclid', filename='testfile.png', cluster_genes=False, show_sample_dendrogram=True, pivot=True)
 #                                 differential = True,
 #                                 proportional = True, 
 #                                 gene_number = 20,
@@ -147,7 +149,7 @@ t = TARGET('mesoderm', sort=False, colors_from_file=True)
 #                                 filename = 'gene_similarity_hm')
 
 
-# t.ranked_similarity_barplot(c, 'euclid',
+# t.ranked_similarity_barplot(c, 'euclid', pivot=True,)
 #                             differential=False,
 #                             proportional=True,
 #                             rank_samples=True,

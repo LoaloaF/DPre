@@ -20,10 +20,9 @@ mpl.rcParams['xtick.major.pad'] = 1.16655
 mpl.rcParams['ytick.major.pad'] = 1.16655
 
 mpl.rcParams['figure.max_open_warning'] = 30
-DPRE_PATH =  os.path.dirname(__file__) + '/../'
 SAVE_FORMAT = 'pdf'
-UNDETECTED_MARKERGENES_BEHAVIOR = 'ignore'
 UNDETECTED_MARKERGENES_BEHAVIOR = 'substitute'
+UNDETECTED_MARKERGENES_BEHAVIOR = 'ignore'
 DROP_TARGET_DETEC_THR = .15
 DESEQ2_P = .05
 
@@ -71,9 +70,11 @@ set_link_color_palette(dendrogram_colors[1:])
 
 
 HM_LEFT = .8
-HM_TOP = .6
+HM_PIVOT_LEFT = .7
+HM_TOP = .8
 HM_RIGHT = .1
 HM_BOTTOM = 1
+HM_PIVOT_BOTTOM = 1.2
 HM_WSPACE = .04
 HM_HSPACE = .02
 HM_Y_COLORBAR = .04
@@ -84,17 +85,19 @@ HM_X_DENDROGRAM = .3
 HM_SQUARE_SIZE = .07
 
 G_HM_SUMPLOT_SIZE = .9
-G_HM_UPDOWN_SPACE_SIZE = .3
+G_HM_UPDOWN_SPACE_SIZE = .4
 
-CB_LEFT = .2
-CB_LEFT_SEC = 1
-CB_TOP = .4
-CB_WIDTH = .65
+CB_LEFT = .3
+CB_LEFT_SEC = 1.3
+CB_TOP = .55
+CB_WIDTH = .85
 CB_HEIGHT = .06
 
-BP_LEFT = 1
-BP_TOP = .3
+BP_LEFT = 1.2
+BP_PIVOT_LEFT = .8
+BP_TOP = .6
 BP_RIGHT = .1
+BP_PIVOT_RIGHT = .3
 BP_BOTTOM = .3
 BP_Y_COLORBAR = .04
 BP_BARSPACE = .8
@@ -106,7 +109,7 @@ AGG_EUCL_DIFF_PROP = ('prop. of changed expr. similarity\n'
                       '[prop. differential mean eucl. dist.]')
 AGG_EUCL_NODIFF = ('mean abs. expr. similarity\n'
                    '[mean abs. eucl. dist.]')
-AGG_INTE_DIFF_NOPROP = ('differential genes similarity\n'
+AGG_INTE_DIFF_NOPROP = ('diff.- & marker genes similarity\n'
                         '[sum of matches(1) & mism.(-1)]')
 AGG_INTE_DIFF_PROP = ('prop. of target markergene intersect\n'
                       '[sum of matches(1) & mism.(-1)]')

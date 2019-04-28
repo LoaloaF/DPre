@@ -3,8 +3,8 @@
 *.txt.gz
 *.png
 *.pdf
-*.tsv
 *.csv
+*.tsv
 *.glb
 *.pyc
 

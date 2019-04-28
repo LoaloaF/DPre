@@ -9,4 +9,4 @@ wget -c http://fantom.gsc.riken.jp/5/datafiles/reprocessed/hg38_latest/extra/CAG
 # Run the python  script to extract remove the cancerous cell types, add the annotations, 
 # merge replicates (where possible), and nicely tidy everything up.
 
-#python3 clean_fantom5.py
+python3 pack_fantom5_data_human.py

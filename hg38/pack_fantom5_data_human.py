@@ -25,8 +25,12 @@ for idx, line in enumerate(oh):
     #print(line)
 
     if '@' in line[1] and 'ENST0' in line[3]: # In this data we only care about the gene annotated CAGE:
-        ent = {'fantom_name': line[0].split(';')[1],
+        if ',' in line[1]:
+            continue # ignore ambiguous CAGE tags
+        ent = {
+            'fantom_name': line[0].split(';')[1], # Don't care about this here
             'promoter_usage': line[1],
+            'name': line[1].split('@')[1],# emulate gene symbol
             'enst': line[3].split('_')[2].split('.')[0]}
         gene_annots.append(ent)
 
@@ -60,10 +64,13 @@ for entry, line in enumerate(oh):
             "cell line", 'differentiation', 'periodontitis', 'differentiated', 'post-infarction', 'asthmatic',
             "nuclear fraction", "Universal RNA", 'Whole blood',"Clontech", # controls;
             "induction", 'response to', 'induced with', # time course treatments;
+            'ccl2',
             ])
         to_keep = [cond_names.index(i) for i in cond_names if True not in [t in i for t in cancer_names]]
         cond_names = [cond_names[idx] for idx in to_keep]
         continue
+
+    #print(cond_names)
 
     if (entry+1) % 10000 == 0:
         print('Processed: {:,} genes'.format(entry+1))
@@ -80,7 +87,9 @@ for entry, line in enumerate(oh):
     if fantom_name not in valid_ids:
         continue
 
-    res.append({"fantom_name": fantom_name, "conditions": [float(tt[7:][idx]) for idx in to_keep]})
+    ex = [float(tt[7:][idx]) for idx in to_keep]
+    if sum(ex) > 1: # Very simple low expression filter;
+        res.append({"fantom_name": fantom_name, "conditions": ex})
 
 # Keep only the genes with an annotated GENE ENST:
 gl = expression(loadable_list=res, cond_names=cond_names)
@@ -125,7 +134,9 @@ for c in gl.getConditionNames():
 gl.setConditionNames(newconds)
 
 gl.sort_sum_expression() # resort the data so picking will get the highest expressed promoter
+print(gl)
 gl.reverse()
+gl = gl.removeDuplicates('name') # Basically keep only the highest sum(expresson) CAGE
 gl.save("hg38.fantom5.glb")
 gl.saveTSV("hg38.fantom5.tsv")
 

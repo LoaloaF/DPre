@@ -1,7 +1,7 @@
 
 """
 
-This is jsut to draw the SOM images for visual inspection;
+This is just to draw the SOM images for visual inspection;
 
 """
 

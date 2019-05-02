@@ -123,8 +123,6 @@ def do_gene_sim(args):
                     show_samples_colorbar = args['show_samples_colorbar'],
                     filename = args['filename'],)
 
-
-
 # create the base parser
 d = ('DPre - visualizing transcriptional similarity across samples and targets')
 u = ('\nPass the input --> Choose the plot --> specify the plot:\n'

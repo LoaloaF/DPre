@@ -280,6 +280,7 @@ class Targets(_differential):
                                   filename = 'target_similarity_hm.png'):
         # check user input for errors and incompatibilities
         def check_args():
+            nonlocal which
             nonlocal differential
             nonlocal proportional
 
@@ -287,43 +288,13 @@ class Targets(_differential):
             nonlocal reorder_to_distance_bar
             nonlocal hide_distance_bar
             nonlocal display_similarity
-            util.check_which(which, self, samples, differential)
-            if which == 'euclid' and not hide_distance_bar and not samples._ctrl:
-                hide_distance_bar = True
-                logger.warning('`hide_distance_bar` cannot be False '
-                               'for which = `euclid` if the samples data is '
-                               'initialized without a control. Set to True.')
-            if which == 'intersect' and not differential:
-                differential = True
-                logger.warning('For the `intersect` similarity metric, '
-                               'differential cannot be False. Was set to True.')
-            if proportional and not differential:
-                proportional = False
-                logger.warning('`proportional` can only be used if '
-                               '`differential` is True aswell. Set to False.')
 
-            if reorder_to_distance_bar and hide_distance_bar:
-                reorder_to_distance_bar = False
-                logger.warning('When `reorder_to_distance_bar` is True, '
-                               '`hide_distance_bar` cannot be True. Set '
-                               'to False.')
-            if reorder_to_distance_bar and cluster_targets:
-                cluster_targets = False
-                logger.warning('Both `reorder_to_distance_bar` and '
-                               '`cluster_targets` were set as True. '
-                               '`cluster_targets` will be ignored.')
-            val = ['mgs mean', 'mgs up', 'mgs down']
-            if display_similarity not in val:
-                logger.warning('Invalid input for display_similarity: `{}`. '
-                               'Valid are {}. Set to default `{}`'
-                               .format(display_similarity, val, val[0]))
-                display_similarity = val[0]
-            if display_similarity == val[2] and not self._down_mgs:
-                logger.error('Cannot display down markergene similarity because'
-                             ' the targets were not initiated with down '
-                             'markergenes.')
-                sys.exit(1)
-            display_similarity = display_similarity[4:]
+            # check general basic input requirements
+            a = util.check_args(self, samples, which, differential, proportional, 
+                                hide_distance_bar, reorder_to_distance_bar,
+                                cluster_targets, display_similarity)
+            which, differential, proportional, hide_distance_bar, \
+            reorder_to_distance_bar, cluster_targets, display_similarity = a
             logger.info('Arguments passed. Getting data now ...')
 
         # get the specific overlap data, plot the mean of up and down mgs
@@ -369,7 +340,7 @@ class Targets(_differential):
                 fig_heights[1] = config.HM_X_DENDROGRAM
             if not hide_distance_bar:
                 fig_heights[2] = config.HM_REQU_EFF_BAR
-            fig_heights[3] = config.HM_SQUARE_SIZE * len(samples._names )
+            fig_heights[3] = config.HM_SQUARE_SIZE * len(samples._names_noctrl)
             if heatmap_height:
                 fig_heights[3] *= heatmap_height
             if not hide_targets_colorbar:
@@ -547,19 +518,26 @@ class Targets(_differential):
         
         # check user input for errors and incompatibilities
         def check_args():
+            nonlocal which
+            nonlocal differential
+            nonlocal proportional
             nonlocal display_genes
             nonlocal specific_genes
             nonlocal custom_target_genelist
-            nonlocal differential
-            nonlocal proportional
 
             nonlocal hide_distance_bar
             nonlocal reorder_to_distance_bar
             nonlocal cluster_genes
             nonlocal show_genes_colorbar
-        
+
+            # check general basic input requirements
+            a = util.check_args(self, samples, which, differential, proportional, 
+                                hide_distance_bar, reorder_to_distance_bar,
+                                cluster_genes)
+            which, differential, proportional, hide_distance_bar, \
+            reorder_to_distance_bar, cluster_genes, display_similarity = a
+
             # check main data input
-            util.check_which(which, self, samples, differential)
             if custom_target_genelist is not None and display_genes:
                 display_genes = None
                 logger.info('Both `display_genes` and '
@@ -584,39 +562,6 @@ class Targets(_differential):
                 msg = ('Both `specific_genes` and `custom_target_genelist` were'
                        ' passed. `specific_genes` will be ignored.')
                 logger.info(msg)
-
-            # inform user of input incompatibilities
-            if which == 'euclid' and not hide_distance_bar and not samples._ctrl:
-                hide_distance_bar = True
-                logger.warning('`hide_distance_bar` cannot be False '
-                               'for which = `euclid` if the samples data is '
-                               'initialized without a control. Set to True.')
-            if which == 'intersect' and not differential:
-                logger.warning('For the `intersect` similarity metric, '
-                               'differential cannot be False.')
-                sys.exit(1)
-                if custom_target_genelist is not None and not hide_distance_bar:
-                    hide_distance_bar = True
-                    msg = ('For the `intersect` similarity metric and a '
-                           '`custom_target_genelist`, the `required_effect_bar`'
-                           ' cannot be drawn. `hide_distance_bar` set '
-                           'to True.')
-                    logger.warning(msg)
-            if proportional and not differential:
-                proportional = False
-                logger.warning('`proportional` can only be used if '
-                               '`differential` is True aswell. Set to False.')
-            if reorder_to_distance_bar and hide_distance_bar:
-                reorder_to_distance_bar = False
-                logger.warning('When `reorder_to_distance_bar` is True, '
-                               '`hide_distance_bar` cannot also be True. '
-                               '`reorder_to_distance_bar` set to False.')
-
-            if reorder_to_distance_bar and cluster_genes:
-                cluster_genes = False
-                logger.warning('Both `reorder_to_distance_bar` and '
-                               '`cluster_genes` were set as True. '
-                               '`cluster_genes` will be ignored.')
             
             # modify arguments for convneience 
             if which == 'euclid' and not differential:
@@ -686,9 +631,12 @@ class Targets(_differential):
                                                       genes_prop=proportional)
             if which == 'euclid':
                 if samples._ctrl:
+                    ctrl_name = samples._ctrl
                     ctrl_sim = ctrl_sim.abs()
                 else:
-                    ctrl_sim = sim.xs(sim.columns[0][2], 1, 2, False)
+                    # dummy, won't be used
+                    ctrl_name = sim.columns[0][2]
+                    ctrl_sim = sim.xs(ctrl_name, 1, 2, False)
                 if not differential:
                     sim = sim.abs()
                 if proportional:
@@ -750,10 +698,10 @@ class Targets(_differential):
                     sys.exit(1)
                 # index overlap data to genelist
                 ts = trg_sim.reindex(get_genes)
-                ctrl_name = mgt, trg, samples._ctrl
+                ctrl_n = mgt, trg, ctrl_name
 
                 if which == 'euclid':
-                    cs = ctrl_sim.loc[get_genes, ctrl_name]
+                    cs = ctrl_sim.loc[get_genes, ctrl_n]
                     if not proportional:
                         agg_sim = ts.mean()
                     else:
@@ -764,14 +712,17 @@ class Targets(_differential):
                         agg_sim = (cs_np - s_np) /cs_np
                 elif which == 'intersect':
                     mgt_int = 1 if mgt == 'up' else -1
-                    cs = pd.Series(mgt_int, get_genes, name=ctrl_name)
+                    cs = pd.Series(mgt_int, get_genes, name=ctrl_n)
                     agg_sim = ts.sum() *mgt_int
                     if proportional:
                         agg_sim /= cs.shape
                 # store plot data in nested dict
+                # sys.exit()
                 data[trg][mgt] = (ts.T, cs.to_frame().T, agg_sim)
             
             # iterate target+markergene type
+            print(genes)
+            print(sim)
             sim.groupby(axis=1, level=(0,1), sort=False).apply(sel_genes, genes)
             return data
 
@@ -844,8 +795,8 @@ class Targets(_differential):
             if cluster_genes and not hide_genes_dendrogram:
                 fig_heights[1] = config.HM_X_DENDROGRAM
             if not hide_distance_bar:
-                fig_heights[2] = config.HM_REQU_EFF_BAR
-            fig_heights[3] = config.HM_SQUARE_SIZE *len(samples._names  ) 
+                fig_heights[2] = config.HM_REQU_EFF_BAR 
+            fig_heights[3] = config.HM_SQUARE_SIZE *len(samples._names_noctrl) 
             if heatmap_height:
                 fig_heights[3] *= heatmap_height
             if show_genes_colorbar:
@@ -1106,37 +1057,21 @@ class Targets(_differential):
 
         # check user input for errors and incompatibilities around `which` arg
         def check_args():
-            nonlocal n_targets
+            nonlocal which
             nonlocal differential
             nonlocal proportional
+            nonlocal n_targets
             nonlocal display_similarity
 
-            util.check_which(which, self, samples, differential)
-            if which == 'intersect' and not differential:
-                logger.warning('For the `intersect` similarity metric, '
-                               'differential cannot be False.')
-                sys.exit(1)
-            if proportional and not differential:
-                proportional = False
-                logger.warning('`proportional` can only be used if '
-                               '`differential` is True aswell. Set to False.')
+            # check general basic input requirements
+            a = util.check_args(self, samples, which, differential, proportional, 
+                                display_similarity=display_similarity)
+            which, differential, proportional, _, _, _, display_similarity = a
             if not n_targets:
                 n_targets = len(self)
                 logger.warning('The number of targets `n_targets` was not '
                                'passed. Set to all target elements ({}).'
                                .format(len(self)))
-            val = ['mgs mean', 'mgs up', 'mgs down']
-            if display_similarity not in val:
-                logger.warning('Invalid input for display_similarity: `{}`. '
-                               'Valid are {}. Set to default `{}`'
-                               .format(display_similarity, val, val[0]))
-                display_similarity = val[0]
-            if display_similarity == val[2] and not self._down_mgs:
-                logger.error('Cannot display down markergene similarity because'
-                             ' the targets were not initiated with down '
-                             'markergenes.')
-                sys.exit(1)
-            display_similarity = display_similarity[4:]
             logger.info('Arguments passed. Getting data now ...')
 
         # get the aggrevated overlap data for plotting, pick the targets

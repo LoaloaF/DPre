@@ -28,10 +28,9 @@
 ------rework save logging...
 ------flip option for all 3 plots
 
-which = none, auto detect
-unify input checking
+------which = none, auto detect
+------unify input checking
 new default targets
-pack frontend in funcs
 tidy up, comment in modules (util etc.)
 
 -----

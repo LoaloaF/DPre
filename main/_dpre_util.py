@@ -91,26 +91,6 @@ def _make_title(differential, proportional, which, el1, el2, pref='', postf=''):
     return title.format(pref, dtype, postf, which_title, el1, el2)
 
 
-def check_which(which, trg, smp, diff):
-    msg = 'The {} were initiated without {} data. Cannot use `{}` similarity.'
-    if which not in ('euclid', 'intersect'):
-        logger.error('Invalid `which` input: `{}`. Valid are `euclid` and '
-                     '`intersect`'.format(which))
-    elif (which == 'euclid') and not trg._has_expr:
-        logger.error(msg.format('targets', 'expression', 'euclid'))
-    elif (which == 'euclid') and not smp._has_expr:
-        logger.error(msg.format('samples', 'expression', 'euclid'))
-    elif (which == 'intersect') and not trg._has_diff:
-        logger.error(msg.format('targets', 'merker gene', 'intersect'))
-    elif (which == 'intersect') and not smp._has_diff:
-        logger.error(msg.format('samples', 'differential', 'intersect'))
-    elif which == 'euclid' and diff and not smp._ctrl:
-        logger.error('To plot the changes in transcriptional similarity with '
-                     'which = `euclid`, the samples must be initiated with a '
-                     'control.')
-    else:
-        return
-    sys.exit(1)
 
     
 
@@ -332,3 +312,84 @@ def color_legend(colors, labels, filename='color_legend.png'):
 # def norm_to_one(ratio):
 #     ratio_normed = [r /sum(ratio) for r in ratio]
 #     return ratio_normed
+
+def check_args(trg, smp, which, differential, proportional, 
+               hide_distance_bar=None, reorder_to_distance_bar=None,
+               cluster_hmx=None, display_similarity=None):
+    def check_which(which, trg, smp, diff):
+        if which is None:
+            if trg._has_expr and smp._has_expr:
+                which = 'euclid'
+            elif trg._has_diff and smp._has_diff:
+                which = 'intersect'
+            else:
+                logger.error('Either initiate targets and samples with '
+                             'expression or with markergenes and diff genes.')
+                sys.exit(1)
+
+        msg = 'The {} were initiated without {} data. Cannot use `{}` similarity.'
+        if which not in ('euclid', 'intersect'):
+            logger.error('Invalid `which` input: `{}`. Valid are `euclid` and '
+                        '`intersect`'.format(which))
+        elif (which == 'euclid') and not trg._has_expr:
+            logger.error(msg.format('targets', 'expression', 'euclid'))
+        elif (which == 'euclid') and not smp._has_expr:
+            logger.error(msg.format('samples', 'expression', 'euclid'))
+        elif (which == 'intersect') and not trg._has_diff:
+            logger.error(msg.format('targets', 'merker gene', 'intersect'))
+        elif (which == 'intersect') and not smp._has_diff:
+            logger.error(msg.format('samples', 'diff genes', 'intersect'))
+        elif which == 'euclid' and diff and not smp._ctrl:
+            logger.error('To plot the changes in transcriptional similarity '
+                         'with which = `euclid`, the samples must be initiated '
+                         'with a control.')
+        else:
+            return which
+        sys.exit(1)
+
+    # checks for all plots
+    which = check_which(which, trg, smp, differential)
+    if which == 'intersect' and not differential:
+        differential = True
+        logger.warning('For the `intersect` similarity metric, '
+                       'differential cannot be False. Was set to True.')
+    if proportional and not differential:
+                    proportional = False
+                    logger.warning('`proportional` can only be used if '
+                                   '`differential` is True aswell. Set to False.')
+
+    # checks for 2 heatmaps
+    if which == 'euclid' and not hide_distance_bar and not smp._ctrl:
+        hide_distance_bar = True
+        logger.warning('`hide_distance_bar` cannot be False '
+                    'for which = `euclid` if the samples data is '
+                    'initialized without a control. Set to True.')
+    if reorder_to_distance_bar and hide_distance_bar:
+        reorder_to_distance_bar = False
+        logger.warning('When `reorder_to_distance_bar` is True, '
+                        '`hide_distance_bar` cannot be True. Set '
+                        'to False.')
+    if reorder_to_distance_bar and cluster_hmx:
+        cluster_hmx = False
+        logger.warning('Both `reorder_to_distance_bar` and '
+                        '`cluster_genes` were set as True. '
+                        '`cluster_genes` will be ignored.')                    
+
+    # checks for target_sim and ranked_sim plots
+    val = ['mgs mean', 'mgs up', 'mgs down']
+    if display_similarity not in val:
+        logger.warning('Invalid input for display_similarity: `{}`. ' 
+                           'Valid are {}. Set to default `{}`'
+                           .format(display_similarity, val, val[0]))
+        display_similarity = val[0] 
+
+    if display_similarity == val[2] and not trg._down_mgs: 
+        logger.error('Cannot display down markergene similarity because'
+                     ' the targets were not initiated with down '
+                     'markergenes.')
+        sys.exit(1)
+    display_similarity = display_similarity[4:]
+
+    return which, differential, proportional, hide_distance_bar, \
+           reorder_to_distance_bar, cluster_hmx, display_similarity
+

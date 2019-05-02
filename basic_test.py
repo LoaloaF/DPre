@@ -3,7 +3,7 @@ import pandas as pd
 from DPre import Samples, Targets, TARGET, config, color_legend
 
 # import os
-# fn = 'C:/Users\LOaLoA\OneDrive\internship_SUSTech\inhibitor_project\emb\original/rsem-genes2/genes_cpm_expression.tsv'
+fn = 'C:/Users\LOaLoA\OneDrive\internship_SUSTech\inhibitor_project\emb\original/rsem-genes2/genes_cpm_expression.tsv'
 # expr = pd.read_csv(fn, sep='\t')
 # expr.set_index('ensg', inplace=True)
 # # expr = expr.iloc[1::2]
@@ -19,7 +19,7 @@ from DPre import Samples, Targets, TARGET, config, color_legend
 #    axis=1)
 # expr.columns = ['2C', '4C', '8C',  'ICM', 'early2C', 'miioocyte', 'zygote']
 # dirr = 'C:/Users\LOaLoA\OneDrive\internship_SUSTech\inhibitor_project\emb\emb_inh\deseq2/res'
-# t = Targets( name='early embryonic fates', down_mgs=True)
+t = Targets(expression=fn, name='early embryonic fates')
 # t.reorder(['miioocyte', 'zygote', 'early2C', '2C', '4C', '8C', 'ICM'])
 # t.set_colors(config.colors)
 
@@ -29,19 +29,20 @@ from DPre import Samples, Targets, TARGET, config, color_legend
 #   the pandas expression table, the name of the control, the object name used 
 #   for headers and logging and finally weather the order differential names 
 #   should be ignored 
-c = Samples(diff_genes = 'test_data/deseq2', 
-            expression = 'test_data/genes_ntc_expression.tsv', 
-            ctrl = 'none', 
+# c = Samples(diff_genes = 'test_data/deseq2', 
+#             expression = 'test_data/genes_ntc_expression.tsv', 
+c = Samples(expression = 'test_data/genes_ntc_expression.tsv', 
+            # ctrl = 'none', 
             name = 'epigenetic inhihbitor combinations',
             override_namematcher=True)
 
 # a few handy features
 # laod in a default target, don't sort the elements alphabetically, look for a 
 #   preset color file to set default colors (available for `embryonic` and `all`)
-t = TARGET('mesoderm', sort=False, preset_colors=False)
+# t = TARGET('mesoderm', sort=False, preset_colors=False)
 
 # plot the target similarity of the samples, using the `euclid` method
-t.target_similarity_heatmap(c, 'euclid', pivot=True, cluster_samples=True,  cluster_targets=True)
+# t.target_similarity_heatmap(c, 'euclid', pivot=True, cluster_samples=True,  cluster_targets=True)
 #                           differential=True, 
 #                           proportional=False,
 #               reorder_to_required_effect_bar=True, 
@@ -131,12 +132,12 @@ t.gene_similarity_heatmap(c,  'euclid', filename='testfile.png', cluster_genes=F
 #                                 filename = 'gene_similarity_hm')
 
 
-t.ranked_similarity_barplot(c, 'euclid', 
-                            differential=False,
-                            proportional=True,
-                            rank_samples=True,
-                            display_negative=True,
+# t.ranked_similarity_barplot(c, 'euclid', 
+#                             differential=False,
+#                             proportional=True,
+#                             rank_samples=True,
+#                             display_negative=True,
                             
-                            colored_bars=True,
-                            title=True,
-)
+#                             colored_bars=True,
+#                             title=True,
+# )

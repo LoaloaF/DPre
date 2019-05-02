@@ -8,8 +8,9 @@ import DPre.main._dpre_util as util
 
 def TARGET(get, sort=False, preset_colors=False):
     spacer.info('\n\n')
-    valid = ['all', 'blood mesoderm', 'embryonic', 'endoderm', 'germ cells',
-            'mesoderm', 'neural crest', 'neuroectoderm', 'surface ectoderm']
+    valid = ['human', 'mouse', 'm blood mesoderm', 'm embryonic', 'm endoderm', 
+             'm germ cells', 'm mesoderm', 'm neural crest', 'm neuroectoderm', 
+             'm surface ectoderm']
     if get not in valid:
         logger.error('`{}` is not a valid default target. valid ones are {}'
                      .format(get, valid))
@@ -17,7 +18,7 @@ def TARGET(get, sort=False, preset_colors=False):
     path = os.path.dirname(__file__)
     get_dir = '{}/../default_targets/{}'.format(path, get)
     try:         
-        diff = pd.read_pickle('{}/differential.gzip'.format(get_dir))
+        diff = pd.read_pickle('{}/markergenes.gzip'.format(get_dir))
         expr = pd.read_pickle('{}/expression.gzip'.format(get_dir))
     except FileNotFoundError as e:
         logger.error('Could not load data for default targets: {}'.format(e))
@@ -27,9 +28,14 @@ def TARGET(get, sort=False, preset_colors=False):
         diff.sort_index(axis=1, inplace=True)
         expr.sort_index(axis=1, inplace=True)
     
+    if get == 'human':
+        name = 'human FANTOM5 library'
+    elif get == 'mouse':
+        name = 'mouse lineages'
+    else:
+        name = get[2:] + ' lineage'
     from DPre.main.targets import Targets
-    t = Targets(markergenes=diff, expression=expr, name=get+' mouse lineages',
-                log=False)
+    t = Targets(markergenes=diff, expression=expr, name=name, log=False)
     if preset_colors:
         try:
             df_colors = pd.read_csv('{}/colors.tsv'.format(get_dir), sep='\t', 
@@ -46,9 +52,6 @@ def TARGET(get, sort=False, preset_colors=False):
                 .format(get, t._name, len(t)))
     return t
 
-
-
-
 def _format_expr(expr, type_name, ctrl):
     if not isinstance(expr, pd.DataFrame):
         if not os.path.exists(expr):
@@ -63,12 +66,13 @@ def _format_expr(expr, type_name, ctrl):
         else:
             expr.set_index(expr.columns[0], inplace=True)
 
-    isna = expr.isna()
-    if isna.any().any():
-        spacer.error('\n')
-        logger.error('Invalid expression data: data contains NaN values.')
-        sys.exit(1)
-
+    met = [c for c in ('loc', 'name', 'tss_loc', 'strand') if c in expr.columns]
+    if met:
+        expr.drop(met, axis=1, inplace=True)
+        spacer.warning('\n')
+        logger.warning('{} found in expression column names. These are set to '
+                       'be automatically deleted'.format(met))
+    
     inv = expr.columns[expr.dtypes == object].tolist()
     if inv:
         spacer.warning('\n')
@@ -76,7 +80,13 @@ def _format_expr(expr, type_name, ctrl):
                         'in expression data: {}\nThese columns will be '
                         'removed.'.format(inv))
         expr.drop(inv, axis=1, inplace=True)
-    
+
+    isna = expr.isna()
+    if isna.any().any():
+        spacer.error('\n')
+        logger.error('Invalid expression data: data contains NaN values.')
+        sys.exit(1)
+
     elif ctrl and (ctrl not in expr.columns.unique(0)):
         spacer.error('\n')
         logger.error('The contrl name `{}` was not found in the passed '
@@ -162,8 +172,8 @@ def _format_diff_genes(diff_genes_dir, genelists_mgtype='up'):
             index_col = test_df.columns[0]
             if not str(test_df[index_col][0]).startswith('ENS'):
                 spacer.error('')
-                logger.error('The *.tsv files holding the differential '
-                            'keys do not have a column `ensg` nor do they '
+                logger.error('The *.tsv files holding the gene '
+                            'keys do not have a column `ENS*` nor do they '
                             'seem to have an ensg index in the first '
                             'column: {}, {}, ...'
                             .format(*test_df[index_col][:2].tolist()))
@@ -202,8 +212,8 @@ def _format_diff_genes(diff_genes_dir, genelists_mgtype='up'):
 
     spacer.info('')
     logger.info('Formatting differential genes from {} files. {} *.tsv '
-                'files in {}:\n{}'.format(inp_t, len(files), direc, 
-                                          [f[f.rfind(os.sep)+1:] for f in files]))
+                'files in {}:\n{} ... {}\n'.format(inp_t, len(files), direc, 
+                       *[f[f.rfind(os.sep)+1:] for f in (files[0], files[-1])]))
 
     diffs = merge_files()
     if inp_t == 'genelist (up)' and get_down_genelists:

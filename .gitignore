@@ -17,6 +17,7 @@ __pycache__
 main/__pycache__/*.pyc
 main/.vimrc
 news.txt
+/.vscode
 
 
 # Byte-compiled / optimized / DLL files

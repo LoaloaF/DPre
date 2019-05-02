@@ -55,8 +55,9 @@ class _differential:
         if not self._has_expr and not self._has_diff:
             spacer.error('')
             cmd_pref = self._type_name.lower()+'_' if log == 'from_cmd' else ''
-            logger.error('At leat one of `{}expression` and `{}` must be '
-                         'passed.'.format(cmd_pref, self._dnm))
+            logger.error('Failed to init {}:\nAt leat one of `{}expression` and '
+                         '`{}` must be passed.'
+                         .format(self._type_name, cmd_pref, self._dnm))
             sys.exit(1)
 
     @property

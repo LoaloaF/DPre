@@ -620,7 +620,7 @@ class Targets(_differential):
             if custom_target_genelist:
                 nonlocal self
                 diff = pd.DataFrame(True, genes.ensg, self._diff.columns)
-                args = {'diff_genes': diff}
+                args = {'markergenes': diff}
                 if which == 'euclid':
                     expr = self._expr.loc[genes.ensg].copy()
                     args.update({'expression': expr})
@@ -717,12 +717,9 @@ class Targets(_differential):
                     if proportional:
                         agg_sim /= cs.shape
                 # store plot data in nested dict
-                # sys.exit()
                 data[trg][mgt] = (ts.T, cs.to_frame().T, agg_sim)
             
             # iterate target+markergene type
-            print(genes)
-            print(sim)
             sim.groupby(axis=1, level=(0,1), sort=False).apply(sel_genes, genes)
             return data
 

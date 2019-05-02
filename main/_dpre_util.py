@@ -36,15 +36,17 @@ def add_mgtmean(agg):
     agg_mean.columns = add_level(agg_mean.columns, 'mean')
     return pd.concat([agg, agg_mean], axis=1)
 
-def _add_log2_z(expr):
+def _add_log2_z(expr, rowwise_v=True):
     expr = np.log2(expr +1)
     expr.columns = add_level(expr.columns, 'log2', at=1)
 
     m = expr.values.mean()
-    s = expr.values.std()
+    if not rowwise_v:
+        s = expr.values.std()
+    else:
+        s = expr.std(1)
     z_expr = expr.apply(lambda c: (c-m) /s)
     z_expr.columns = add_level(z_expr.columns, 'z', 1, True)
-
     return pd.concat((expr, z_expr), axis=1).reindex(expr.columns.unique(0), 
                                                      axis=1, level=0)
 

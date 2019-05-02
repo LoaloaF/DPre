@@ -32,6 +32,7 @@
 ------unify input checking
 new default targets
 tidy up, comment in modules (util etc.)
+pass colors to cmds + gen legend
 
 -----
 

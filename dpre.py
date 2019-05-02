@@ -1,16 +1,25 @@
 import DPre
 import argparse
 
+# import DPre.main._dpre_util as util
+# import DPre.main.config as config
+
 # initaite and return the targets and samples for the plots
 def init_trg_smp(args):
-               t = DPre.Targets(markergenes = args['markergenes'],
-                    expression = args['targets_expression'],
-                    name = args['targets_name'],
-                    ignore_down_mgs = args['ignore_down_mgs'],
-                    override_namematcher = args['targets_override_namematcher'], 
-                    log='from_cmd')
+               if args['targets_preset'] is not None:
+                    t = DPre.TARGET(args['targets_preset'])
+               else:
+                    t = DPre.Targets(markergenes = args['markergenes'],
+                         expression = args['targets_expression'],
+                         name = args['targets_name'],
+                         ignore_down_mgs = args['ignore_down_mgs'],
+                         override_namematcher = args['targets_override_namematcher'], 
+                         log='from_cmd')
                if args['targets_slice'] is not None:
                     t = t.slice_elements(args['targets_slice'])
+               # t.set_colors({**dict.fromkeys(('Hepatocyte', 'Liver adult', 'Liver fetal'), config.colors[10]), 
+               #               'H9 embryonic stem cells': config.colors[11]})
+               # util.color_legend((config.colors[10], config.colors[10], config.colors[10], config.colors[11]), ('Hepatocyte', 'Liver adult', 'Liver fetal', 'H9 embryonic stem cells'))
                s = DPre.Samples(diff_genes = args['diff_genes'],
                     expression = args['samples_expression'],
                     ctrl = args['control'],
@@ -368,7 +377,7 @@ dat_grp.add_argument('--proportional', '-p', action='store_true',
 dat_grp.add_argument('--display_similarity', '-ds', default='mgs mean',
                      choices=['mgs mean', 'mgs up', 'mgs down'], help='Specify '
                      'up- or down markerene similarity, default mean')
-dat_grp.add_argument('--n_targets', '-nt', type=int,
+dat_grp.add_argument('--n_targets', '-nt', type=int, default=16,
                      help='specify number of targets to show')
 dat_grp.add_argument('--display_negative', '-din', action='store_true',
                      help='besides postive values, display the negative ones')
@@ -400,8 +409,8 @@ elem_grp.add_argument('--hide_targetlabels', '-hta', action='store_true',
 elem_grp.add_argument('--hide_colorbar', '-hc', action='store_true', 
                       help='do not plot the targets colorbar')
 
-
-
 args = vars(parser.parse_args())
 do_plot = args.pop('func')
 do_plot(args)
+
+# python .\dpre.py -tp human -se .\example_data\hsliver\GSE70741_genes_expression.tsv -c "Day 00" -sn "in vitro hepatic diff. hESCs" target_sim -d -ct --hide_targets_dendrogram -hw .2 -hta -ta .1 -f "target_sim_diff.png"

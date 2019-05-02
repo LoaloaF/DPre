@@ -183,7 +183,7 @@ def _init_figure(fig_widths, fig_heights, nplts, spacers):
 
     return fig, axes
 
-def setup_heatmap_xy(x_y, ax, lbls, pivot, show_lbls, trg_lbl_size, colors):
+def setup_heatmap_xy(x_y, ax, lbls, pivot, hide_lbls, trg_lbl_size, colors):
     
     dim = len(lbls)
     if x_y == 'x':
@@ -191,7 +191,7 @@ def setup_heatmap_xy(x_y, ax, lbls, pivot, show_lbls, trg_lbl_size, colors):
         ax.set_xlim(0, dim)
         ticks = np.arange(.5, dim)
         ax.set_xticks(ticks)
-        if show_lbls:
+        if not hide_lbls:
             ax.tick_params(labelbottom=True)
             fs = trg_lbl_size*config.FONTS if trg_lbl_size else config.FONTS
             if not pivot:
@@ -207,7 +207,7 @@ def setup_heatmap_xy(x_y, ax, lbls, pivot, show_lbls, trg_lbl_size, colors):
     elif x_y == 'y':
         ax.set_ylim((-.1, dim +.01))
         ax.set_yticks(np.arange(.5, dim))
-        if show_lbls:
+        if not hide_lbls:
             ax.tick_params(labelleft=True) 
             if not pivot:
                 ax.set_yticklabels(lbls, x=.5)

@@ -26,9 +26,13 @@
 ------option to view only up or only down markergene sims. for agg plots
 ------color legend
 ------rework save logging...
-flip option for all 3 plots
-comments for all the miscelanious code...
+------flip option for all 3 plots
+
+which = none, auto detect
 unify input checking
+new default targets
+pack frontend in funcs
+tidy up, comment in modules (util etc.)
 
 -----
 

@@ -27,8 +27,8 @@ def TARGET(get, sort=False, preset_colors=False):
         diff.sort_index(axis=1, inplace=True)
         expr.sort_index(axis=1, inplace=True)
     
-    from DPre.main.targets import Targets   
-    t = Targets(diff_genes=diff, expression=expr, name=get+' mouse lineages',
+    from DPre.main.targets import Targets
+    t = Targets(markergenes=diff, expression=expr, name=get+' mouse lineages',
                 log=False)
     if preset_colors:
         try:
@@ -49,32 +49,40 @@ def TARGET(get, sort=False, preset_colors=False):
 
 
 
-def _validate_expression(expr, type_name, ctrl):
-    isna = expr.isna()
-    if isna.any().any():
-        if not ((expr.columns.nlevels == 2) and not isna.xs('z', 1, 1).any().any()):
-            spacer.error('\n')
-            logger.error('Invalid expression data: data contains NaN values.')
+def _format_expr(expr, type_name, ctrl):
+    if not isinstance(expr, pd.DataFrame):
+        if not os.path.exists(expr):
+            spacer.info('')
+            logger.error('Could not change directory to {}\nCheck the '
+                        'path.'.format(os.path.abspath(expr)))
             sys.exit(1)
 
-    if 'object' in expr.dtypes.values:
+        expr = pd.read_csv(expr, sep='\t')
+        if 'ensg' in expr.columns:
+            expr.set_index('ensg', inplace=True)
+        else:
+            expr.set_index(expr.columns[0], inplace=True)
+
+    isna = expr.isna()
+    if isna.any().any():
         spacer.error('\n')
-        logger.error('Invalid expression data: data contains elements of '
-                     'datatype `object` (often text).')
+        logger.error('Invalid expression data: data contains NaN values.')
         sys.exit(1)
 
-    # if type_name == 'Samples' and not ctrl:
-    #     spacer.error('\n')
-    #     logger.error('For Drivers, the name of the contrl must be passed if '
-    #                  'expression data is loaded.')
-        # sys.exit(0)
+    inv = expr.columns[expr.dtypes == object].tolist()
+    if inv:
+        spacer.warning('\n')
+        logger.warning('Invalid columns of datatype `object` (often text) '
+                        'in expression data: {}\nThese columns will be '
+                        'removed.'.format(inv))
+        expr.drop(inv, axis=1, inplace=True)
     
     elif ctrl and (ctrl not in expr.columns.unique(0)):
         spacer.error('\n')
         logger.error('The contrl name `{}` was not found in the passed '
-                     'expression data.'.format(ctrl))
+                    'expression data.'.format(ctrl))
         sys.exit(1)
-        
+
     if expr.columns.nlevels > 1:
         exp_idx = [(name, dt) for name in expr.columns.unique(0) 
                     for dt in ['log2', 'z']]
@@ -97,51 +105,53 @@ def _validate_expression(expr, type_name, ctrl):
         return util._add_log2_z(expr)
 
 
-def _format_diff_genes(diff_genes_dir, has_expr, genelists_mgtype='up'): 
+def _format_diff_genes(diff_genes_dir, genelists_mgtype='up'): 
     # check if path exists and contains .tsv files
     def check_path(direc):
         if not os.path.exists(direc):
             spacer.info('')
-            logger.error('Could not change directory to {}/{}\nCheck the '
-                        'path.'.format(os.getcwd(), direc))
+            logger.error('Could not change directory to {}\nCheck the '
+                        'path.'.format(os.path.abspath(direc)))
             sys.exit(1)
         files = glob.glob(direc + '/*.tsv')
         if not files:
             spacer.info('')
-            logger.error('No *.tsv files found in {}/{}\nCheck the path.'
-                        .format(os.getcwd(), direc))
+            logger.error('No *.tsv files found in {}\nCheck the path.'
+                        .format(os.path.abspath(direc)))
             sys.exit(1)
-            os.sep
+            
     # check if up and down genelist directories are compatible
     def check_up_down_genelists():
-        if isinstance(diff_genes_dir, (list, tuple)):
+        if isinstance(diff_genes_dir, (list, tuple)) and len(diff_genes_dir) == 2:
             check_path(diff_genes_dir[0])
             check_path(diff_genes_dir[1])
             up_dir = glob.glob(diff_genes_dir[0]+'/*.tsv')
             down_dir = glob.glob(diff_genes_dir[1]+'/*.tsv')
             if len(up_dir) != len(down_dir):
                 logger.error('Number of up- and down genelist files differ. '
-                            'Found {} *.tsv files in up directory:\n{}/{}\n'
-                            '{} *tsv files in down directory:\n{}/{}\n'
-                            .format(len(up_dir), os.getcwd(), 
-                                    diff_genes_dir[0], len(down_dir), 
-                                    os.getcwd(), diff_genes_dir[1]))
+                             'Found {} *.tsv files in up directory\n{}\n'
+                             '{} *tsv files in down directory:\n{}\n'
+                             .format(len(up_dir), os.path.abspath(diff_genes_dir[0]), 
+                                     len(down_dir), 
+                                     os.path.abspath(diff_genes_dir[1])))
                 sys.exit(1)
-
-            is_single = lambda n: (n not in up_dir) or (n not in down_dir)
-            singles = list(filter(is_single, set((*up_dir, *down_dir))))
+            f_up = [f[f.rfind(os.sep)+1:] for f in up_dir]
+            f_down = [f[f.rfind(os.sep)+1:] for f in down_dir]
+            is_single = lambda n: (n not in f_up) or (n not in f_down)
+            singles = list(filter(is_single, set((*f_up, *f_down))))
             if singles:
                 logger.error('Names of up- and down genelist files differ. '
-                            'Names only found in one of the two '
-                            'directories ({}):\n{}'
-                            .format(len(singles), singles))
+                             'Names only found in one of the two '
+                             'directories ({}):\n{}'
+                             .format(len(singles), singles))
                 sys.exit(1)
-            get_down_genelists = True
-            return diff_genes_dir[0]
+            return diff_genes_dir[0], True
+        elif isinstance(diff_genes_dir, (list, tuple)):
+            check_path(diff_genes_dir[0])
+            return diff_genes_dir[0], False
         else:
-            get_down_genelists = False
             check_path(diff_genes_dir)
-            return diff_genes_dir, get_down_genelists
+            return diff_genes_dir, False
 
     # check wether to process deseq2 files or genelist files
     def check_input_type():
@@ -185,7 +195,7 @@ def _format_diff_genes(diff_genes_dir, has_expr, genelists_mgtype='up'):
                 diffs.append(s)
         return diffs
 
-    spacer.info('\n\n')
+    spacer.info('\n')
     direc, get_down_genelists = check_up_down_genelists()
     files = glob.glob(direc + '/*.tsv')
     inp_t, index_col = check_input_type()
@@ -193,17 +203,12 @@ def _format_diff_genes(diff_genes_dir, has_expr, genelists_mgtype='up'):
     spacer.info('')
     logger.info('Formatting differential genes from {} files. {} *.tsv '
                 'files in {}:\n{}'.format(inp_t, len(files), direc, 
-                                          [f[f.rfind(os.sep):] for f in files]))
-    if (inp_t == 'genelist (up)') and not has_expr:
-        spacer.warning('')
-        logger.warning('You are iniatiating the {} from genelist files ' 
-                    'without passing expression data. Note that you '
-                    'may therefore have a low value of detected genes.')
+                                          [f[f.rfind(os.sep)+1:] for f in files]))
 
     diffs = merge_files()
     if inp_t == 'genelist (up)' and get_down_genelists:
         # recursion entry
-        diffs.extend(_format_diff_genes(diff_genes_dir[1], has_expr, 'down'))
+        diffs.extend(_format_diff_genes(diff_genes_dir[1], 'down'))
         # recursion over
     elif inp_t == 'genelist (down)':
         # recursion exit

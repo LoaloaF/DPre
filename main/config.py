@@ -70,7 +70,7 @@ set_link_color_palette(dendrogram_colors[1:])
 
 
 HM_LEFT = .8
-HM_PIVOT_LEFT = .7
+HM_PIVOT_LEFT = .8
 HM_TOP = .8
 HM_RIGHT = .1
 HM_BOTTOM = 1

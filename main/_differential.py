@@ -5,16 +5,16 @@ import matplotlib.colors as mpl_colors
 import matplotlib.pyplot as plt
 
 import DPre.main._dpre_util as util
-import DPre.main._format_input as _format_input
+import DPre.main._format_input as fmt_inp
 import DPre.main.config as config
 from DPre.main._logger import logger, spacer, log_init
 
 class _differential:
-    def __init__(self, diff_genes,  expression, ctrl, override_diff_names,
-                 name, log):
+    def __init__(self, diff_genes, expression, name, override_namematcher,
+                 log, diff_mg_logname):
 
         self._name = name if name else self._type_name
-        self._ctrl = ctrl
+        self._dnm = diff_mg_logname
         self._colors = {}
         self._has_expr = False
         self._has_diff = False
@@ -22,17 +22,15 @@ class _differential:
         self._expr = expression
         if self._expr is not None:
             self._has_expr = True
-            self._expr = _format_input._validate_expression(expression, 
-                                                    self._type_name, self._ctrl)
+            ctrl = self._ctrl if self._type_name == 'Samples' else None
+            self._expr = fmt_inp._format_expr(expression, self._type_name, ctrl)
             self._min_zval = self._expr.xs('z', level=1, axis=1).min().min()
-            self._max_zval = self._expr.xs('z', level=1, axis=1).max().max()
 
         self._diff = diff_genes
         if self._diff is not None:
             self._has_diff = True
             if not isinstance(diff_genes, pd.DataFrame):
-                self._diff = _format_input._format_diff_genes(diff_genes, 
-                                                              self._has_expr)
+                self._diff = fmt_inp._format_diff_genes(diff_genes)
 
             if self._type_name == 'Targets':
                 if not self._down_mgs:
@@ -41,35 +39,26 @@ class _differential:
                     self._down_mgs = False
             if log:
                 spacer.info('')
-                logger.info('Number of differential genes: \n{}'
-                            .format(self._diff.sum().unstack(level=0).to_string()))
+                logger.info('Number of {} genes: \n{}'.format(self._dnm, 
+                            self._diff.sum().unstack(0).to_string()))
                         
             if self._has_expr:
                 self._diff = self._diff.reindex(self._expr.index).fillna(False)
-                self._is_expr_diff_compatible(override_diff_names, log)
+                self._is_expr_diff_compatible(override_namematcher, log)
+
         elif self._type_name == 'Targets':
             self._down_mgs = False
-            logger.warning('The targets `{}` are initiated without marker '
-                           'genes. Note that comparing against all genes can '
+            logger.warning('The targets `{}` are initiated without markergenes.'
+                           ' Note that comparing against all genes can '
                            'lead to low accuracy for defining transcr. '
                            'similarity.'.format(self._name))
-
-        
         if not self._has_expr and not self._has_diff:
             spacer.error('')
-            logger.error('One of `expression` and `diff_genes` must be passed.')
+            cmd_pref = self._type_name.lower()+'_' if log == 'from_cmd' else ''
+            logger.error('At leat one of `{}expression` and `{}` must be '
+                         'passed.'.format(cmd_pref, self._dnm))
             sys.exit(1)
-        if log:
-            spacer.info('\n\n')
-            self._log_init()
 
-    @property
-    def _names_noctrl(self):
-        ns = self._names
-        if self._ctrl and self._ctrl in ns:
-            ns.remove(self._ctrl)
-        return ns
-    
     @property
     def _names(self):
         name_from, at = (self._expr, 0) if self._has_expr else (self._diff, 1)
@@ -86,14 +75,6 @@ class _differential:
 
     def __len__(self):
         return len(self._names)
-    
-    def __repr__(self):
-        return ('\n=|=|= {}-instance =|=|=\nname = {};\nelements = {};\n'
-                'differential data = {};\nexpression data = {} (n={});\n'
-                .format(self._type_name, self._name, self._names, len(self),
-                        self._has_diff, self._has_expr))
-
-
 
     def set_name(self, name):
         self._name = name
@@ -262,16 +243,15 @@ class _differential:
     
 
 
-    def _is_expr_diff_compatible(self, override_diff_names=False, log=True):
+    def _is_expr_diff_compatible(self, override_namematcher=False, log=True):
         expr_names = self._names
         diff_names = self._diff.columns.unique(-1).tolist()
         if log:
             spacer.info('\n\n')
-        
         if len(expr_names) != len(diff_names):
             if (len(expr_names) == len(diff_names) +1):
-                msg = ('Differential ({}) has one element less than expression '
-                       '({}). '.format(len(diff_names), len(expr_names)))
+                msg = ('{} ({}) has one element less than expression ({}). '
+                       .format(self._dnm, len(diff_names), len(expr_names)))
                 if self._ctrl:
                     msg += ('An empty element `{}` (control) will be added to '
                             'differential.'.format(self._ctrl))
@@ -287,65 +267,66 @@ class _differential:
                 else:
                     msg += ('If the control is missing in the differential '
                             'elements, you can pass its name to append it '
-                            'automatically.')
+                            'automatically or delete it from expression data.')
                     logger.info(msg)
                     sys.exit(1)
 
             else:
-                logger.error('Passed expression ({}) and differential ({}) do '
+                logger.error('Passed expression ({}) and {} ({}) do '
                              'not have the same number of elements. Check input.'
-                             .format(len(expr_names), len(diff_names)))
+                             .format(len(expr_names), self._dnm, len(diff_names)))
                 sys.exit(1)
         
-        align = [e_n in d_n for e_n, d_n in zip(expr_names, diff_names)]
+        align = [e_n == d_n for e_n, d_n in zip(expr_names, diff_names)]
         df = pd.DataFrame({'expression names': expr_names, 
-                            'differential names': diff_names, 
-                            'expr. substring of diff.': align})
-        if all(align) or override_diff_names:
+                            self._dnm+' names': diff_names, 
+                            'match': align})
+        if all(align) or override_namematcher:
             spacer.info('')
-            msg = 'Differential names have been overriden by expression names. '
+            msg = self._dnm + ' names have been overriden by expression names. '
             lvls = self._diff.columns.unique(0), expr_names
             self._diff.columns = pd.MultiIndex.from_product(lvls)
-            if all(align):
-                if log:
-                    logger.info('Expression and differential names match: \n{}'
-                                '\n{}'.format(df.to_string(), msg))
-            elif override_diff_names:
-                logger.warning('{}CAUTION: Differential- and expression names '
+            if override_namematcher:
+                logger.warning('{}CAUTION: {}- and expression names '
                                'do not match for all elements:\n{}\nMake sure '
                                'data aligns to avaid mislabeling!'
-                               .format(msg, df.to_string()))
+                               .format(msg, self._dnm, df.to_string()))
         else:
             spacer.error('')
-            logger.error(('Differential- and expression element names do '
-                          'not match:\n{}\nRename elements in expression '
-                          '/differential input files or override the '
-                          'differential names by setting `override_diff_names` '
-                          'to True.'.format(df.to_string())))
+            logger.error(('{0}- and expression element names do '
+                          'not match:\n{1}\nRename elements in expression '
+                          '/{0} input files or override the '
+                          '{0} names by setting `override_namematcher` '
+                          'to True.'.format(self._dnm, df.to_string())))
             sys.exit(1)
 
 
     def _log_init(self):
         if self._has_diff:
             ud = self._diff.any(axis=1).sum()
-            uniq_diff = (', of which {} unique differential'.format(ud))
+            uniq_diff = (', of which {} {}'.format(ud, self._dnm))
         else:
             uniq_diff = ''
 
+        if self._type_name == 'Targets':
+            diffmgs = 'Markergenes'
+            trg_smp_arg = 'Down markergenes loaded: {}'.format(self._down_mgs)
+        elif self._type_name == 'Samples':
+            diffmgs = 'Differential genes'
+            trg_smp_arg = ('Control passed: {}'
+                           .format(self._ctrl if self._ctrl else False))
         msg = ('{}\nNew {}-instance created: `{}`\n\t{} ({}):\n\t\t{}\n\t'
-               'Detected genes: {}{}\n\tDifferential genes loaded: {}\n\t'
-               'Expression data loaded: {}'
+               'Detected genes: {}{}\n\t{} loaded: {}\n\t'
+               'Expression data loaded: {}\n\t{}'
                .format(log_init, self._type_name, self._name,
                        self._type_name, len(self), ',\n\t\t'.join(self._names), 
-                       len(self._detec_genes), uniq_diff, self._has_diff, 
-                       self._has_expr))
-        if self._type_name == 'Samples':
-            msg += '\n\tPassed control: {}'.format(bool(self._ctrl))
+                       len(self._detec_genes), uniq_diff, diffmgs, 
+                       self._has_diff, self._has_expr, trg_smp_arg))
         logger.info(msg)
 
 
     def _update_data_columns(self, names, func_name='reindex'):
-        args = {'labels': names, 'axis':1,}
+        args = {'labels': names, 'axis': 1,}
         if self._has_expr:
             if func_name == 'reindex':
                 self._expr = self._expr.reindex(**args, level=0)

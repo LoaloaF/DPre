@@ -2,64 +2,46 @@ import pandas as pd
 
 from DPre import Samples, Targets, TARGET, config, color_legend
 
-import os
-fn = 'C:/Users\LOaLoA\OneDrive\internship_SUSTech\inhibitor_project\emb\original/rsem-genes2/genes_cpm_expression.tsv'
-expr = pd.read_csv(fn, sep='\t')
-expr.set_index('ensg', inplace=True)
-# expr = expr.iloc[1::2]
-[expr.drop(c, axis=1, inplace=True) for c in expr.columns if 'mean_' not in c]
-expr = expr.reindex([
-                'mean_embryo 2C',
-                'mean_embryo 4C',
-                'mean_embryo 8C',
-               'mean_embryo ICM',
-           'mean_embryo early2C',
-         'mean_embryo miioocyte',
-            'mean_embryo zygote'], 
-   axis=1)
-expr.columns = ['2C', '4C', '8C',  'ICM', 'early2C', 'miioocyte', 'zygote']
-dirr = 'C:/Users\LOaLoA\OneDrive\internship_SUSTech\inhibitor_project\emb\emb_inh\deseq2/res'
-t = Targets(expression=expr, diff_genes=dirr, name='early embryonic fates', use_down_mgs=True)
-t.reorder(['miioocyte', 'zygote', 'early2C', '2C', '4C', '8C', 'ICM'])
-t.set_colors(config.colors)
+# import os
+# fn = 'C:/Users\LOaLoA\OneDrive\internship_SUSTech\inhibitor_project\emb\original/rsem-genes2/genes_cpm_expression.tsv'
+# expr = pd.read_csv(fn, sep='\t')
+# expr.set_index('ensg', inplace=True)
+# # expr = expr.iloc[1::2]
+# [expr.drop(c, axis=1, inplace=True) for c in expr.columns if 'mean_' not in c]
+# expr = expr.reindex([
+#                 'mean_embryo 2C',
+#                 'mean_embryo 4C',
+#                 'mean_embryo 8C',
+#                'mean_embryo ICM',
+#            'mean_embryo early2C',
+#          'mean_embryo miioocyte',
+#             'mean_embryo zygote'], 
+#    axis=1)
+# expr.columns = ['2C', '4C', '8C',  'ICM', 'early2C', 'miioocyte', 'zygote']
+# dirr = 'C:/Users\LOaLoA\OneDrive\internship_SUSTech\inhibitor_project\emb\emb_inh\deseq2/res'
+# t = Targets( name='early embryonic fates', down_mgs=True)
+# t.reorder(['miioocyte', 'zygote', 'early2C', '2C', '4C', '8C', 'ICM'])
+# t.set_colors(config.colors)
 
 # prepare input expression table
-expr = pd.read_csv('test_data/genes_ntc_expression.tsv', sep='\t', 
-                   index_col='ensg')
-order = ['4C-8C DMIT', '4C BMIT', '4C DBMIT', '4C DBMI','4C DBMT',
-         '8C DMVIT', '8C DMVI', '8C DMVT', '8C DVIT', 
-         'DIB', 'DMB', 'DMI', 'DMVIBTCOUCGSB', 'DMV',  'DVB', 'DVI', 
-         'ICM DITCO', 'ICM DTCO', 'ICM ITCO', 
-         'MIB', 'MVB', 'MVI', 'VIB', 'none']
-expr = expr.reindex(['mean_ESC '+ o for o in order], axis=1)
-# reorder columns to match the order of the differential data (alphabetically sorted)
-expr.columns = order
 
 # initiate samples instance by passing the directory of deseq2 files, 
 #   the pandas expression table, the name of the control, the object name used 
 #   for headers and logging and finally weather the order differential names 
 #   should be ignored 
 c = Samples(diff_genes = 'test_data/deseq2', 
-            expression = expr, 
+            expression = 'test_data/genes_ntc_expression.tsv', 
             ctrl = 'none', 
             name = 'epigenetic inhihbitor combinations',
-            override_diff_names=True)
+            override_namematcher=True)
 
 # a few handy features
-c.set_colors(config.colors)
-order.remove('DMVIBTCOUCGSB')
-c = c.slice_elements(order)
-c.reorder(['DMV',  'DVB', 'DVI', 'ICM DITCO', 'ICM DTCO', 'ICM ITCO', 
-           'MIB', 'MVB', 'MVI', 'VIB', 'none', '4C-8C DMIT', '4C BMIT', 
-           '4C DBMIT', '4C DBMI','4C DBMT', '8C DMVIT', '8C DMVI', 
-           '8C DMVT', '8C DVIT', 'DIB', 'DMB', 'DMI'])
-           
 # laod in a default target, don't sort the elements alphabetically, look for a 
 #   preset color file to set default colors (available for `embryonic` and `all`)
 t = TARGET('mesoderm', sort=False, preset_colors=False)
 
 # plot the target similarity of the samples, using the `euclid` method
-t.target_similarity_heatmap(c, 'euclid', pivot=True, cluster_samples=True, show_samples_colorbar=False)
+t.target_similarity_heatmap(c, 'euclid', pivot=True, cluster_samples=True,  cluster_targets=True)
 #                           differential=True, 
 #                           proportional=False,
 #               reorder_to_required_effect_bar=True, 
@@ -111,7 +93,7 @@ t.target_similarity_heatmap(c, 'euclid', pivot=True, cluster_samples=True, show_
 #     "Pecam1", "Dppa5a", 'Dppa2', 
 #     "Rcor2", "Lin28b", "Foxo4", "Ccnd3", "Ccnb1", "Cbx1", "Dab2", "Gli1", "Tbx2", "Tgfb2"], config.colors[17])
 # genes_colorbar = {**cols_stab, **cols_init, **cols_mat}
-t.gene_similarity_heatmap(c,  'euclid', filename='testfile.png', cluster_genes=False, show_sample_dendrogram=True, pivot=True)
+t.gene_similarity_heatmap(c,  'euclid', filename='testfile.png', cluster_genes=False, show_samples_dendrogram=True, pivot=True)
 #                                 differential = True,
 #                                 proportional = True, 
 #                                 gene_number = 20,
@@ -149,15 +131,12 @@ t.gene_similarity_heatmap(c,  'euclid', filename='testfile.png', cluster_genes=F
 #                                 filename = 'gene_similarity_hm')
 
 
-# t.ranked_similarity_barplot(c, 'euclid', pivot=True,)
-#                             differential=False,
-#                             proportional=True,
-#                             rank_samples=True,
-#                             show_negative=True,
+t.ranked_similarity_barplot(c, 'euclid', 
+                            differential=False,
+                            proportional=True,
+                            rank_samples=True,
+                            display_negative=True,
                             
-#                             show_colorbar=True,
-#                             colored_bars=True,
-#                             show_targetlabels=True,
-#                             title=True,
-#                             filename='testfiles.png'
-# )
+                            colored_bars=True,
+                            title=True,
+)

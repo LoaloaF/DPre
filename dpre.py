@@ -9,12 +9,16 @@ def init_trg_smp(args):
                     ignore_down_mgs = args['ignore_down_mgs'],
                     override_namematcher = args['targets_override_namematcher'], 
                     log='from_cmd')
+               if args['targets_slice'] is not None:
+                    t = t.slice_elements(args['targets_slice'])
                s = DPre.Samples(diff_genes = args['diff_genes'],
                     expression = args['samples_expression'],
                     ctrl = args['control'],
                     name = args['samples_name'],
                     override_namematcher = args['samples_override_namematcher'], 
                     log='from_cmd')
+               if args['samples_slice'] is not None:
+                    s = s.slice_elements(args['samples_slice'])
                return t, s
 
 # run the target_similarity_heatmap plot with the parsed arguments (1/3)
@@ -147,6 +151,8 @@ trg_grp.add_argument('--targets_name', '-tn', type=str,
 trg_grp.add_argument('--targets_override_namematcher', '-to', 
                      action='store_true', help='when both markergenes and '
                      'expression, ignore name mismatches')
+trg_grp.add_argument('--targets_slice', '-ts', nargs='*', type=str, 
+                     help='convenience slicer, pass the element names to keep')
 
 # create a group from the parser for the samples data input
 smp_grp = parser.add_argument_group('Samples', description='input data to '
@@ -164,6 +170,8 @@ smp_grp.add_argument('--samples_name', '-sn', type=str,
 smp_grp.add_argument('--samples_override_namematcher', '-so', 
                      action='store_true', help='when both differential and '
                     'expression, ignore name mismatches')
+smp_grp.add_argument('--samples_slice', '-ss', nargs='*', type=str, 
+                     help='convenience slicer, pass the element names to keep')
 
 # create a subparser of parser that specifies the plot to run
 # each plot is a parser of this subparser and implements its do_plot function
@@ -393,6 +401,8 @@ elem_grp.add_argument('--hide_targetlabels', '-hta', action='store_true',
                       help='do not show the target labels')
 elem_grp.add_argument('--hide_colorbar', '-hc', action='store_true', 
                       help='do not plot the targets colorbar')
+
+
 
 args = vars(parser.parse_args())
 do_plot = args.pop('func')

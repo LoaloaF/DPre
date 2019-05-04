@@ -14,6 +14,7 @@ def init_trg_smp(args):
                          name = args['targets_name'],
                          ignore_down_mgs = args['ignore_down_mgs'],
                          override_namematcher = args['targets_override_namematcher'], 
+                         species = args['species'], 
                          log='from_cmd')
                if args['targets_slice'] is not None:
                     t = t.slice_elements(args['targets_slice'])
@@ -158,6 +159,8 @@ trg_grp.add_argument('--targets_name', '-tn', type=str,
 trg_grp.add_argument('--targets_override_namematcher', '-to', 
                      action='store_true', help='when both markergenes and '
                      'expression, ignore name mismatches')
+trg_grp.add_argument('--species', '-s', type=str, default='mouse',
+                     help='species of the target, default `mouse`')
 trg_grp.add_argument('--targets_slice', '-ts', nargs='*', type=str, 
                      help='convenience slicer, pass the element names to keep')
 

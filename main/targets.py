@@ -13,46 +13,46 @@ from DPre.main._logger import spacer, logger, log_plot
 import DPre.main.config as config
 import DPre.main._dpre_util as util
 
-"""class describing the data to compare similarity against
-
-Targets can hold lists of markergenes and expression data identifying a 
-collection of comparitive transcriptional identities, the targets. 
-Targets are recomended to be initiated with markergenes. 
-
-Arguments:
-    markergenes (optional): directory with deseq2 output OR directories with 
-        up- and (optional) down genelists OR pandas.DataFrame. Defaults to None.
-        Genelist data have an ensg key in the first column or contain an 'ensg' 
-        column label.
-        When passing a DataFrame, the index should consist of all genes, 
-        the columns of a pandas.MultiIndex with up or up and down at level 0 and 
-        the element names at level 1. THe dtype is bool, markergenes are marked 
-        as True values. 
-    expression (optional): directory with expression tsv file OR 
-        pandas.DataFrame. Defaults to None.
-        The .tsv input should have an ensg key in the first column or ensg 
-        column label. Columns `loc`, `name`, `tss_loc` and `strand` are removed
-        automatically. The data should be exclusively numerical without NaN's.
-        When passing a DataFrame, the data should be log2- and z-transformed. 
-        The index should consist of all genes, the columns of a 
-        pandas.MultiIndex with the element names at level 0, and `log2` & `z` at 
-        level 1.
-    ignore_down_mgs (bool, optional): Even if found in markergene input, do not
-        use the down markergenes for the analysis. Defaults to False.
-    override_namematcher (bool, optional): When both markergenes and expression 
-        passed, this overrides the element names in markergenes. Defaults to 
-        False. When False, element names in markergenes and expression are 
-        expected to match perfectly.
-    name (str, optional): Name label of the Targets. Defaults to 'Targets'. Used
-        in logging and plot annotations.
-    log: (bool, optional): Log the Targets initiation. Defaults to True.
-    
-Note:
-    passed, the inputs must have the same elment order. It is rrecommended to 
-    At least one of markergenes and expression must be passed. When both are 
-    initiate with markergens.
-"""
 class Targets(_differential):
+    """class describing the data to compare similarity against
+
+    Targets can hold lists of markergenes and expression data identifying a 
+    collection of comparitive transcriptional identities, the targets. 
+    Targets are recomended to be initiated with markergenes. 
+
+    Arguments:
+        markergenes (optional): directory with deseq2 output OR directories with 
+            up- and (optional) down genelists OR pandas.DataFrame. Defaults to None.
+            Genelist data have an ensg key in the first column or contain an 'ensg' 
+            column label.
+            When passing a DataFrame, the index should consist of all genes, 
+            the columns of a pandas.MultiIndex with up or up and down at level 0 and 
+            the element names at level 1. THe dtype is bool, markergenes are marked 
+            as True values. 
+        expression (optional): directory with expression tsv file OR 
+            pandas.DataFrame. Defaults to None.
+            The .tsv input should have an ensg key in the first column or ensg 
+            column label. Columns `loc`, `name`, `tss_loc` and `strand` are removed
+            automatically. The data should be exclusively numerical without NaN's.
+            When passing a DataFrame, the data should be log2- and z-transformed. 
+            The index should consist of all genes, the columns of a 
+            pandas.MultiIndex with the element names at level 0, and `log2` & `z` at 
+            level 1.
+        ignore_down_mgs (bool, optional): Even if found in markergene input, do not
+            use the down markergenes for the analysis. Defaults to False.
+        override_namematcher (bool, optional): When both markergenes and expression 
+            passed, this overrides the element names in markergenes. Defaults to 
+            False. When False, element names in markergenes and expression are 
+            expected to match perfectly.
+        name (str, optional): Name label of the Targets. Defaults to 'Targets'. Used
+            in logging and plot annotations.
+        log: (bool, optional): Log the Targets initiation. Defaults to True.
+        
+    Note:
+        At least one of markergenes and expression must be passed. When both are 
+        passed, the inputs must have the same elment order. Markergene input is
+        alphabetically sorted. It is recommended to initiate with markergenes.
+    """
     def __init__(self, markergenes=None, expression=None, name=None, 
                  ignore_down_mgs=False, override_namematcher=False, 
                  species='mouse', log=True):
@@ -69,9 +69,11 @@ class Targets(_differential):
         if self._has_diff:
             if not self._down_mgs and 'down' in self._diff.columns.unique(0):
                 self._diff.drop('down', axis=1, level=0, inplace=True)
+            elif 'down' not in self._diff.columns.unique(0) and self._down_mgs:
+                self._down_mgs = False
             if log:
                 spacer.info('')
-                n = self._diff.sum().unstack(0).reindex(self._names).to_string()
+                n = self._diff.sum().unstack(0).reindex(self.names).to_string()
                 logger.info('Number of markergenes: \n{}'.format(n))
         # inform that not passing markergenes is not recommended
         else:
@@ -80,7 +82,7 @@ class Targets(_differential):
             logger.warning('The targets `{}` are initiated without markergenes.'
                            ' Note that comparing against all genes can '
                            'lead to low accuracy for defining transcriptional '
-                           'similarity.'.format(self._name))
+                           'similarity.'.format(self.name))
         
         # store a masked version of _expr that holds only the markergenes
         if self._has_expr:
@@ -91,8 +93,14 @@ class Targets(_differential):
                 self._expr_mgs = expr_mgs.reindex(self._mgs)
             else:
                 self._expr_mgs = expr_mgs
-        self._log_init(log, 'markergenes')
+        spacer.info('\n\n')
+        self._log_init(log)
 
+    def __repr__(self):
+        return ('\n=|=|= Targets-instance =|=|=\nname = {};\nelements = {};\n'
+                'n = {};\nmarkergenes data = {};\nexpression data = {}\n'
+                .format(self.name, self.names, len(self), self._has_diff, 
+                        self._has_expr))
     @property
     def _mgs(self):
         if self._has_diff:
@@ -104,24 +112,18 @@ class Targets(_differential):
     def _mg_types(self):
         return ['up', 'down'] if self._down_mgs else ['up']
 
-    def __repr__(self):
-        return ('\n=|=|= {}-instance =|=|=\nname = {};\nelements = {};\n'
-                'markergenes data = {};\nexpression data = {} (n={});\n'
-                .format(self._type_name, self._name, self._names, len(self),
-                        self._has_diff, self._has_expr))
-
     def _overlap_samples(self, samples, which):
         spacer.info('')
         logger.info('Overlappping samples ({}): `{}` on Targets: `{}` ... '
-                    .format(which, samples._name, self._name))
+                    .format(which, samples.name, self.name))
         
         # check marker gene detection before overlapping
-        det = self.detec_mgs_prop(samples, filename=None).reindex(self._names, 
+        det = self.detec_mgs_prop(samples, filename=None).reindex(self.names, 
                                                                   level=1)
         keep = det[det.proportion > config.DROP_TARGET_DETEC_THR].index.unique(1)
         if len(keep) != len(self):
             # drop targets with too few detected genes
-            dr = pd.Index(self._names).difference(keep).tolist()
+            dr = pd.Index(self.names).difference(keep).tolist()
             logger.info('{} target elements dropped due to marker gene detection'
                         ' proportions lower {} (Set in config.DROP_TARGET_'
                         'DETEC_THR):\n{}'
@@ -139,7 +141,7 @@ class Targets(_differential):
             # substitute diff data with +1 for upregualted genes, -1 for down
             # if the targets have no down markergenes, slice the sample data
             # same as for samples, but don't merge up and down markergene lists
-            smp_data = util._diff_to_int_updown_notation(samples._diff)
+            smp_data = util._diff_to_int_updown_notation(samples._diff, True)
             smp_data = smp_data[self._mg_types]
             diff_mgs = self._diff.reindex(self._mgs)
             trg_data = util._diff_to_int_updown_notation(diff_mgs, False)
@@ -150,20 +152,14 @@ class Targets(_differential):
         # multiply the sample data len(target data) times for groupby operation
         smp_data = smp_data.reindex(self._mgs)
         smp_exts = [d for _, dd in smp_data.iteritems() 
-                    for d in [dd]*len(self._names)]
+                    for d in [dd]*len(self.names)]
         smp_ext = pd.concat(smp_exts, axis=1)
-        lvls = (self._mg_types, smp_ext.columns.unique(1), self._names)
+        lvls = (self._mg_types, smp_ext.columns.unique(1), self.names)
         smp_ext.columns = pd.MultiIndex.from_product(lvls).swaplevel()
         
-        # either substitute not detected marker genes with expression of 0 or 
-        # ignore not detected marker genes all together (drop them)
-        if config.UNDETECTED_MARKERGENES_BEHAVIOR == 'substitute':
-            smp_ext.fillna(subst, inplace=True)
-        elif config.UNDETECTED_MARKERGENES_BEHAVIOR == 'ignore':
-            smp_ext.dropna(inplace=True)
-            trg_data = trg_data.reindex(smp_ext.index)
-        logger.info('Set behaviour for not detected marker genes: `{}`\n'
-                    .format(config.UNDETECTED_MARKERGENES_BEHAVIOR))
+        # ignore not detected marker genes 
+        smp_ext.dropna(inplace=True)
+        trg_data = trg_data.reindex(smp_ext.index)
 
         # core
         # calculate the differnece between the z target marker gene expression 
@@ -189,7 +185,7 @@ class Targets(_differential):
         if self._has_diff:
             trg_d = self._diff
         elif self._has_expr:
-            cols = pd.MultiIndex.from_product((self._mg_types, self._names))
+            cols = pd.MultiIndex.from_product((self._mg_types, self.names))
             trg_d = pd.DataFrame(True, self._expr.index, cols)
         det = trg_d.reindex(self._mgs).apply(lambda trg: trg & smp_d).sum()
         n_mgs = trg_d.sum()
@@ -202,7 +198,7 @@ class Targets(_differential):
         edges = order.droplevel(0)[:n_trgs].append(order.droplevel(0)[-n_trgs:])
         logger.info('Detection of target ({}) marker genes in sample data ({}):'
                     '\n{}\nShown are the {} edge proportion values.'
-                    .format(self._name, samples._name, 
+                    .format(self.name, samples.name, 
                             df.loc[(slice(None), edges), :].to_string(), 
                             len(edges)))
         if filename:
@@ -210,10 +206,10 @@ class Targets(_differential):
             ax.bar(np.arange(len(order)), df.proportion, width=1, edgecolor='k',
                               color=self.get_colors(order.get_level_values(1)))
             ax.hlines(config.DROP_TARGET_DETEC_THR, 0, len(self))
-            ax.set_xlabel(self._name, fontsize=4)
+            ax.set_xlabel(self.name, fontsize=4)
             ax.set_ylabel('Proportion of detected markergenes', fontsize=4)
             ax.set_title('Proportion of detected {} markergenes in {}\nline = drop'
-                      ' threshhold'.format(self._name, samples._name), fontsize=6)
+                      ' threshhold'.format(self.name, samples.name), fontsize=6)
             fig.savefig(fname=filename)
             logger.info('Plot saved at {}\n'
                         .format(os.path.abspath(filename)))
@@ -286,7 +282,7 @@ class Targets(_differential):
             # ovp stores matches (1) and mismatches (-1). This option is for 
             # reverting that notation for down mgs, matches -1, mismatches 1
             n_mgs = ovp.notna().sum().xs(s_ord[0], level=2)
-            n_mgs.index = util.add_level(n_mgs.index, 'n_mgs', at=2)
+            n_mgs.index = util._add_level(n_mgs.index, 'n_mgs', at=2)
             n_mgs = util.add_mgtmean(n_mgs.unstack((0,1))).astype(int)
 
             agg = ovp.sum().unstack((0,1)).reindex(s_ord)
@@ -333,7 +329,7 @@ class Targets(_differential):
                                   show_samples_colorbar = False,
                                   filename = 'target_similarity_hm.png'):
         # check user input for errors and incompatibilities
-        def check_args():
+        def _check_args():
             nonlocal which
             nonlocal differential
             nonlocal proportional
@@ -344,7 +340,7 @@ class Targets(_differential):
             nonlocal display_similarity
 
             # check general basic input requirements
-            a = util.check_args(self, samples, which, differential, proportional, 
+            a = util._check_args(self, samples, which, differential, proportional, 
                                 hide_distance_bar, reorder_to_distance_bar,
                                 cluster_targets, display_similarity)
             which, differential, proportional, hide_distance_bar, \
@@ -418,7 +414,7 @@ class Targets(_differential):
             if title:
                 if title and type(title) is not str:
                     this_t = util._make_title(differential, proportional, which, 
-                                              samples._name, self._name)
+                                              samples.name, self.name)
                 else:
                     this_t = title
                 if not pivot:
@@ -433,7 +429,7 @@ class Targets(_differential):
             if cluster_targets:
                 at = axes[0, 1] if not hide_targets_dendrogram else axes[0, 0]
                 order = util._heatmap_cluster(sim, 'top', at, 'columns')
-                sim, ctrl_sim = util.align_indices([sim, ctrl_sim], order)
+                sim, ctrl_sim = util._align_indices([sim, ctrl_sim], order)
             if cluster_samples:
                 at = axes[2, 2] if show_samples_dendrogram else axes[0, 0]
                 order = util._heatmap_cluster(sim, 'right', at, 'rows')
@@ -444,7 +440,7 @@ class Targets(_differential):
             if not hide_distance_bar:
                 if reorder_to_distance_bar:
                     order = ctrl_sim.iloc[0].sort_values().index
-                    sim, ctrl_sim = util.align_indices([sim, ctrl_sim], order)
+                    sim, ctrl_sim = util._align_indices([sim, ctrl_sim], order)
                 draw_cb = True if not hide_colorbar_legend else False
                 if which == 'euclid' and not differential:
                         draw_cb = False
@@ -457,19 +453,19 @@ class Targets(_differential):
                 if distance_bar_range is not None:
                     bar_args.update({'vmin': distance_bar_range[0], 
                                      'vmax': distance_bar_range[1]})
-                util.plot_required_effect_bar(axes[1, :2], ctrl_sim,
+                util._plot_distance_bar(axes[1, :2], ctrl_sim,
                                             ctrl_lbl, bar_args, draw_cb, 
                                             cb_lbl, fig, pivot, width, height)
 
             # setup heatmap x,y axis, including the colorbars
             cols = self.get_colors(sim.columns) if not hide_targets_colorbar \
                    else None
-            util.setup_heatmap_xy('x', axes[3, 1], sim.columns, pivot,
+            util._setup_heatmap_xy('x', axes[3, 1], sim.columns, pivot,
                                   hide_targetlabels, targetlabels_size, cols)
                    
             cols = samples.get_colors(sim.index[::-1]) if show_samples_colorbar \
                    else None
-            util.setup_heatmap_xy('y', axes[2, 0], sim.index[::-1], pivot, 
+            util._setup_heatmap_xy('y', axes[2, 0], sim.index[::-1], pivot, 
                                   hide_samplelabels, targetlabels_size, cols)
 
             ax = axes[2, 1]
@@ -512,18 +508,18 @@ class Targets(_differential):
             return fig, axes, (sim, ctrl_sim)
 
         spacer.info('\n\n' + log_plot)
-        logger.info('Plot: {} & {}'.format(self._name, samples._name))
-        check_args()
+        logger.info('Plot: {} & {}'.format(self.name, samples.name))
+        _check_args()
         data = get_data()
         cap, re_cap = get_caps()
 
         nplts, fig_widths, fig_heights = get_plot_sizes()
         spacer.info('')
         logger.info('Drawing...')
-        filename, pp = util.open_file(filename)
+        filename, pp = util._open_file(filename)
         fig, axes, data = do_plot()
         # plt.show()
-        util.save_file(fig, filename=filename, pp=pp)
+        util._save_file(fig, filename=filename, pp=pp)
         if pp:
             pp.close()
         logger.info('Plot saved at {}/{}\n\n'
@@ -571,7 +567,7 @@ class Targets(_differential):
                                 filename = 'gene_similarity_hm.pdf'):
         
         # check user input for errors and incompatibilities
-        def check_args():
+        def _check_args():
             nonlocal which
             nonlocal differential
             nonlocal proportional
@@ -585,7 +581,7 @@ class Targets(_differential):
             nonlocal show_genes_colorbar
 
             # check general basic input requirements
-            a = util.check_args(self, samples, which, differential, proportional, 
+            a = util._check_args(self, samples, which, differential, proportional, 
                                 hide_distance_bar, reorder_to_distance_bar,
                                 cluster_genes)
             which, differential, proportional, hide_distance_bar, \
@@ -641,12 +637,8 @@ class Targets(_differential):
                     isin = 'markergenes'
                 elif custom_target_genelist is not None:
                     inp_gl = pd.Index(custom_target_genelist).drop_duplicates()
-                    val_gl = self._detec_genes
+                    val_gl = self._detec_genes.intersection(samples._detec_genes)
                     isin = 'detected genes'
-                    # if the overlap contains only sample-detected genes:
-                    if config.UNDETECTED_MARKERGENES_BEHAVIOR == 'ignore':
-                        val_gl = val_gl.intersection(samples._detec_genes)
-                        isin = 'valid genes'
                     val_gl = pd.Index(util.annotate(val_gl, self._species))
                 
                 inv = [g for g in inp_gl if g not in val_gl]
@@ -655,7 +647,7 @@ class Targets(_differential):
                     logger.warning('{} ({}/{}) are not {} in any of the targets'
                                    ' in `{}`. These genes will not be included.'
                                    .format(inv, len(inv), len(inv)+len(inp_gl), 
-                                           isin, self._name))
+                                           isin, self.name))
                     if len(inv) == (len(inv)+len(inp_gl)):
                         sys.exit(1)
                 # update passed list
@@ -674,7 +666,7 @@ class Targets(_differential):
             # init a new target where all genes are markergenes of all targets
             if custom_target_genelist:
                 nonlocal self
-                diff = pd.DataFrame(True, genes.ensg, self._names)
+                diff = pd.DataFrame(True, genes.ensg, self.names)
                 diff = util._add_mg_types(diff, False)
                 args = {'markergenes': diff}
                 if which == 'euclid':
@@ -701,7 +693,7 @@ class Targets(_differential):
 
             # init mutable dict with target and markegene type keys
             data = dict((trg, dict((mgt, None) for mgt in self._mg_types))
-                        for trg in self._names)
+                        for trg in self.names)
             # select genes, form the 3 data elements target simlarity (heatmap), 
             # ctrl_sim (required_effect_bar), agg_sim (sumplot)
             def sel_genes(trg_sim, genes):
@@ -883,7 +875,7 @@ class Targets(_differential):
             if title:
                 if title and type(title) is not str:
                     this_t = util._make_title(differential, proportional, which,
-                                              samples._name, t_name, 
+                                              samples.name, t_name, 
                                               postf='single gene ')
                 else:
                     this_t = title
@@ -902,18 +894,18 @@ class Targets(_differential):
                 if cluster_genes:
                     at = axes[r, 1] if not hide_genes_dendrogram else axes[r, 0]
                     order = util._heatmap_cluster(sim, 'top', at, 'columns')
-                    sim, ctrl_sim = util.align_indices([sim, ctrl_sim], order)
+                    sim, ctrl_sim = util._align_indices([sim, ctrl_sim], order)
                 if cluster_samples:
                     at = axes[2+r, 2] if show_samples_dendrogram else axes[r, 0]
                     order = util._heatmap_cluster(sim, 'right', at, 'rows')
-                    sim, sim_agg = util.align_indices([sim, sim_agg], order, 0)
+                    sim, sim_agg = util._align_indices([sim, sim_agg], order, 0)
                 axes[r, 0].set_visible(False)
 
                 # draw the required_effect bar
                 if not hide_distance_bar:
                     if reorder_to_distance_bar:
                         order = ctrl_sim.iloc[0].sort_values().index
-                        sim, ctrl_sim = util.align_indices([sim, ctrl_sim], order)
+                        sim, ctrl_sim = util._align_indices([sim, ctrl_sim], order)
                     draw_cb = False
                     if which == 'euclid':
                         if not hide_colorbar_legend and (mgt == 'up') and \
@@ -934,7 +926,7 @@ class Targets(_differential):
                     if distance_bar_range is not None:
                         bar_args.update({'vmin': distance_bar_range[0], 
                                          'vmax': distance_bar_range[1]})
-                    util.plot_required_effect_bar(axes[1+r, :2], ctrl_sim, 
+                    util._plot_distance_bar(axes[1+r, :2], ctrl_sim, 
                                                   ctrl_lbl, bar_args, draw_cb, 
                                                   cb_lbl, fig, pivot, width, height)
 
@@ -946,7 +938,7 @@ class Targets(_differential):
                     cols = [c if is_color_like(c) else default for c in cols]
                 else:
                     cols = None
-                util.setup_heatmap_xy('x', axes[3+r, 1], xlbl, pivot,
+                util._setup_heatmap_xy('x', axes[3+r, 1], xlbl, pivot,
                                       hide_genelabels, genelabels_size, cols) 
 
 
@@ -954,7 +946,7 @@ class Targets(_differential):
                 ylbl = sim.index.unique(2)[::-1]
                 cols = samples.get_colors(ylbl) if show_samples_colorbar else \
                        None
-                util.setup_heatmap_xy('y', axes[2+r, 0], ylbl, pivot, 
+                util._setup_heatmap_xy('y', axes[2+r, 0], ylbl, pivot, 
                                       hide_samplelabels, genelabels_size, cols)
                 if self._down_mgs:
                     tit = '{} markergenes'.format(mgt)
@@ -1062,15 +1054,15 @@ class Targets(_differential):
             return fig, axes, dat
         
         spacer.info('\n\n' + log_plot)
-        logger.info('Plot: {} & {}'.format(self._name, samples._name))
-        genes = check_args()
+        logger.info('Plot: {} & {}'.format(self.name, samples.name))
+        genes = _check_args()
         data = get_data()
         cap, re_cap, agg_lim, n_genes = get_caps()
 
         nplts, fig_widths, fig_heights = get_plot_sizes()
         spacer.info('')
         logger.info('Drawing...')
-        filename, pp = util.open_file(filename)
+        filename, pp = util._open_file(filename)
         ret = {}
         l_fn = filename.rfind('.png')
         for i, (t_name, dat) in enumerate(data.items()):
@@ -1079,7 +1071,7 @@ class Targets(_differential):
             # plt.show()
             ret.update({t_name: (fig, axes, dat)})
             this_png_fn = '{}_{}.png'.format(filename[:l_fn], t_name)
-            util.save_file(fig, filename=this_png_fn, pp=pp)
+            util._save_file(fig, filename=this_png_fn, pp=pp)
         if pp:
             pp.close()
         logger.info('Plots saved at {}/{}\n\n'
@@ -1109,7 +1101,7 @@ class Targets(_differential):
                                   filename = 'ranked_similarity_bp.pdf'):
 
         # check user input for errors and incompatibilities around `which` arg
-        def check_args():
+        def _check_args():
             nonlocal which
             nonlocal differential
             nonlocal proportional
@@ -1117,7 +1109,7 @@ class Targets(_differential):
             nonlocal display_similarity
 
             # check general basic input requirements
-            a = util.check_args(self, samples, which, differential, proportional, 
+            a = util._check_args(self, samples, which, differential, proportional, 
                                 display_similarity=display_similarity)
             which, differential, proportional, _, _, _, display_similarity = a
             if not n_targets:
@@ -1195,7 +1187,7 @@ class Targets(_differential):
             if title:
                 if title and type(title) is not str:
                     this_t = util._make_title(differential, proportional, which,
-                                              s_name, self._name, pref='ranked ')
+                                              s_name, self.name, pref='ranked ')
                 else:
                     this_t = title
                 if not pivot:
@@ -1279,15 +1271,15 @@ class Targets(_differential):
             return fig, axes
 
         spacer.info('\n\n' + log_plot)
-        logger.info('Plot: {} & {}'.format(self._name, samples._name))
-        check_args()
+        logger.info('Plot: {} & {}'.format(self.name, samples.name))
+        _check_args()
         data, ctrl_sim = get_data()
         lims = get_caps()
 
         fig_widths, fig_heights = get_plot_sizes()
         spacer.info('')
         logger.info('Drawing...')
-        filename, pp = util.open_file(filename)
+        filename, pp = util._open_file(filename)
         ret = {}
         l_fn = filename.rfind('.png')
         for i, (s_name, dat) in enumerate(data.items()):
@@ -1296,7 +1288,7 @@ class Targets(_differential):
             # plt.show()
             ret.update({s_name: (fig, axes, dat)})
             this_png_fn = '{}_{}.png'.format(filename[:l_fn], s_name)
-            util.save_file(fig, filename=this_png_fn, pp=pp)
+            util._save_file(fig, filename=this_png_fn, pp=pp)
         if pp:
             pp.close()
         logger.info('Plots saved at {}/{}\n\n'

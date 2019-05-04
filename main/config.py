@@ -1,9 +1,9 @@
-from matplotlib.colors import LinearSegmentedColormap
+"""module storing package wide variables, colors and plot sizes"""
 import matplotlib as mpl
+from matplotlib.colors import LinearSegmentedColormap
 from scipy.cluster.hierarchy import set_link_color_palette
-import os
 
-# DPI to from 100 to 300
+# change DPI from 100 to 300, adjust everything accordingly
 mpl.rcParams['figure.dpi'] = 300.0
 mpl.rcParams['savefig.dpi'] = 300.0
 mpl.rcParams['font.size'] = FONTS = 3.5
@@ -18,14 +18,19 @@ mpl.rcParams['ytick.major.width'] = 0.26664
 mpl.rcParams['grid.linewidth'] = 0.26664
 mpl.rcParams['xtick.major.pad'] = 1.16655
 mpl.rcParams['ytick.major.pad'] = 1.16655
-
 mpl.rcParams['figure.max_open_warning'] = 30
+
+# the default save format if the passed filename has no valid ending
 SAVE_FORMAT = 'pdf'
-UNDETECTED_MARKERGENES_BEHAVIOR = 'substitute'
-UNDETECTED_MARKERGENES_BEHAVIOR = 'ignore'
+# To give significant insight on transcriptional similarity, a minimum 
+# proportion of the Targets markergenes should be detected in the Samples.
+# If the markergene detection proportion is below the specified value, this
+# Target is dropped from the analysis. By default 15%.
 DROP_TARGET_DETEC_THR = .15
+# p value when dealing with deseq2 differential input
 DESEQ2_P = .05
 
+# predefined colors to use for labeling 
 colors = ['#e6194B', #    0 = red
           '#3cb44b', #    1 = green
           '#ffe119', #    2 = yellow
@@ -50,25 +55,39 @@ colors = ['#e6194B', #    0 = red
           '#000000'  #    21 = black
 ]
 
-default_targets_colors = {
-    'embryonic': '#fbcc8c', 
-    'germ cells': '#f0f0a6',
-    'neural crest': '#c8b1ce', 
-    'surface ectoderm': '#9edce4',
-    'neuroectoderm': '#5888c2', 
-    'mesoderm': '#64bb79', 
-    'endoderm': '#843487', 
-    'blood mesoderm': '#fe7e81', 
+# predefined colors for preset_targets
+preset_targets_colors = {
+    'm embryonic': '#fbcc8c', 
+    'm germ cells': '#f0f0a6',
+    'm neural crest': '#c8b1ce', 
+    'm surface ectoderm': '#9edce4',
+    'm neuroectoderm': '#5888c2', 
+    'm mesoderm': '#64bb79', 
+    'm endoderm': '#843487', 
+    'm blood mesoderm': '#fe7e81', 
+}
+# predefined legend parameters for annotating preset_targets with various color-
+# labeled groups. For these preset_targets, colors are defined in colors.tsv.
+preset_col_legend = {
+    'm embryonic': (['pre-2C', '2C', '4C 8C', 'post-8C', 'Blastocyst', 
+                     'Naive ESCs', 'Epiblast', 'ESCs', 'late embryonic'], 
+                    colors[3:12]),
+    'mouse': (['embryonic', 'germ cells', 'neural crest', 'surface ectoderm', 
+               'neuroectoderm', 'mesoderm', 'endoderm', 'blood mesoderm'], 
+              list(preset_targets_colors.values()))
 }
 
+# custom mpl.colormap for visualizing -1, 0, 1 descrete values
 RdBu_bin = LinearSegmentedColormap.from_list('RdBu_binary', 
                                              [colors[18], '#f6f7f7', colors[14]], 
                                              3)
-# dendrogram_colors = [colors[19], '#589909', '#0c9691', '#13bf63']
+# dendrogram colors. By default set to all black.
 dendrogram_colors = ['#000000', '#000000', '#000000', '#000000']
+# dendrogram_colors = [colors[19], '#589909', '#0c9691', '#13bf63']
 set_link_color_palette(dendrogram_colors[1:])
 
-
+# default plot elment sizes in inches
+# HM_* args correspond to plot elements in both heatmap functions
 HM_LEFT = .8
 HM_PIVOT_LEFT = .8
 HM_TOP = .8
@@ -84,15 +103,18 @@ HM_Y_DENDROGRAM = .3
 HM_X_DENDROGRAM = .3
 HM_SQUARE_SIZE = .07
 
+# G_HM_* args correspond to plot elements in the single-gene heatmap function
 G_HM_SUMPLOT_SIZE = .9
 G_HM_UPDOWN_SPACE_SIZE = .4
 
+# CB_* args correspond to the colorbar dimensions in inches
 CB_LEFT = .3
 CB_LEFT_SEC = 1.3
 CB_TOP = .55
 CB_WIDTH = .85
 CB_HEIGHT = .06
 
+# BP_* args correspond to plot elements in the barplot function
 BP_LEFT = 1.2
 BP_PIVOT_LEFT = .8
 BP_TOP = .6
@@ -103,6 +125,7 @@ BP_Y_COLORBAR = .04
 BP_BARSPACE = .8
 BP_BARWIDTH_SIZE = .07
 
+# Aggregated plot labels; used for all except single-gene annotation
 AGG_EUCL_DIFF_NOPROP = ('mean change in expr. similarity\n'
                         '[differential mean eulc. dist.]')
 AGG_EUCL_DIFF_PROP = ('prop. of changed expr. similarity\n'

@@ -4,8 +4,8 @@ del os, sys
 
 from .main.samples import Samples
 from .main.targets import Targets
-from .main._format_input import TARGET
+from .main._format_input import preset_targets
 import main.config as config
-from .main._dpre_util import color_legend
+from .main._dpre_util import plot_color_legend
 from .main._dpre_util import annotate
 from .main._dpre_util import get_ensgs

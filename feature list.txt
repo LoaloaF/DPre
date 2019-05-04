@@ -30,17 +30,17 @@
 
 ------which = none, auto detect
 ------unify input checking
-new default targets
+------new default targets
+------automatic colorlegend
+append instead of nargs in argparse
+extend usage
+
 tidy up, comment in modules (util etc.)
-pass colors to cmds + gen legend
 
------
-
-documentation and tutorial
-
------
-
-
-
-
-DONE
+generate documentation
+requirements, lisience README files
+sort repo structure, what to download etc
+finalize figure, description
+write results
+polish manuscript
+write tutorial on examples

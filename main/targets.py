@@ -3,41 +3,95 @@ import numpy as np
 import sys
 import os
 import copy
-
 import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
 from matplotlib.colors import is_color_like
 from matplotlib.lines import Line2D
 
 from DPre.main._differential import _differential
 from DPre.main.samples import Samples
 from DPre.main._logger import spacer, logger, log_plot
-
 import DPre.main.config as config
 import DPre.main._dpre_util as util
 
-class Targets(_differential):
-    n_insts = 0
-    def __init__(self, markergenes=None, expression=None, name=None, 
-                 ignore_down_mgs=False, override_namematcher=False, log=True):
-        self._down_mgs = not ignore_down_mgs
-        self._overlaps = {}
-        super().__init__(diff_genes=markergenes, expression=expression, name=name,
-                         override_namematcher=override_namematcher, 
-                         log=log, diff_mg_logname='markergenes')
+"""class describing the data to compare similarity against
 
+Targets can hold lists of markergenes and expression data identifying a 
+collection of comparitive transcriptional identities, the targets. 
+Targets are recomended to be initiated with markergenes. 
+
+Arguments:
+    markergenes (optional): directory with deseq2 output OR directories with 
+        up- and (optional) down genelists OR pandas.DataFrame. Defaults to None.
+        Genelist data have an ensg key in the first column or contain an 'ensg' 
+        column label.
+        When passing a DataFrame, the index should consist of all genes, 
+        the columns of a pandas.MultiIndex with up or up and down at level 0 and 
+        the element names at level 1. THe dtype is bool, markergenes are marked 
+        as True values. 
+    expression (optional): directory with expression tsv file OR 
+        pandas.DataFrame. Defaults to None.
+        The .tsv input should have an ensg key in the first column or ensg 
+        column label. Columns `loc`, `name`, `tss_loc` and `strand` are removed
+        automatically. The data should be exclusively numerical without NaN's.
+        When passing a DataFrame, the data should be log2- and z-transformed. 
+        The index should consist of all genes, the columns of a 
+        pandas.MultiIndex with the element names at level 0, and `log2` & `z` at 
+        level 1.
+    ignore_down_mgs (bool, optional): Even if found in markergene input, do not
+        use the down markergenes for the analysis. Defaults to False.
+    override_namematcher (bool, optional): When both markergenes and expression 
+        passed, this overrides the element names in markergenes. Defaults to 
+        False. When False, element names in markergenes and expression are 
+        expected to match perfectly.
+    name (str, optional): Name label of the Targets. Defaults to 'Targets'. Used
+        in logging and plot annotations.
+    log: (bool, optional): Log the Targets initiation. Defaults to True.
+    
+Note:
+    passed, the inputs must have the same elment order. It is rrecommended to 
+    At least one of markergenes and expression must be passed. When both are 
+    initiate with markergens.
+"""
+class Targets(_differential):
+    def __init__(self, markergenes=None, expression=None, name=None, 
+                 ignore_down_mgs=False, override_namematcher=False, 
+                 species='mouse', log=True):
+        # call _differential __init__ method
+        super().__init__(diff_genes=markergenes, expression=expression, 
+                         name=name, override_namematcher=override_namematcher, 
+                         log=log)
+        # define if down markergenes are used, which species and the overlap dict
+        self._down_mgs = not ignore_down_mgs
+        self._species = species
+        self._overlaps = {}
+        
+        # remove down mgs from _diff if in there but not desired by the user
+        if self._has_diff:
+            if not self._down_mgs and 'down' in self._diff.columns.unique(0):
+                self._diff.drop('down', axis=1, level=0, inplace=True)
+            if log:
+                spacer.info('')
+                n = self._diff.sum().unstack(0).reindex(self._names).to_string()
+                logger.info('Number of markergenes: \n{}'.format(n))
+        # inform that not passing markergenes is not recommended
+        else:
+            self._down_mgs = False
+            spacer.warning('')
+            logger.warning('The targets `{}` are initiated without markergenes.'
+                           ' Note that comparing against all genes can '
+                           'lead to low accuracy for defining transcriptional '
+                           'similarity.'.format(self._name))
+        
+        # store a masked version of _expr that holds only the markergenes
         if self._has_expr:
             expr_mgs = util._add_mg_types(self._expr.copy(), self._down_mgs)
             if self._has_diff: 
-                diff_masker = lambda trg: trg.mask(~self._diff[trg.columns[0][:-1]])
-                expr_mgs = expr_mgs.groupby(level=(0,1), axis=1).apply(diff_masker)
+                mg_mask = lambda trg: trg.mask(~self._diff[trg.columns[0][:-1]])
+                expr_mgs = expr_mgs.groupby(level=(0,1), axis=1).apply(mg_mask)
                 self._expr_mgs = expr_mgs.reindex(self._mgs)
             else:
                 self._expr_mgs = expr_mgs
-        
-        if log:
-            spacer.info('\n\n')
-            self._log_init()
+        self._log_init(log, 'markergenes')
 
     @property
     def _mgs(self):
@@ -80,7 +134,7 @@ class Targets(_differential):
             trg_data = self._expr_mgs.xs('z', 1, 2)
             smp_data = samples._expr.xs('z', 1, 1)
             smp_data = util._add_mg_types(smp_data, self._down_mgs)
-            subst = samples._min_zval
+            subst = samples._expr.xs('z', level=1, axis=1).min().min()
         elif which == 'intersect':
             # substitute diff data with +1 for upregualted genes, -1 for down
             # if the targets have no down markergenes, slice the sample data
@@ -535,7 +589,7 @@ class Targets(_differential):
                                 hide_distance_bar, reorder_to_distance_bar,
                                 cluster_genes)
             which, differential, proportional, hide_distance_bar, \
-            reorder_to_distance_bar, cluster_genes, display_similarity = a
+            reorder_to_distance_bar, cluster_genes, _ = a
 
             # check main data input
             if custom_target_genelist is not None and display_genes:
@@ -577,7 +631,7 @@ class Targets(_differential):
                     show_genes_colorbar = None
 
             # get a list of generally valid annotated genes
-            genes = pd.DataFrame({'name': util.annotate(self._mgs), 
+            genes = pd.DataFrame({'name': util.annotate(self._mgs, self._species), 
                                   'ensg': self._mgs })
             if specific_genes is not None or custom_target_genelist is not None:
                 # for gene input check if genes are detected in the target data
@@ -593,7 +647,7 @@ class Targets(_differential):
                     if config.UNDETECTED_MARKERGENES_BEHAVIOR == 'ignore':
                         val_gl = val_gl.intersection(samples._detec_genes)
                         isin = 'valid genes'
-                    val_gl = pd.Index(util.annotate(val_gl))
+                    val_gl = pd.Index(util.annotate(val_gl, self._species))
                 
                 inv = [g for g in inp_gl if g not in val_gl]
                 inp_gl = inp_gl.drop(inv) 
@@ -609,17 +663,19 @@ class Targets(_differential):
                     specific_genes = inp_gl
                 elif custom_target_genelist is not None:
                     genes = pd.DataFrame({'name': inp_gl, 
-                                          'ensg': util.get_ensgs(inp_gl)})
+                                          'ensg': util.get_ensgs(inp_gl, 
+                                                                 self._species)})
             logger.info('Arguments passed. Getting data now ...')
             return genes                   
 
         # get the specific overlap data and pick out the genes to display
         def get_data():
             
-            # init a new target where all genes are markergenes all targets
+            # init a new target where all genes are markergenes of all targets
             if custom_target_genelist:
                 nonlocal self
-                diff = pd.DataFrame(True, genes.ensg, self._diff.columns)
+                diff = pd.DataFrame(True, genes.ensg, self._names)
+                diff = util._add_mg_types(diff, False)
                 args = {'markergenes': diff}
                 if which == 'euclid':
                     expr = self._expr.loc[genes.ensg].copy()
@@ -679,7 +735,7 @@ class Targets(_differential):
                 if specific_genes is not None:
                     # check if passed genelist in target markergenes add them 
                     # if not already in 
-                    inp_ensg = util.get_ensgs(specific_genes)
+                    inp_ensg = util.get_ensgs(specific_genes, self._species)
                     not_mg = filter(lambda ie: ie not in trg_sim.index, inp_ensg)
                     inv = genes.set_index('ensg').loc[not_mg].name
                     if not inv.empty:

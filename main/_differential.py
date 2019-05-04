@@ -2,7 +2,6 @@ import pandas as pd
 import sys
 import copy
 import matplotlib.colors as mpl_colors
-import matplotlib.pyplot as plt
 
 import DPre.main._dpre_util as util
 import DPre.main._format_input as fmt_inp
@@ -10,55 +9,51 @@ import DPre.main.config as config
 from DPre.main._logger import logger, spacer, log_init
 
 class _differential:
-    def __init__(self, diff_genes, expression, name, override_namematcher,
-                 log, diff_mg_logname):
+    """base class of the core classes Targets and Drivers
+    
+    This class provides the basic functionality of an RNAseq dataset container 
+    holding expression- and differential genelist data
 
-        self._name = name if name else self._type_name
-        self._dnm = diff_mg_logname
-        self._colors = {}
+    Attributes:
+        _expr (pd.DataFrame): expression data (float). ENSG keys make up the,
+            index, the columns have the element names at level 0 (MultiIndex); 
+            each element has a log2 and z column.
+        _diff (pd.DataFrame): differential gene data for Samples, markergene 
+            data for Targets. Only the naming is differnt, the data structure
+            for both is the same. The index is the same as the expression one,
+            the columns are split in up and down markergenes, then the element
+            names at level 1. A differentially regualted gene (or markergene
+            respectively) has a True value.
+        _has_diff (bool): instance was initiated with differential input
+        _has_diff (bool): instance was initiated with expression input
+        name (str): the name used in logging messages and plot annotations
+        _colors (dict): a mapping of all elements name and their color
+    """
+
+    def __init__(self, diff_genes, expression, name, override_namematcher, log):
+        # set the _expr attribute with experssion input if passed
         self._has_expr = False
-        self._has_diff = False
-
         self._expr = expression
         if self._expr is not None:
             self._has_expr = True
             ctrl = self._ctrl if self._type_name == 'Samples' else None
             self._expr = fmt_inp._format_expr(expression, self._type_name, ctrl)
-            self._min_zval = self._expr.xs('z', level=1, axis=1).min().min()
 
+        # set the _diff attribute with diff_genes input if passed
+        self._has_diff = False
         self._diff = diff_genes
         if self._diff is not None:
             self._has_diff = True
             if not isinstance(diff_genes, pd.DataFrame):
-                self._diff = fmt_inp._format_diff_genes(diff_genes)
-
-            if self._type_name == 'Targets':
-                if not self._down_mgs:
-                    self._diff = self._diff.xs('up', 1, 0, False)
-                if 'down' not in self._diff.columns.unique(0):
-                    self._down_mgs = False
-            if log:
-                spacer.info('')
-                logger.info('Number of {} genes: \n{}'.format(self._dnm, 
-                            self._diff.sum().unstack(0).to_string()))
-                        
+                self._diff = fmt_inp._format_diff_genes(diff_genes, 
+                                                      type_name=self._type_name)
             if self._has_expr:
                 self._diff = self._diff.reindex(self._expr.index).fillna(False)
                 self._is_expr_diff_compatible(override_namematcher, log)
-
-        elif self._type_name == 'Targets':
-            self._down_mgs = False
-            logger.warning('The targets `{}` are initiated without markergenes.'
-                           ' Note that comparing against all genes can '
-                           'lead to low accuracy for defining transcr. '
-                           'similarity.'.format(self._name))
-        if not self._has_expr and not self._has_diff:
-            spacer.error('')
-            cmd_pref = self._type_name.lower()+'_' if log == 'from_cmd' else ''
-            logger.error('Failed to init {}:\nAt leat one of `{}expression` and '
-                         '`{}` must be passed.'
-                         .format(self._type_name, cmd_pref, self._dnm))
-            sys.exit(1)
+        
+        # set basic attributes name and colors
+        self._name = name if name else self._type_name
+        self._colors = {}
 
     @property
     def _names(self):
@@ -201,16 +196,15 @@ class _differential:
             logger.error('Invalid element names. Passed elements not contained '
                          'in current element names:\n{}'.format(not_ctnd))
             sys.exit(1)
-        if self._ctrl and (self._ctrl not in elements):
-            if (self._type_name == 'Samples') and self._has_expr:
-                spacer.warning('')
-                logger.warning('When slicing a Samples-instance holding '
-                               'expression data, the control must be kept. `{}`'
-                               ' was added to passed list of `elements`.'
-                               .format(self._ctrl))
-                elements.append(self._ctrl)
-            else:
-                self._ctrl = None
+        # if self._type_name == 'Samples': 
+        #     if self._ctrl and (self._ctrl not in elements):
+        #     if self._has_expr:
+        #         spacer.warning('')
+        #         logger.warning('When slicing a Samples-instance holding '
+        #                        'expression data, the control must be kept. `{}`'
+        #                        ' was added to passed list of `elements`.'
+        #                        .format(self._ctrl))
+        #         elements.append(self._ctrl)
 
         slc = copy.copy(self)
         slc._update_data_columns(elements)
@@ -247,15 +241,16 @@ class _differential:
     def _is_expr_diff_compatible(self, override_namematcher=False, log=True):
         expr_names = self._names
         diff_names = self._diff.columns.unique(-1).tolist()
+        diff_n = 'diff. genes' if self._type_name == 'Targets' else 'markergenes'
         if log:
             spacer.info('\n\n')
         if len(expr_names) != len(diff_names):
             if (len(expr_names) == len(diff_names) +1):
                 msg = ('{} ({}) has one element less than expression ({}). '
-                       .format(self._dnm, len(diff_names), len(expr_names)))
+                       .format(diff_n, len(diff_names), len(expr_names)))
                 if self._ctrl:
                     msg += ('An empty element `{}` (control) will be added to '
-                            'differential.'.format(self._ctrl))
+                            'diff. genes.'.format(self._ctrl))
                     logger.info(msg)
 
                     # add control to match with expression element names
@@ -275,39 +270,48 @@ class _differential:
             else:
                 logger.error('Passed expression ({}) and {} ({}) do '
                              'not have the same number of elements. Check input.'
-                             .format(len(expr_names), self._dnm, len(diff_names)))
+                             .format(len(expr_names), diff_n, len(diff_names)))
                 sys.exit(1)
         
         align = [e_n == d_n for e_n, d_n in zip(expr_names, diff_names)]
         df = pd.DataFrame({'expression names': expr_names, 
-                            self._dnm+' names': diff_names, 
+                            diff_n+' names': diff_names, 
                             'match': align})
         if all(align) or override_namematcher:
             spacer.info('')
-            msg = self._dnm + ' names have been overriden by expression names. '
+            msg = diff_n + ' names have been overriden by expression names. '
             lvls = self._diff.columns.unique(0), expr_names
             self._diff.columns = pd.MultiIndex.from_product(lvls)
             if override_namematcher:
                 logger.warning('{}CAUTION: {}- and expression names '
                                'do not match for all elements:\n{}\nMake sure '
                                'data aligns to avaid mislabeling!'
-                               .format(msg, self._dnm, df.to_string()))
+                               .format(msg, diff_n, df.to_string()))
         else:
             spacer.error('')
             logger.error(('{0}- and expression element names do '
                           'not match:\n{1}\nRename elements in expression '
                           '/{0} input files or override the '
                           '{0} names by setting `override_namematcher` '
-                          'to True.'.format(self._dnm, df.to_string())))
+                          'to True.'.format(diff_n, df.to_string())))
             sys.exit(1)
 
 
-    def _log_init(self):
+    def _log_init(self, log, diff_n):
         if self._has_diff:
-            ud = self._diff.any(axis=1).sum()
-            uniq_diff = (', of which {} {}'.format(ud, self._dnm))
+            d = self._diff.any(axis=1).sum()
+            n_diff_descr = (', of which {} {}'.format(d, diff_n))
+        elif self._has_expr:
+            n_diff_descr = ''
         else:
-            uniq_diff = ''
+            spacer.error('')
+            cmd_pref = self._type_name.lower()+'_' if log == 'from_cmd' else ''
+            logger.error('Failed to init {}:\nAt least one of `{}expression` '
+                         'and `{}` must be passed.'
+                         .format(self._type_name, cmd_pref, diff_n))
+            sys.exit(1)
+        if not log:
+            return
 
         if self._type_name == 'Targets':
             diffmgs = 'Markergenes'
@@ -321,8 +325,9 @@ class _differential:
                'Expression data loaded: {}\n\t{}'
                .format(log_init, self._type_name, self._name,
                        self._type_name, len(self), ',\n\t\t'.join(self._names), 
-                       len(self._detec_genes), uniq_diff, diffmgs, 
+                       len(self._detec_genes), n_diff_descr, diffmgs, 
                        self._has_diff, self._has_expr, trg_smp_arg))
+        spacer.info('\n\n')
         logger.info(msg)
 
 

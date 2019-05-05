@@ -48,13 +48,18 @@ oh = gzip.open("hg38_fair+new_CAGE_peaks_phase1and2_tpm.osc.txt.gz", "rt")# Down
 res = []
 cond_names = []
 reps = {}
+to_keep = []
 
 for entry, line in enumerate(oh):
+    if '#' in line:
+        continue
+
     if "00Annotation" in line: # get the condition names
         tt = line.strip().split("\t")
         cond_names = ["".join(i.split(".")[0:2]) for i in tt[7:]]
         cond_names = [i.replace("%20", " ").replace("tpm", "").replace("%2b", "+").replace("%2c", "").replace("%3a", ":") for i in cond_names]
         cond_names = [i.replace("%28", "(").replace("%29", ")").replace("%27", "").replace('%2f', '-') for i in cond_names]
+        cond_names = [i.replace('Mallassez-derived', 'Mallassez derived') for i in cond_names]
 
         # And also remove time course data, (response to), controls (Univeral RNA) and others:
         cancer_names = set([
@@ -64,20 +69,25 @@ for entry, line in enumerate(oh):
             "cell line", 'differentiation', 'periodontitis', 'differentiated', 'post-infarction', 'asthmatic',
             "nuclear fraction", "Universal RNA", 'Whole blood',"Clontech", # controls;
             "induction", 'response to', 'induced with', # time course treatments;
-            'ccl2',
+            'ccl2', 're diff',
             ])
-        to_keep = [cond_names.index(i) for i in cond_names if True not in [t in i for t in cancer_names]]
+        bad_samples = set(['adipose donor1', 'adipose donor2', 'adipose donor3', 'adipose donor4', 'hIPS biol_rep3'])
+
+        for idx, c in enumerate(cond_names):
+            if not c:
+                continue
+            if c in bad_samples:
+                continue
+            if True in [t in c for t in cancer_names]:
+                continue
+            print('%s "%s"' % (idx, c), )
+            to_keep.append(idx)
         cond_names = [cond_names[idx] for idx in to_keep]
         continue
-
-    #print(cond_names)
 
     if (entry+1) % 10000 == 0:
         print('Processed: {:,} genes'.format(entry+1))
         #break
-
-    if '#' in line:
-        continue
 
     if 'hg_' not in line:
         continue
@@ -88,17 +98,18 @@ for entry, line in enumerate(oh):
         continue
 
     ex = [float(tt[7:][idx]) for idx in to_keep]
-    if sum(ex) > 1: # Very simple low expression filter;
+    if sum(ex) > 10: # Very simple low expression filter;
         res.append({"fantom_name": fantom_name, "conditions": ex})
 
 # Keep only the genes with an annotated GENE ENST:
 gl = expression(loadable_list=res, cond_names=cond_names)
 gl = gene_annots.map(genelist=gl, key='fantom_name')
 
-cuts = ['donor', 'biol_rep', 'tech_rep', '(', ')', 'rep', 'donation', 'pool', 'biol_', 'and', '-']
+cuts = ['donor', 'biol_rep', 'tech_rep', '(', ')', 'rep', 'donation', 'pool', 'biol_', 'and', 'light', 'dark', 'stimulated']
 for k in cond_names:
     head = []
-    for t in k.split(' '):
+    tk = k.replace(' -', '') # Stop CD14+CD16- getting cut;
+    for t in tk.split(' '):
         if True in [c in t for c in cuts]:
             continue
         head.append(t)

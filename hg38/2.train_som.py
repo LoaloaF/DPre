@@ -17,7 +17,7 @@ print(expn)
 labs = ['POU5F1', 'SOX2', 'NANOG', # embryonic
     'EOMES', 'HAND1', 'TFAP2A', # Other embryonic
     'SOX7', 'HNF4A', 'GATA4', 'GATA6', 'SOX17', # endoderm
-    'TRP63', # Surface ectoderm
+    'TP63', # Surface ectoderm
     'MYOD1', # Muscle mesoderm
     'NR2F1', 'MSX1', 'MSX2', # Neural crest
     'TAL1', 'CEBPE',# Blood mesoderm
@@ -37,13 +37,13 @@ expn.draw_scatter_CV(filename='s2.scatter_CV_afterLOW.png', size=[5,3], label_fo
     ylims=[0,17], xlims=[2**-4, 2**14], vlines=[low_expressed_threshold,],
     hlines=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15])
 
-expn = expn.filter_high_expressed(2**7, 100)
+expn = expn.filter_high_expressed(2**5, 150)
 
 expn.draw_scatter_CV(filename='s3.scatter_CV_afterHIGH.png', size=[5,3], label_fontsize=5, label_genes=labs, label_genes_key='name',
     ylims=[0,17], xlims=[2**-4, 2**14], vlines=[low_expressed_threshold,],
     hlines=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15])
 
-expn = expn.filter_by_CV(1.5, 20)
+expn = expn.filter_by_CV(1.5, 10)
 
 expn.draw_scatter_CV(filename='s4.scatter_CV_afterCV.png', size=[5,3], label_fontsize=5, label_genes=labs, label_genes_key='name',
     ylims=[0,17], xlims=[2**-4, 2**14], vlines=[low_expressed_threshold,],

@@ -74,7 +74,10 @@ preset_col_legend = {
                     colors[3:12]),
     'mouse': (['embryonic', 'germ cells', 'neural crest', 'surface ectoderm', 
                'neuroectoderm', 'mesoderm', 'endoderm', 'blood mesoderm'], 
-              list(preset_targets_colors.values()))
+              list(preset_targets_colors.values())),
+    'human': (['surface ectoderm', 'neuroectoderm', 'mesoderm',  'endoderm', 
+              'blood mesoderm'],
+              ['#9edce4', '#5888c2', '#64bb79', '#843487', '#fe7e81']),
 }
 
 # custom mpl.colormap for visualizing -1, 0, 1 descrete values
@@ -91,7 +94,7 @@ set_link_color_palette(dendrogram_colors[1:])
 HM_LEFT = .8
 HM_PIVOT_LEFT = .8
 HM_TOP = .8
-HM_RIGHT = .1
+HM_RIGHT = .3
 HM_BOTTOM = 1
 HM_PIVOT_BOTTOM = 1.2
 HM_WSPACE = .04

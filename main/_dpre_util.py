@@ -159,6 +159,7 @@ def _save_file(fig, filename=None, pp=None):
         fig.savefig(pp, format='pdf')
     elif filename:
         fig.savefig(filename, format='png')
+        plt.close(fig)
 
 def _clean_axes(axes):
     """Remove all spines, ticks and tickalabels"""
@@ -367,13 +368,10 @@ def plot_color_legend(labels, colors, filename='color_legend.png'):
         logger.error('The following colors are not recognized as colors by '
                      'matplotlib: {}'.format(inv_cols))
         sys.exit(1)
-    filename, pp = _open_file(filename)
     fig, ax = plt.subplots(1, 1, figsize=(2, 2))
     _clean_axes(np.array([ax]))
     ax.legend(handles=[Patch(color=colors[i], label=labels[i]) 
                 for i in range(len(colors))], loc='center')
-    _save_file(fig, filename, pp)
-    if pp:
-        pp.close()
+    fig.savefig(filename)
     logger.info('Color legend generated and saved at {}/{}\n\n'
                 .format(os.path.abspath(os.curdir), filename))

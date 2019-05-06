@@ -1,3 +1,4 @@
+"""frontend implementing an argparse command line interface"""
 import DPre
 import argparse
 
@@ -6,8 +7,8 @@ import argparse
 
 # initaite and return the targets and samples for the plots
 def init_trg_smp(args):
-               if args['targets_preset'] is not None:
-                    t = DPre.TARGET(args['targets_preset'])
+               if args['preset_targets'] is not None:
+                    t = DPre.preset_targets(args['preset_targets'])
                else:
                     t = DPre.Targets(markergenes = args['markergenes'],
                          expression = args['targets_expression'],
@@ -33,6 +34,7 @@ def init_trg_smp(args):
 
 # run the target_similarity_heatmap plot with the parsed arguments (1/3)
 def do_target_sim(args):
+     print(args)
      t, s = init_trg_smp(args)
      t.target_similarity_heatmap(
                     # plot data
@@ -134,20 +136,20 @@ def do_gene_sim(args):
                     filename = args['filename'],)
 
 # create the base parser
-d = ('DPre - visualizing transcriptional similarity across samples and targets')
-u = ('\nPass the input --> Choose the plot --> specify the plot:\n'
-    '$ ./dpre.py <targets> <samples> <plot> <plot args> (optional)')
+d = ('DPre - visualizing transcriptional similarity between Samples and Targets')
+u = ('\n\n\n\n\n\nPass the input --> Choose the plot --> specify the plot:\n'
+    '$ ./dpre.py <targets> <samples> <plot> <plot args> (optional)\n')
 parser = argparse.ArgumentParser(description=d, usage=u, allow_abbrev=False,
                                  add_help=False)
 
 # create a group from the parser for the target data input
 trg_grp = parser.add_argument_group('Targets', description='input comparison '
-                                    'data, pass `targets_preset` or '
+                                    'data, pass `preset_targets` or '
                                     '`markergenes` & `targets_expression`')
-trg_grp.add_argument('--targets_preset', '-tp', type=str, 
+trg_grp.add_argument('--preset_targets', '-pt', type=str, 
                      help='load a default targets profile (all other options '
                      'are ignored)')
-trg_grp.add_argument('--markergenes', '-m', nargs='*', type=str, 
+trg_grp.add_argument('--markergenes', '-m', action='append', type=str, 
                      help='directory/ies with markergene files (up or up & '
                      'down)')
 trg_grp.add_argument('--targets_expression', '-te', type=str, 
@@ -161,14 +163,14 @@ trg_grp.add_argument('--targets_override_namematcher', '-to',
                      'expression, ignore name mismatches')
 trg_grp.add_argument('--species', '-s', type=str, default='mouse',
                      help='species of the target, default `mouse`')
-trg_grp.add_argument('--targets_slice', '-ts', nargs='*', type=str, 
+trg_grp.add_argument('--targets_slice', '-ts', action='append', type=str, 
                      help='convenience slicer, pass the element names to keep')
 
 # create a group from the parser for the samples data input
 smp_grp = parser.add_argument_group('Samples', description='input data to '
                                     'explore similarity for, pass `diff_genes` '
                                     'and/or `samples_expression`', )
-smp_grp.add_argument('--diff_genes', '-di', nargs='*', type=str, 
+smp_grp.add_argument('--diff_genes', '-di', action='append', type=str, 
                      help='directory/ies with differential gene files (up or '
                      'up & down)')
 smp_grp.add_argument('--samples_expression', '-se', type=str, 
@@ -180,7 +182,7 @@ smp_grp.add_argument('--samples_name', '-sn', type=str,
 smp_grp.add_argument('--samples_override_namematcher', '-so', 
                      action='store_true', help='when both differential and '
                     'expression, ignore name mismatches')
-smp_grp.add_argument('--samples_slice', '-ss', nargs='*', type=str, 
+smp_grp.add_argument('--samples_slice', '-ss', action='append', type=str, 
                      help='convenience slicer, pass the element names to keep')
 
 # create a subparser of parser that specifies the plot to run
@@ -237,9 +239,9 @@ genhm_grp.add_argument('--heatmap_width', '-hw', type=float,
                        help='heatmap width multiplier, deafult 1')
 genhm_grp.add_argument('--heatmap_height', '-hh', type=float,
                        help='heatmap height multiplier, deafult 1')
-genhm_grp.add_argument('--heatmap_range', '-hr', nargs=2,
+genhm_grp.add_argument('--heatmap_range', '-hr', action='append',
                        help='range of heatmap values, (lower, upper)')
-genhm_grp.add_argument('--distance_bar_range', '-dr', nargs=2, help='range of '
+genhm_grp.add_argument('--distance_bar_range', '-dr', action='append', help='range of '
                        'required_effect_bar values, (lower, upper)')
 genhm_grp.add_argument('--targetlabels_space', '-ta', type=float, 
                        help='space reserved for targetlabels in inches')
@@ -293,9 +295,9 @@ dat_grp.add_argument('--display_genes', '-dis', type=str, default='variant',
                      'of genes to extract, default `variant`')
 dat_grp.add_argument('--gene_number', '-ge', type=int, default=45, 
                      help='specify number of genes to extract (for to opt. 1)')
-dat_grp.add_argument('--specific_genes', '-sp', nargs='*', 
+dat_grp.add_argument('--specific_genes', '-sp', action='append', 
                      help='Option 2: specify a list of target markergenes' )
-dat_grp.add_argument('--custom_target_genelist', '-cu',  nargs='*', 
+dat_grp.add_argument('--custom_target_genelist', '-cu',  action='append', 
                      help='Option 3: specify any list of genes')
 # data ordering
 d = 'parameters to control ordering, i.e. clustering'
@@ -318,11 +320,11 @@ genhm_grp.add_argument('--heatmap_width', '-hw', type=float,
                        help='heatmap width multiplier, default 1')
 genhm_grp.add_argument('--heatmap_height', '-hh', type=float,
                        help='heatmap height multiplier, default 1')
-genhm_grp.add_argument('--heatmap_range', '-hr', nargs=2,
+genhm_grp.add_argument('--heatmap_range', '-hr', action='append',
                        help='range of heatmap values, (lower, upper)')
-genhm_grp.add_argument('--distance_bar_range', '-dr', nargs=2, help='range of '
+genhm_grp.add_argument('--distance_bar_range', '-dr', action='append', help='range of '
                        'required_effect_bar values, (lower, upper)')
-genhm_grp.add_argument('--sum_plot_range', '-sr', nargs=2,
+genhm_grp.add_argument('--sum_plot_range', '-sr', action='append',
                        help='range of sum plot values, (lower, upper)')
 genhm_grp.add_argument('--genelabels_space', '-gls', type=float, 
                        help='space reserved for genelabels in inches')
@@ -396,7 +398,7 @@ genhm_grp = rank_sim_parser.add_argument_group('General barplot options',
                                                description=d)
 genhm_grp.add_argument('--pivot', '-pi', action='store_true',
                        help='flip the plot 90 degrees')
-genhm_grp.add_argument('--xlim_range', '-x', nargs=2,
+genhm_grp.add_argument('--xlim_range', '-x', action='append',
                        help='range of barplot values, (lower, upper)')
 genhm_grp.add_argument('--targetlabels_space', '-ta', type=float, 
                        help='space reserved for targetlabels in inches')

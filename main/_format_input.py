@@ -119,7 +119,7 @@ def _format_expr(expr, type_name, ctrl):
         expr.drop(met, axis=1, inplace=True)
         spacer.warning('\n')
         logger.warning('{} found in expression column names. These are set to '
-                       'be automatically deleted'.format(met))
+                       'be automatically deleted.'.format(met))
     inv = expr.columns[expr.dtypes == object].tolist()
     if inv:
         spacer.warning('\n')

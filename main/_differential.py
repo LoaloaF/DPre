@@ -340,6 +340,7 @@ class _differential:
             diff_n: differential name, 'markergenes' for Targets diff. genes'
                 for Samples
         """
+        diff_n = 'markergenes' if self._type_name == 'Targets' else 'diff. genes'
         if not self._has_diff and not self._has_expr:
             spacer.error('')
             cmd_pref = self._type_name.lower()+'_' if log == 'from_cmd' else ''
@@ -350,7 +351,6 @@ class _differential:
         if not log:
             return
         # assemble log message by checking the various inputs
-        diff_n = 'markergenes' if self._type_name == 'Targets' else 'diff. genes'
         if self._has_diff:
             d = self._diff.any(axis=1).sum()
             n_diff_descr = (', of which {} {}'.format(d, diff_n))
@@ -366,7 +366,7 @@ class _differential:
                            .format(self._ctrl if self._ctrl else False))
         msg = ('{}\nNew {}-instance created: `{}`\n\t{} ({}):\n\t\t{}\n\t'
                'Detected genes: {}{}\n\t{} loaded: {}\n\t'
-               'Expression data loaded: {}\n\t{}'
+               'Expression data loaded: {}\n\t{}\n'
                .format(log_init, self._type_name, self.name,
                        self._type_name, len(self), ',\n\t\t'.join(self.names), 
                        len(self._detec_genes), n_diff_descr, diffmgs, 

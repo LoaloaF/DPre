@@ -32,8 +32,10 @@
 ------unify input checking
 ------new default targets
 ------automatic colorlegend
-append instead of nargs in argparse
-extend usage
+------append instead of nargs in argparse
+------extend usage
+diff default
+spines for bar plot
 
 tidy up, comment in modules (util etc.)
 

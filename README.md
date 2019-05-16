@@ -4,7 +4,7 @@
 ## Description
 DPre is a bioinformatic tool that enables the user to explore cell type conversion/ differentiation experiments. DPre may take the expression or the differentially regulated genes of the samples to rate transcriptional similarity with a reference dataset, the targets. Included are mouse- and human pre-packaged targets datasets for easy identification of differentiation bias in the samples. Further, DPre implements a function that extracts the genes accounting for the major shifts in cell type similarity. The user can visualize the transcriptional similarity between samples and targets in 3 highly customizable main plots. DPre can be run from a UNIX shell or through Python bindings.
 
-<img src="images/DPre_schematic.png"/> 
+<img src="docs/images/DPre_schematic.png"/> 
 
 
 ## Installation and Setup
@@ -85,7 +85,7 @@ or
 
 to generate
 
-<img src="images/DPre_showcase.png"/> 
+<img src="docs/images/DPre_showcase.png"/> 
 
 # License
 

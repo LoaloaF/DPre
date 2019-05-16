@@ -52,15 +52,6 @@ Initiate samples and targets with the input data, then call one of the three sim
 
 
 ```python
-# setting up jupyter
-%matplotlib inline
-import matplotlib as mpl
-mpl.rcParams['figure.dpi'] = 300
-mpl.rcParams['savefig.dpi'] = 300
-```
-
-
-```python
 import DPre
 
 s = DPre.samples(expression='examples/example1_hsliver/hsliver_expression.tsv', ctrl='Day00')

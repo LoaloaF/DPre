@@ -40,7 +40,7 @@ def _diff_to_int_updown_notation(_diff, trans_updown):
         int_diff['down'] = int_diff['down'].mask(_diff['up'], 1)
     return int_diff
 
-def add_mgtmean(agg):
+def _add_mgtmean(agg):
     """Prodcue the mean between aggregated up- and down mg similarity values"""
     agg_mean = agg.groupby(axis=1, level=1, sort=False).mean()
     agg_mean.columns = _add_level(agg_mean.columns, 'mean')

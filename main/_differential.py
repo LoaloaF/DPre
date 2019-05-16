@@ -9,7 +9,7 @@ import DPre.main.config as config
 from DPre.main._logger import logger, spacer, log_init
 
 class _differential:
-    """base class of the core classes Targets and Drivers
+    """base class of the core classes targets and Drivers
     
     This class provides the basic functionality of an RNAseq dataset container 
     holding expression- and differential genelist data
@@ -18,8 +18,8 @@ class _differential:
         _expr (pd.DataFrame): expression data (float). ENSG keys make up the,
             index, the columns have the element names at level 0 (MultiIndex); 
             each element has a log2 and z column.
-        _diff (pd.DataFrame): differential gene data for Samples, markergene 
-            data for Targets. Only the naming is differnt, the data structure
+        _diff (pd.DataFrame): differential gene data for samples, markergene 
+            data for targets. Only the naming is differnt, the data structure
             for both is the same. The index is the same as the expression one,
             the columns are split in up and down markergenes, then the element
             names at level 1. A differentially regualted gene (or markergene
@@ -29,14 +29,13 @@ class _differential:
         name (str): the name used in logging messages and plot annotations
         _colors (dict): a mapping of all elements name and their color
     """
-
     def __init__(self, diff_genes, expression, name, override_namematcher, log):
         # set the _expr attribute with experssion input if passed
         self._has_expr = False
         self._expr = expression
         if self._expr is not None:
             self._has_expr = True
-            ctrl = self._ctrl if self._type_name == 'Samples' else None
+            ctrl = self._ctrl if self._type_name == 'samples' else None
             self._expr = fmt_inp._format_expr(expression, self._type_name, ctrl)
 
         # set the _diff attribute with diff_genes input if passed
@@ -100,24 +99,24 @@ class _differential:
     
     @property
     def _detec_genes(self):
-        """Get an pandas.Index of the detected genes in Targets/Samples"""
+        """Get an pandas.Index of the detected genes in targets/samples"""
         genes_from = self._expr if self._has_expr else self._diff
         return genes_from.index
 
     @property
     def _type_name(self):
-        """Get instance type name, `Targets` or `Samples`"""
+        """Get instance type name, `targets` or `samples`"""
         return self.__class__.__name__
 
     def __len__(self):
         return len(self.names)
 
     def set_name(self, name):
-        """Set the Targets/Samples name"""
+        """Set the targets/samples name"""
         self.name = name
 
     def get_colors(self, order=None):
-        """Get the Targets/Samples colors of `order`
+        """Get the targets/samples colors of `order`
 
         Args:
             order (list, optional): A listing of element names in which the 
@@ -153,7 +152,7 @@ class _differential:
         return [self._colors[k] for k in order]
 
     def set_colors(self, colors, log=True):
-        """Set the colors for elements in Targets/Samples
+        """Set the colors for elements in targets/samples
 
         Args:
             colors (dict:list): A mapping of element name to color or a list
@@ -199,7 +198,7 @@ class _differential:
 
 
     def reorder(self, order):
-        """Reorder the elements in Targets/Samples inplace
+        """Reorder the elements in targets/samples inplace
 
             Args:
                 order (list): the new order of elements
@@ -226,14 +225,14 @@ class _differential:
                     .format(self.name, self.names))
 
     def slice_elements(self, elements, name=None, log=True):
-        """Slice the Targets/Samples to a specific list of elements. Return a 
+        """Slice the targets/samples to a specific list of elements. Return a 
             copy of the original.
 
         Args:
             elements (list): the list of elements to slice. 
         
         Returns:
-            sliced: the sliced Targets/Samples instance
+            sliced: the sliced targets/samples instance
         
         Note:
             If the passed names are not found in the current element names, 
@@ -241,7 +240,7 @@ class _differential:
         """
         if log:
             spacer.info('\n\n')
-        if not elements or not len(elements):
+        if elements is None or not len(elements):
             spacer.error('')
             logger.error('The list of elements cannot be empty.')
             sys.exit(1)
@@ -251,11 +250,13 @@ class _differential:
             logger.error('Invalid element names. Passed elements not contained '
                          'in current element names:\n{}'.format(not_ctnd))
             sys.exit(1)
-        if self._type_name == 'Samples': 
-            if self._ctrl and (self._ctrl not in elements):
-                self._ctrl = None
 
         sliced = copy.copy(self)
+        if sliced._type_name == 'samples': 
+            if sliced._ctrl and (sliced._ctrl not in elements):
+                sliced._ctrl = None
+        elif self._type_name == 'targets':
+            sliced._overlaps.clear()
         sliced._update_data_columns(elements)
         [sliced._colors.pop(k, None) for k in sliced.names if k not in elements]
         sliced.name = name if name else sliced.name
@@ -263,9 +264,7 @@ class _differential:
         if log:
             logger.info('`{}` sliced:'.format(self.name))
             spacer.info('')
-            diff_n = 'markergenes' if self._type_name == 'Targets' else \
-                     'diff. genes' 
-            sliced._log_init(log, diff_n)
+            sliced._log_init(log)
         return sliced
 
     def _is_expr_diff_compatible(self, override_namematcher=False):
@@ -278,10 +277,10 @@ class _differential:
         """
         expr_ns = self.names
         diff_ns = self._diff.columns.unique(-1).tolist()
-        diff_n = 'markergenes' if self._type_name == 'Targets' else 'diff. genes'
+        diff_n = 'markergenes' if self._type_name == 'targets' else 'diff. genes'
         spacer.info('\n\n')
         if len(expr_ns) != len(diff_ns):
-            if (len(expr_ns) == len(diff_ns)+1) and self._type_name == 'Samples':
+            if (len(expr_ns) == len(diff_ns)+1) and self._type_name == 'samples':
                 msg = ('{} ({}) has one element less than expression ({}). '
                        .format(diff_n, len(diff_ns), len(expr_ns)))
                 if self._ctrl:
@@ -298,7 +297,7 @@ class _differential:
                 else:
                     msg += ('If the expression data has a control that is '
                             'missing in diff. genes, you can resolve this by '
-                            'passing the control name for Samples initiation.')
+                            'passing the control name for samples initiation.')
                     logger.info(msg)
                     sys.exit(1)
 
@@ -333,14 +332,14 @@ class _differential:
 
     def _log_init(self, log):
         """Check if expression or differential was passed, then log the 
-        initiated Targets/Samples result
+        initiated targets/samples result
 
         Args:
             log: log initiation, otherwise only check input
-            diff_n: differential name, 'markergenes' for Targets diff. genes'
-                for Samples
+            diff_n: differential name, 'markergenes' for targets diff. genes'
+                for samples
         """
-        diff_n = 'markergenes' if self._type_name == 'Targets' else 'diff. genes'
+        diff_n = 'markergenes' if self._type_name == 'targets' else 'diff. genes'
         if not self._has_diff and not self._has_expr:
             spacer.error('')
             cmd_pref = self._type_name.lower()+'_' if log == 'from_cmd' else ''
@@ -357,10 +356,10 @@ class _differential:
         elif self._has_expr:
             n_diff_descr = ''
 
-        if self._type_name == 'Targets':
+        if self._type_name == 'targets':
             diffmgs = 'Markergenes'
             trg_smp_arg = 'Down markergenes loaded: {}'.format(self._down_mgs)
-        elif self._type_name == 'Samples':
+        elif self._type_name == 'samples':
             diffmgs = 'Differential genes'
             trg_smp_arg = ('Control passed: {}'
                            .format(self._ctrl if self._ctrl else False))
@@ -393,7 +392,7 @@ class _differential:
             elif func_name == 'rename':
                 self._expr = self._expr.rename(**args, level=0)
                 
-            if self._type_name == 'Targets':
+            if self._type_name == 'targets':
                 if func_name == 'reindex':
                     self._expr_mgs = self._expr_mgs.reindex(**args, level=1)
                     self._expr_mgs.dropna(how='all', inplace=True)

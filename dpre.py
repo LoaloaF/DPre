@@ -1,16 +1,18 @@
 """frontend implementing an argparse command line interface"""
-import DPre
+import os
+import sys
 import argparse
 
-# import DPre.main._dpre_util as util
-# import DPre.main.config as config
+# if os.path.abspath(os.path.dirname(__file__)) not in sys.path:
+#      sys.path.append(os.path.abspath(os.path.dirname(__file__)))
+import DPre
 
 # initaite and return the targets and samples for the plots
 def init_trg_smp(args):
                if args['preset_targets'] is not None:
                     t = DPre.preset_targets(args['preset_targets'])
                else:
-                    t = DPre.Targets(markergenes = args['markergenes'],
+                    t = DPre.targets(markergenes = args['targets_markergenes'],
                          expression = args['targets_expression'],
                          name = args['targets_name'],
                          ignore_down_mgs = args['ignore_down_mgs'],
@@ -19,10 +21,8 @@ def init_trg_smp(args):
                          log='from_cmd')
                if args['targets_slice'] is not None:
                     t = t.slice_elements(args['targets_slice'])
-               # t.set_colors({**dict.fromkeys(('Hepatocyte', 'Liver adult', 'Liver fetal'), config.colors[10]), 
-               #               'H9 embryonic stem cells': config.colors[11]})
-               # util.color_legend((config.colors[10], config.colors[10], config.colors[10], config.colors[11]), ('Hepatocyte', 'Liver adult', 'Liver fetal', 'H9 embryonic stem cells'))
-               s = DPre.Samples(diff_genes = args['diff_genes'],
+
+               s = DPre.samples(diff_genes = args['samples_diff_genes'],
                     expression = args['samples_expression'],
                     ctrl = args['control'],
                     name = args['samples_name'],
@@ -33,14 +33,13 @@ def init_trg_smp(args):
                return t, s
 
 # run the target_similarity_heatmap plot with the parsed arguments (1/3)
-def do_target_sim(args):
-     print(args)
+def _do_target_sim(args):
      t, s = init_trg_smp(args)
      t.target_similarity_heatmap(
                     # plot data
                     samples = s, 
                     which = args['which'], 
-                    differential = args['differential'],
+                    differential = args['absolut'],
                     proportional = args['proportional'], 
                     display_similarity = args['display_similarity'],
                     # data ordering
@@ -56,6 +55,7 @@ def do_target_sim(args):
                     targetlabels_space = args['targetlabels_space'],
                     samplelabels_space = args['samplelabels_space'],
                     targetlabels_size = args['targetlabels_size'],
+                    samplelabels_size = args['samplelabels_size'],
                     title = args['title'],
                     # show/hide elements
                     hide_colorbar_legend = args['hide_colorbar_legend'],
@@ -68,39 +68,14 @@ def do_target_sim(args):
                     show_samples_colorbar = args['show_samples_colorbar'],
                     filename = args['filename'])
 
-# run the ranked similarity barplot with the parsed arguments (2/3)
-def do_ranked_sim(args):
-     t, s = init_trg_smp(args)
-     t.ranked_similarity_barplot(
-                    # plot data
-                    samples = s,
-                    which = args['which'],
-                    differential = args['differential'],
-                    proportional = args['proportional'],
-                    display_similarity = args['display_similarity'],
-                    n_targets = args['n_targets'],
-                    display_negative = args['display_negative'],
-                    # data ordering
-                    rank_samples = args['rank_samples'],
-                    # general settings
-                    pivot = args['pivot'],
-                    xlim_range = args['xlim_range'],
-                    targetlabels_space = args['targetlabels_space'],
-                    colored_bars = args['colored_bars'],
-                    title = args['title'],
-                    # show/ hide elements
-                    hide_colorbar = args['hide_colorbar'],
-                    hide_targetlabels = args['hide_targetlabels'],
-                    filename = args['filename'])
-
 # run the single gene similarity heatmap with the parsed arguments (3/3)
-def do_gene_sim(args):
+def _do_gene_sim(args):
      t, s = init_trg_smp(args)
      t.gene_similarity_heatmap(
                     # plot data
                     samples = s,  
                     which = args['which'],
-                    differential = args['differential'],
+                    differential = args['absolut'],
                     proportional = args['proportional'],
                     display_genes = args['display_genes'],
                     gene_number = args['gene_number'],
@@ -133,23 +108,51 @@ def do_gene_sim(args):
                     hide_samplelabels = args['hide_samplelabels'],
                     show_samples_dendrogram = args['show_samples_dendrogram'],
                     show_samples_colorbar = args['show_samples_colorbar'],
-                    filename = args['filename'],)
+                    filename = args['filename'])
+
+# run the ranked similarity barplot with the parsed arguments (2/3)
+def _do_ranked_sim(args):
+     t, s = init_trg_smp(args)
+     t.ranked_similarity_barplot(
+                    # plot data
+                    samples = s,
+                    which = args['which'],
+                    differential = args['absolut'],
+                    proportional = args['proportional'],
+                    display_similarity = args['display_similarity'],
+                    n_targets = args['n_targets'],
+                    display_negative = args['display_negative'],
+                    # data ordering
+                    rank_samples = args['rank_samples'],
+                    # general settings
+                    pivot = args['pivot'],
+                    xlim_range = args['xlim_range'],
+                    targetlabels_space = args['targetlabels_space'],
+                    targetlabels_size = args['targetlabels_size'],
+                    colored_bars = args['colored_bars'],
+                    title = args['title'],
+                    spines = args['spines'],
+                    # show/ hide elements
+                    hide_colorbar = args['hide_colorbar'],
+                    hide_targetlabels = args['hide_targetlabels'],
+                    filename = args['filename'])
+
 
 # create the base parser
-d = ('DPre - visualizing transcriptional similarity between Samples and Targets')
+d = ('DPre - visualizing transcriptional similarity between samples and targets')
 u = ('\n\n\n\n\n\nPass the input --> Choose the plot --> specify the plot:\n'
     '$ ./dpre.py <targets> <samples> <plot> <plot args> (optional)\n')
 parser = argparse.ArgumentParser(description=d, usage=u, allow_abbrev=False,
                                  add_help=False)
 
 # create a group from the parser for the target data input
-trg_grp = parser.add_argument_group('Targets', description='input comparison '
+trg_grp = parser.add_argument_group('targets', description='input comparison '
                                     'data, pass `preset_targets` or '
-                                    '`markergenes` & `targets_expression`')
+                                    '`targets_markergenes` & `targets_expression`')
 trg_grp.add_argument('--preset_targets', '-pt', type=str, 
                      help='load a default targets profile (all other options '
                      'are ignored)')
-trg_grp.add_argument('--markergenes', '-m', action='append', type=str, 
+trg_grp.add_argument('--targets_markergenes', '-tm', action='append', type=str, 
                      help='directory/ies with markergene files (up or up & '
                      'down)')
 trg_grp.add_argument('--targets_expression', '-te', type=str, 
@@ -167,10 +170,10 @@ trg_grp.add_argument('--targets_slice', '-ts', action='append', type=str,
                      help='convenience slicer, pass the element names to keep')
 
 # create a group from the parser for the samples data input
-smp_grp = parser.add_argument_group('Samples', description='input data to '
-                                    'explore similarity for, pass `diff_genes` '
+smp_grp = parser.add_argument_group('samples', description='input data to '
+                                    'explore similarity for, pass `targets_diff_genes` '
                                     'and/or `samples_expression`', )
-smp_grp.add_argument('--diff_genes', '-di', action='append', type=str, 
+smp_grp.add_argument('--samples_diff_genes', '-sd', action='append', type=str, 
                      help='directory/ies with differential gene files (up or '
                      'up & down)')
 smp_grp.add_argument('--samples_expression', '-se', type=str, 
@@ -202,17 +205,20 @@ optional.add_argument('-h', '--help', action='help',
 d = ('Plot the elementwise similarity of the samples and targets in a heatmap\n'
      'target_similarity_heatmap specific args:')
 trg_sim_parser = subparsers.add_parser('target_sim', description=d, usage=u)
-trg_sim_parser.set_defaults(func=do_target_sim)
+trg_sim_parser.set_defaults(func=_do_target_sim)
 trg_sim_parser.add_argument('--filename', '-f', type=str, default='target_'
-                            'similarity_hm.png', help='filename for saving')
+                            'similarity_hm.png', help='filename for saving.' 
+                            'If None plot is not saved, default: '
+                            'target_similarity_hm.png')
 # add arguments for each argument group
 # plot data
 d = 'main parameters to control the presented similarity'
 dat_grp = trg_sim_parser.add_argument_group('Data options', description=d)
 dat_grp.add_argument('--which', '-w', type=str, choices=('euclid', 'intersect'),
                      help='select the similarity metric')
-dat_grp.add_argument('--differential', '-d', action='store_true',
-                     help='plot the changes in similarity')
+dat_grp.add_argument('--absolut', '-a', action='store_false', help='plot the '
+                     'absolut similarity, `euclid` only. Will appear as '
+                     'differential=False in logs.')
 dat_grp.add_argument('--proportional', '-p', action='store_true',
                      help='plot the proportional changes in similarity')
 dat_grp.add_argument('--display_similarity', '-ds', default='mgs mean',
@@ -239,16 +245,18 @@ genhm_grp.add_argument('--heatmap_width', '-hw', type=float,
                        help='heatmap width multiplier, deafult 1')
 genhm_grp.add_argument('--heatmap_height', '-hh', type=float,
                        help='heatmap height multiplier, deafult 1')
-genhm_grp.add_argument('--heatmap_range', '-hr', action='append',
+genhm_grp.add_argument('--heatmap_range', '-hr', action='append', type=float,
                        help='range of heatmap values, (lower, upper)')
-genhm_grp.add_argument('--distance_bar_range', '-dr', action='append', help='range of '
-                       'required_effect_bar values, (lower, upper)')
+genhm_grp.add_argument('--distance_bar_range', '-dr', action='append', type=float,
+                       help='range of distance bar values, (lower, upper)')
 genhm_grp.add_argument('--targetlabels_space', '-ta', type=float, 
                        help='space reserved for targetlabels in inches')
 genhm_grp.add_argument('--samplelabels_space', '-sa', type=float, 
                        help='space reserved for sample labels in inches')
 genhm_grp.add_argument('--targetlabels_size', '-tas', type=float, 
                        help='multiplier for targetlabels fontsize, default = 1')
+genhm_grp.add_argument('--samplelabels_size', '-sas', type=float, 
+                       help='multiplier for samplelabels fontsize, default = 1')
 genhm_grp.add_argument('--title', '-t', default=True,
                        help='a custom title or hide title if `f`, `F`, ..')
 # show/ hide specific plot elements
@@ -272,28 +280,30 @@ elem_grp.add_argument('--show_samples_colorbar', '-ssc', action='store_true',
                       help='do not plot the samples colorbar')
 
 
-
 # create the parser of the gene_similarity_hm; parse respective args
 d = 'Plot the single-gene similarity of the samples with each target in a heatmap'
 gene_sim_parser = subparsers.add_parser('gene_sim', description=d, usage=u)
-gene_sim_parser.set_defaults(func=do_gene_sim)
+gene_sim_parser.set_defaults(func=_do_gene_sim)
 gene_sim_parser.add_argument('--filename', '-f', type=str, default='gene_'
-                             'similarity_hm.pdf', help='filename for saving')
+                             'similarity_hm.pdf', help='filename for saving.' 
+                             'If None plot is not saved, default: '
+                             'gene_similarity_hm.pdf')
 # add arguments for each argument group
 # plot data
 d = 'main parameters to control the presented similarity'
 dat_grp = gene_sim_parser.add_argument_group('Data options', description=d)
 dat_grp.add_argument('--which', '-w', type=str, choices=('euclid', 'intersect'),
                      help='select the similarity metric')
-dat_grp.add_argument('--differential', '-d', action='store_true',
-                     help='plot the changes in similarity')
+dat_grp.add_argument('--absolut', '-a', action='store_false', help='plot the '
+                     'absolut similarity, `euclid` only. Will appear as '
+                     'differential=False in logs.')
 dat_grp.add_argument('--proportional', '-p', action='store_true',
                      help='plot the proportional changes in similarity')
-dat_grp.add_argument('--display_genes', '-dis', type=str, default='variant', 
+dat_grp.add_argument('--display_genes', '-di', type=str, default='variant', 
                      choices=['variant', 'greatest', 'increasing', 'decreasing', 
                      'similar', 'distant'], help='Option 1: specify the group '
                      'of genes to extract, default `variant`')
-dat_grp.add_argument('--gene_number', '-ge', type=int, default=45, 
+dat_grp.add_argument('--gene_number', '-gn', type=int, default=45, 
                      help='specify number of genes to extract (for to opt. 1)')
 dat_grp.add_argument('--specific_genes', '-sp', action='append', 
                      help='Option 2: specify a list of target markergenes' )
@@ -320,13 +330,13 @@ genhm_grp.add_argument('--heatmap_width', '-hw', type=float,
                        help='heatmap width multiplier, default 1')
 genhm_grp.add_argument('--heatmap_height', '-hh', type=float,
                        help='heatmap height multiplier, default 1')
-genhm_grp.add_argument('--heatmap_range', '-hr', action='append',
+genhm_grp.add_argument('--heatmap_range', '-hr', action='append', type=float, 
                        help='range of heatmap values, (lower, upper)')
-genhm_grp.add_argument('--distance_bar_range', '-dr', action='append', help='range of '
-                       'required_effect_bar values, (lower, upper)')
-genhm_grp.add_argument('--sum_plot_range', '-sr', action='append',
+genhm_grp.add_argument('--distance_bar_range', '-dr', action='append', type=float, 
+                       help='range of distance bar values, (lower, upper)')
+genhm_grp.add_argument('--sum_plot_range', '-sr', action='append', type=float,
                        help='range of sum plot values, (lower, upper)')
-genhm_grp.add_argument('--genelabels_space', '-gls', type=float, 
+genhm_grp.add_argument('--genelabels_space', '-ge', type=float, 
                        help='space reserved for genelabels in inches')
 genhm_grp.add_argument('--samplelabels_space_left', '-sa', type=float, 
                        help='space reserved for samplelabels on left in inches')
@@ -334,6 +344,8 @@ genhm_grp.add_argument('--samplelabels_space_right', '-sar', type=float,
                        help='space reserved for samplelabels on right in inches')
 genhm_grp.add_argument('--genelabels_size', '-ges', type=float, 
                        help='multiplier for genelabels fontsize, default = 1')
+genhm_grp.add_argument('--targetlabels_size', '-tas', type=float, 
+                       help='multiplier for targetlabels fontsize, default = 1')
 genhm_grp.add_argument('--title', '-t', default=True, help='a custom title or '
                        'hide title with {f, false, F, False}')
 # show/ hide specific plot elements
@@ -351,9 +363,8 @@ elem_grp.add_argument('--hide_genelabels', '-hge', action='store_true',
                       help='do not show the genelabels')
 elem_grp.add_argument('--hide_genes_dendrogram', '-hgd', action='store_true',
                        help='do not plot the genes dendrogram')
-elem_grp.add_argument('--show_genes_colorbar', '-sgc', type=str, default=False,
-                      help='mapping of genes and colors, or {T, True, t, true}'
-                      ' when specific_genes')
+elem_grp.add_argument('--show_genes_colorbar', '-sgc', type=bool, default=False,
+                      help='plot a genes colorbar when specific_genes passed')
 elem_grp.add_argument('--hide_samplelabels', '-hsa', action='store_true', 
                       help='do not show the samplelabels')
 elem_grp.add_argument('--show_samples_dendrogram', '-ssd', action='store_true',
@@ -366,17 +377,20 @@ elem_grp.add_argument('--show_samples_colorbar', '-ssc', action='store_true',
 # create the parser of the ranked_similarity_barplot; parse respective args
 d = 'Plot the ranked similarity of the samples with targets in a bar plot'
 rank_sim_parser = subparsers.add_parser('ranked_sim', description=d, usage=u)
-rank_sim_parser.set_defaults(func=do_ranked_sim)
+rank_sim_parser.set_defaults(func=_do_ranked_sim)
 rank_sim_parser.add_argument('--filename', '-f', type=str, default='ranked_'
-                             'similarity_bp.pdf', help='filename for saving')
+                             'similarity_bp.pdf', help='filename for saving.' 
+                             'If None plot is not saved, default: '
+                             'ranked_similarity_hm.png')
 # add arguments for each argument group
 # plot data
 d ='main parameters to control the presented similarity'
 dat_grp = rank_sim_parser.add_argument_group('Data options', description = d)
 dat_grp.add_argument('--which', '-w', type=str, choices=('euclid', 'intersect'),
                      help='select the similarity metric')
-dat_grp.add_argument('--differential', '-d', action='store_true',
-                     help='plot the changes in similarity')
+dat_grp.add_argument('--absolut', '-a', action='store_false', help='plot the '
+                     'absolut similarity, `euclid` only. Will appear as '
+                     'differential=False in logs.')
 dat_grp.add_argument('--proportional', '-p', action='store_true',
                      help='plot the proportional changes in similarity')
 dat_grp.add_argument('--display_similarity', '-ds', default='mgs mean',
@@ -398,12 +412,16 @@ genhm_grp = rank_sim_parser.add_argument_group('General barplot options',
                                                description=d)
 genhm_grp.add_argument('--pivot', '-pi', action='store_true',
                        help='flip the plot 90 degrees')
-genhm_grp.add_argument('--xlim_range', '-x', action='append',
+genhm_grp.add_argument('--xlim_range', '-x', action='append', type=float, 
                        help='range of barplot values, (lower, upper)')
 genhm_grp.add_argument('--targetlabels_space', '-ta', type=float, 
                        help='space reserved for targetlabels in inches')
+genhm_grp.add_argument('--targetlabels_size', '-tas', type=float, 
+                       help='multiplier for targetlabels fontsize, default = 1')
 genhm_grp.add_argument('--colored_bars', '-co', action='store_true',
                        help='color the bars according to the value')
+genhm_grp.add_argument('--spines', '-spi', action='store_true', 
+                      help='additionally show spines on top and right')
 genhm_grp.add_argument('--title', '-t', default=True, help='a custom title or '
                        'hide title with {f, false, F, False}')
 # show/ hide specific plot elements
@@ -417,5 +435,3 @@ elem_grp.add_argument('--hide_colorbar', '-hc', action='store_true',
 args = vars(parser.parse_args())
 do_plot = args.pop('func')
 do_plot(args)
-
-# python .\dpre.py -tp human -se .\example_data\hsliver\GSE70741_genes_expression.tsv -c "Day 00" -sn "in vitro hepatic diff. hESCs" target_sim -d -ct --hide_targets_dendrogram -hw .2 -hta -ta .1 -f "target_sim_diff.png"

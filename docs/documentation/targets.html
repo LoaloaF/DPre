@@ -1,0 +1,606 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module targets</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>targets</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:c%3A%5Cusers%5Cloaloa%5Canaconda3%5Clib%5Cdpre%5Cmain%5Ctargets.py">c:\users\loaloa\anaconda3\lib\dpre\main\targets.py</a></font></td></tr></table>
+    <p></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="DPre.main.config.html">DPre.main.config</a><br>
+<a href="copy.html">copy</a><br>
+</td><td width="25%" valign=top><a href="numpy.html">numpy</a><br>
+<a href="os.html">os</a><br>
+</td><td width="25%" valign=top><a href="pandas.html">pandas</a><br>
+<a href="matplotlib.pyplot.html">matplotlib.pyplot</a><br>
+</td><td width="25%" valign=top><a href="sys.html">sys</a><br>
+<a href="DPre.main._dpre_util.html">DPre.main._dpre_util</a><br>
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ee77aa">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Classes</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl>
+<dt><font face="helvetica, arial"><a href="DPre.main._differential.html#_differential">DPre.main._differential._differential</a>(<a href="builtins.html#object">builtins.object</a>)
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="targets.html#targets">targets</a>
+</font></dt></dl>
+</dd>
+</dl>
+ <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="targets">class <strong>targets</strong></a>(<a href="DPre.main._differential.html#_differential">DPre.main._differential._differential</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt><a href="#targets">targets</a>(markergenes=None,&nbsp;expression=None,&nbsp;name=None,&nbsp;ignore_down_mgs=False,&nbsp;override_namematcher=False,&nbsp;species='mouse',&nbsp;log=True)<br>
+&nbsp;<br>
+class&nbsp;describing&nbsp;the&nbsp;data&nbsp;to&nbsp;compare&nbsp;similarity&nbsp;against<br>
+&nbsp;<br>
+<a href="#targets">targets</a>&nbsp;can&nbsp;hold&nbsp;lists&nbsp;of&nbsp;markergenes&nbsp;and&nbsp;expression&nbsp;data&nbsp;identifying&nbsp;a&nbsp;<br>
+collection&nbsp;of&nbsp;comparitive&nbsp;transcriptional&nbsp;identities,&nbsp;the&nbsp;<a href="#targets">targets</a>.&nbsp;<br>
+<a href="#targets">targets</a>&nbsp;are&nbsp;recomended&nbsp;to&nbsp;be&nbsp;initiated&nbsp;with&nbsp;markergenes.&nbsp;<br>
+&nbsp;<br>
+Arguments:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;markergenes&nbsp;(optional):&nbsp;directory&nbsp;with&nbsp;deseq2&nbsp;output&nbsp;OR&nbsp;directories&nbsp;with&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;up-&nbsp;and&nbsp;(optional)&nbsp;down&nbsp;genelists&nbsp;OR&nbsp;pandas.DataFrame.&nbsp;Defaults&nbsp;to&nbsp;None.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Genelist&nbsp;data&nbsp;have&nbsp;an&nbsp;ensg&nbsp;key&nbsp;in&nbsp;the&nbsp;first&nbsp;column&nbsp;or&nbsp;contain&nbsp;an&nbsp;'ensg'&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;column&nbsp;label.&nbsp;Up-markergenes&nbsp;should&nbsp;mark&nbsp;genes&nbsp;expected&nbsp;to&nbsp;be&nbsp;highly<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;expressed&nbsp;in&nbsp;a&nbsp;target,&nbsp;down-markergenes&nbsp;those&nbsp;expected&nbsp;to&nbsp;be&nbsp;low.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;When&nbsp;passing&nbsp;a&nbsp;DataFrame,&nbsp;the&nbsp;index&nbsp;should&nbsp;consist&nbsp;of&nbsp;all&nbsp;genes,&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;columns&nbsp;of&nbsp;a&nbsp;pandas.MultiIndex&nbsp;with&nbsp;up&nbsp;or&nbsp;up&nbsp;and&nbsp;down&nbsp;at&nbsp;level&nbsp;0&nbsp;and&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;element&nbsp;names&nbsp;at&nbsp;level&nbsp;1.&nbsp;THe&nbsp;dtype&nbsp;is&nbsp;bool,&nbsp;markergenes&nbsp;are&nbsp;marked&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;as&nbsp;True&nbsp;values.&nbsp;If&nbsp;None,&nbsp;all&nbsp;expression&nbsp;values&nbsp;are&nbsp;considered&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;as&nbsp;markergenes.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;expression&nbsp;(optional):&nbsp;TSV&nbsp;expression&nbsp;file&nbsp;OR&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pandas.DataFrame.&nbsp;Defaults&nbsp;to&nbsp;None.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;.tsv&nbsp;input&nbsp;should&nbsp;have&nbsp;an&nbsp;ensg&nbsp;key&nbsp;in&nbsp;the&nbsp;first&nbsp;column&nbsp;or&nbsp;ensg&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;column&nbsp;label.&nbsp;Columns&nbsp;`loc`,&nbsp;`name`,&nbsp;`tss_loc`&nbsp;and&nbsp;`strand`&nbsp;are&nbsp;removed<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;automatically.&nbsp;The&nbsp;data&nbsp;should&nbsp;be&nbsp;exclusively&nbsp;numerical&nbsp;without&nbsp;NaN's.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;When&nbsp;passing&nbsp;a&nbsp;DataFrame,&nbsp;the&nbsp;data&nbsp;should&nbsp;be&nbsp;log2-&nbsp;and&nbsp;z-transformed.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;index&nbsp;should&nbsp;consist&nbsp;of&nbsp;all&nbsp;genes,&nbsp;the&nbsp;columns&nbsp;of&nbsp;a&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pandas.MultiIndex&nbsp;with&nbsp;the&nbsp;element&nbsp;names&nbsp;at&nbsp;level&nbsp;0,&nbsp;and&nbsp;`log2`&nbsp;&amp;&nbsp;`z`&nbsp;at&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;level&nbsp;1.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ignore_down_mgs&nbsp;(bool,&nbsp;optional):&nbsp;Even&nbsp;if&nbsp;found&nbsp;in&nbsp;markergene&nbsp;input,&nbsp;do&nbsp;not<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;use&nbsp;the&nbsp;down&nbsp;markergenes&nbsp;for&nbsp;the&nbsp;analysis.&nbsp;Defaults&nbsp;to&nbsp;False.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;override_namematcher&nbsp;(bool,&nbsp;optional):&nbsp;When&nbsp;both&nbsp;markergenes&nbsp;and&nbsp;expression&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;passed,&nbsp;this&nbsp;overrides&nbsp;the&nbsp;element&nbsp;names&nbsp;in&nbsp;markergenes.&nbsp;Defaults&nbsp;to&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;False.&nbsp;When&nbsp;False,&nbsp;element&nbsp;names&nbsp;in&nbsp;markergenes&nbsp;and&nbsp;expression&nbsp;are&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;expected&nbsp;to&nbsp;match&nbsp;perfectly.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;name&nbsp;(str,&nbsp;opti&nbsp;onal):&nbsp;Name&nbsp;label&nbsp;of&nbsp;the&nbsp;<a href="#targets">targets</a>.&nbsp;Defaults&nbsp;to&nbsp;'<a href="#targets">targets</a>'.&nbsp;Used<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;in&nbsp;logging&nbsp;and&nbsp;plot&nbsp;annotations.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;log:&nbsp;(bool,&nbsp;optional):&nbsp;Log&nbsp;the&nbsp;<a href="#targets">targets</a>&nbsp;initiation.&nbsp;Defaults&nbsp;to&nbsp;True.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+Note:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;At&nbsp;least&nbsp;one&nbsp;of&nbsp;markergenes&nbsp;and&nbsp;expression&nbsp;must&nbsp;be&nbsp;passed.&nbsp;When&nbsp;both&nbsp;are&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;passed,&nbsp;the&nbsp;inputs&nbsp;must&nbsp;have&nbsp;the&nbsp;same&nbsp;elment&nbsp;order.&nbsp;Markergene&nbsp;input&nbsp;is<br>
+&nbsp;&nbsp;&nbsp;&nbsp;alphabetically&nbsp;sorted.&nbsp;It&nbsp;is&nbsp;recommended&nbsp;to&nbsp;initiate&nbsp;with&nbsp;markergenes.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="targets.html#targets">targets</a></dd>
+<dd><a href="DPre.main._differential.html#_differential">DPre.main._differential._differential</a></dd>
+<dd><a href="builtins.html#object">builtins.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="targets-__init__"><strong>__init__</strong></a>(self, markergenes=None, expression=None, name=None, ignore_down_mgs=False, override_namematcher=False, species='mouse', log=True)</dt><dd><tt>Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</tt></dd></dl>
+
+<dl><dt><a name="targets-__repr__"><strong>__repr__</strong></a>(self)</dt><dd><tt>Get&nbsp;a&nbsp;readable&nbsp;summary&nbsp;of&nbsp;the&nbsp;samples&nbsp;instance</tt></dd></dl>
+
+<dl><dt><a name="targets-gene_similarity_heatmap"><strong>gene_similarity_heatmap</strong></a>(self, samples, which=None, differential=True, proportional=False, display_genes='variant', gene_number=45, specific_genes=None, custom_target_genelist=None, cluster_genes=False, cluster_samples=False, reorder_to_distance_bar=False, pivot=False, heatmap_width=None, heatmap_height=None, heatmap_range=None, distance_bar_range=None, sum_plot_range=None, genelabels_space=None, genelabels_size=None, samplelabels_size=None, samplelabels_space_left=None, samplelabels_space_right=None, title=True, hide_colorbar_legend=False, hide_distance_bar=False, hide_sum_plot=False, show_samplelabels_sum_plot=False, hide_genelabels=False, hide_genes_dendrogram=False, show_genes_colorbar=None, hide_samplelabels=False, show_samples_dendrogram=False, show_samples_colorbar=False, filename='gene_similarity_hm.pdf', plt_show=False, **kwargs)</dt><dd><tt>Plot&nbsp;the&nbsp;single-gene&nbsp;similarities&nbsp;of&nbsp;the&nbsp;samples&nbsp;with&nbsp;the&nbsp;<a href="#targets">targets</a>&nbsp;<br>
+in&nbsp;an&nbsp;array&nbsp;of&nbsp;heatmaps.<br>
+&nbsp;<br>
+This&nbsp;function&nbsp;reveals&nbsp;the&nbsp;drivers&nbsp;behind&nbsp;target&nbsp;similarity&nbsp;shifts.&nbsp;<br>
+Besides&nbsp;various&nbsp;gene&nbsp;extraction&nbsp;options,&nbsp;a&nbsp;genelist&nbsp;can&nbsp;be&nbsp;passed&nbsp;to&nbsp;<br>
+investigate&nbsp;specific&nbsp;similarity&nbsp;changes.&nbsp;On&nbsp;the&nbsp;right&nbsp;of&nbsp;the&nbsp;<br>
+heatmap,&nbsp;a&nbsp;bar&nbsp;plot&nbsp;visualizes&nbsp;a&nbsp;summery&nbsp;of&nbsp;the&nbsp;gene&nbsp;values.<br>
+Two&nbsp;different&nbsp;metrics&nbsp;can&nbsp;be&nbsp;picked&nbsp;to&nbsp;assess&nbsp;similarity:&nbsp;<br>
+'euclid'&nbsp;for&nbsp;expression&nbsp;inputs&nbsp;or&nbsp;'intersect'&nbsp;for&nbsp;comparison&nbsp;based&nbsp;<br>
+on&nbsp;diff.&nbsp;genes/&nbsp;markergenes.&nbsp;Differential&nbsp;and&nbsp;proportional&nbsp;gene<br>
+similarity&nbsp;values&nbsp;are&nbsp;available&nbsp;options&nbsp;for&nbsp;investagting&nbsp;the&nbsp;change&nbsp;<br>
+in&nbsp;similarity.&nbsp;When&nbsp;<a href="#targets">targets</a>&nbsp;were&nbsp;initiated&nbsp;with&nbsp;down-markergenes,<br>
+a&nbsp;seperate&nbsp;heatmap&nbsp;for&nbsp;each&nbsp;markergene&nbsp;type&nbsp;is&nbsp;drawn.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;===================&nbsp;Plot&nbsp;data&nbsp;options&nbsp;===================<br>
+&nbsp;&nbsp;&nbsp;&nbsp;samples&nbsp;(samples):&nbsp;the&nbsp;data&nbsp;to&nbsp;rate&nbsp;similariity&nbsp;for.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;which&nbsp;(str,&nbsp;optional):&nbsp;the&nbsp;similarity&nbsp;metric&nbsp;to&nbsp;use.&nbsp;Defaults&nbsp;to<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;None.&nbsp;Valid&nbsp;options&nbsp;are&nbsp;'euclid'&nbsp;and&nbsp;'intersect'.&nbsp;'euclic'&nbsp;shows&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;euclidean&nbsp;distance&nbsp;towards&nbsp;the&nbsp;target&nbsp;markergenes<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;expression&nbsp;levels&nbsp;and&nbsp;requires&nbsp;expression&nbsp;input&nbsp;for&nbsp;samples&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;and&nbsp;<a href="#targets">targets</a>&nbsp;(preferably&nbsp;plus&nbsp;markergenes).&nbsp;'intersect'&nbsp;will&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;rate&nbsp;the&nbsp;overlap&nbsp;between&nbsp;diff.&nbsp;sample&nbsp;genes&nbsp;and&nbsp;target&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;markergenes&nbsp;requiring&nbsp;differential&nbsp;gene&nbsp;input.&nbsp;When&nbsp;None,&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;determine&nbsp;metric&nbsp;based&nbsp;on&nbsp;input&nbsp;data&nbsp;in&nbsp;<a href="#targets">targets</a>&nbsp;and&nbsp;samples.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;differential&nbsp;(bool,&nbsp;optional):&nbsp;plot&nbsp;the&nbsp;differential&nbsp;(change&nbsp;in)&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gene&nbsp;similarity&nbsp;with&nbsp;the&nbsp;<a href="#targets">targets</a>.&nbsp;Defaults&nbsp;to&nbsp;True.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Requires&nbsp;a&nbsp;control&nbsp;to&nbsp;be&nbsp;passed&nbsp;for&nbsp;the&nbsp;'euclid'&nbsp;metric.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Cannot&nbsp;be&nbsp;False&nbsp;for&nbsp;'intersect'-metric.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;proportional&nbsp;(bool,&nbsp;optional):&nbsp;plot&nbsp;the&nbsp;proportional&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;differential&nbsp;gene&nbsp;similarity&nbsp;with&nbsp;the&nbsp;<a href="#targets">targets</a>.&nbsp;Defaults&nbsp;to&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;False.&nbsp;For&nbsp;the&nbsp;'euclid'-metric,&nbsp;a&nbsp;proportional&nbsp;value&nbsp;of&nbsp;1&nbsp;reflects&nbsp;a&nbsp;change&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;in&nbsp;gene&nbsp;similarity&nbsp;equal&nbsp;to&nbsp;the&nbsp;absolute&nbsp;gene&nbsp;similarity&nbsp;of&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;control.&nbsp;Negative&nbsp;values&nbsp;are&nbsp;capped&nbsp;to&nbsp;-3&nbsp;to&nbsp;deal&nbsp;with&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;very&nbsp;low&nbsp;absolute&nbsp;gene&nbsp;similarities.&nbsp;Example:&nbsp;the&nbsp;samples&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;control&nbsp;has&nbsp;an&nbsp;absolute&nbsp;gene&nbsp;similarity&nbsp;of&nbsp;0.01&nbsp;with&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;markergene&nbsp;x&nbsp;of&nbsp;target&nbsp;A.&nbsp;A&nbsp;change&nbsp;in&nbsp;similarity&nbsp;of&nbsp;Sample&nbsp;A&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;with&nbsp;markergene&nbsp;x&nbsp;by&nbsp;-0.1&nbsp;results&nbsp;in&nbsp;a&nbsp;proportional&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;differential&nbsp;value&nbsp;of&nbsp;-3&nbsp;(rather&nbsp;then&nbsp;-10).&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;For&nbsp;the&nbsp;'intersect'&nbsp;metric,&nbsp;no&nbsp;proportional&nbsp;gene&nbsp;value&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;exists&nbsp;but&nbsp;the&nbsp;summary&nbsp;plot&nbsp;will&nbsp;devide&nbsp;the&nbsp;intersection&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;value&nbsp;by&nbsp;the&nbsp;number&nbsp;of&nbsp;displayed&nbsp;genes.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;display_genes(str,&nbsp;optional)&nbsp;Extract&nbsp;a&nbsp;specific&nbsp;set&nbsp;of&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;markergenes&nbsp;to&nbsp;display&nbsp;for&nbsp;each&nbsp;target.&nbsp;Defaults&nbsp;to&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'variant'.&nbsp;Valid&nbsp;options&nbsp;are&nbsp;'variant',&nbsp;'greatest',&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'increasing',&nbsp;'decreasing'&nbsp;when&nbsp;differential&nbsp;True,&nbsp;and&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'variant',&nbsp;'distant',&nbsp;'similar'&nbsp;for&nbsp;differential&nbsp;False.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;To&nbsp;identify&nbsp;sample&nbsp;specific&nbsp;effects,&nbsp;these&nbsp;metrics&nbsp;favor&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;outlaying&nbsp;sample&nbsp;values&nbsp;rather&nbsp;then&nbsp;overall&nbsp;high/&nbsp;low/&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;increasing&nbsp;etc.&nbsp;values.&nbsp;This&nbsp;is&nbsp;one&nbsp;of&nbsp;the&nbsp;3&nbsp;gene&nbsp;selection&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;options&nbsp;to&nbsp;choose&nbsp;from.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;gene_number(int,&nbsp;optional)&nbsp;The&nbsp;number&nbsp;of&nbsp;genes&nbsp;to&nbsp;plot&nbsp;for&nbsp;the&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'display_genes'&nbsp;option.&nbsp;Defaults&nbsp;to&nbsp;45.&nbsp;This&nbsp;option&nbsp;is&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ignored&nbsp;for&nbsp;the&nbsp;two&nbsp;other&nbsp;gene&nbsp;selection&nbsp;options&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'specific_genes'&nbsp;and&nbsp;'custom_target_genelist'.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;specific_genes(list,&nbsp;optional):&nbsp;Specify&nbsp;the&nbsp;markergenes&nbsp;to&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;display&nbsp;in&nbsp;a&nbsp;list&nbsp;of&nbsp;gene&nbsp;names.&nbsp;Defaults&nbsp;to&nbsp;None.&nbsp;A&nbsp;gene&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;from&nbsp;this&nbsp;list&nbsp;is&nbsp;only&nbsp;displayed&nbsp;if&nbsp;it&nbsp;is&nbsp;a&nbsp;markergene&nbsp;of&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;specifc&nbsp;target&nbsp;and&nbsp;detected&nbsp;in&nbsp;the&nbsp;samples.&nbsp;This&nbsp;option&nbsp;can&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;be&nbsp;used&nbsp;idependently&nbsp;or&nbsp;in&nbsp;combination&nbsp;with&nbsp;'display_genes'&nbsp;for&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;adding&nbsp;specific&nbsp;genes&nbsp;of&nbsp;interest&nbsp;to&nbsp;the&nbsp;extracted&nbsp;ones.&nbsp;Genes&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;are&nbsp;annotated&nbsp;referencing&nbsp;enseble&nbsp;v.96.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;custom_target_genelist&nbsp;(list,&nbsp;optional):&nbsp;Specify&nbsp;a&nbsp;custom&nbsp;list&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;of&nbsp;gene&nbsp;names&nbsp;to&nbsp;display&nbsp;similarity&nbsp;for.&nbsp;Defaults&nbsp;to&nbsp;None.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Currently&nbsp;this&nbsp;option&nbsp;is&nbsp;only&nbsp;implemented&nbsp;for&nbsp;the&nbsp;'euclid'&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;similarity&nbsp;metric.&nbsp;The&nbsp;passed&nbsp;genelist&nbsp;will&nbsp;be&nbsp;used&nbsp;for&nbsp;all&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#targets">targets</a>.&nbsp;In&nbsp;contrast&nbsp;to&nbsp;'specific_genes',&nbsp;the&nbsp;genes&nbsp;only&nbsp;need&nbsp;to&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;be&nbsp;detected&nbsp;in&nbsp;the&nbsp;<a href="#targets">targets</a>&nbsp;instead&nbsp;of&nbsp;qualifying&nbsp;as&nbsp;specific&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;target&nbsp;markergenes.&nbsp;Still,&nbsp;genes&nbsp;need&nbsp;to&nbsp;be&nbsp;detected&nbsp;in&nbsp;the&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;samples.&nbsp;Genes&nbsp;are&nbsp;annotated&nbsp;referencing&nbsp;enseble&nbsp;v.96.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;===================&nbsp;data&nbsp;ordering&nbsp;options&nbsp;===================<br>
+&nbsp;&nbsp;&nbsp;&nbsp;cluster_genes&nbsp;(bool,&nbsp;optional):&nbsp;cluster&nbsp;genes&nbsp;using&nbsp;the&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;euclidean&nbsp;distance.&nbsp;Defaults&nbsp;to&nbsp;False.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;cluster_samples&nbsp;(bool,&nbsp;optional):&nbsp;cluster&nbsp;samples&nbsp;using&nbsp;the&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;euclidean&nbsp;distance.&nbsp;Defaults&nbsp;to&nbsp;False.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;reorder_to_distance_bar&nbsp;(bool,&nbsp;optional):&nbsp;reorder&nbsp;the&nbsp;genes<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;from&nbsp;lowest&nbsp;to&nbsp;highest&nbsp;base&nbsp;distance.&nbsp;Defaults&nbsp;to&nbsp;False.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Cannot&nbsp;be&nbsp;True&nbsp;when&nbsp;&nbsp;'cluster_genes'&nbsp;is&nbsp;True&nbsp;aswell.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;For&nbsp;details,&nbsp;check&nbsp;the&nbsp;'hide_distance_bar'&nbsp;argument.&nbsp;<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;===================&nbsp;general&nbsp;visual&nbsp;options&nbsp;===================<br>
+&nbsp;&nbsp;&nbsp;&nbsp;pivot&nbsp;(bool,&nbsp;optional):&nbsp;pivot&nbsp;the&nbsp;heatmap&nbsp;by&nbsp;90&nbsp;degrees.&nbsp;Defaults&nbsp;to&nbsp;False.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Useful&nbsp;for&nbsp;fitting&nbsp;the&nbsp;heatmap&nbsp;on&nbsp;a&nbsp;canvas.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;heatmap_width&nbsp;(float,&nbsp;optional):&nbsp;multiplier&nbsp;to&nbsp;stretch/&nbsp;squeeze&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;heatmap&nbsp;squares&nbsp;in&nbsp;x&nbsp;direction.&nbsp;Defaults&nbsp;to&nbsp;None.&nbsp;For&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pivot&nbsp;=&nbsp;True&nbsp;this&nbsp;paramter&nbsp;controls&nbsp;the&nbsp;height.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Useful&nbsp;for&nbsp;very&nbsp;low&nbsp;or&nbsp;high&nbsp;number&nbsp;of&nbsp;genes.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;heatmap_height&nbsp;(float,&nbsp;optional):&nbsp;multiplier&nbsp;to&nbsp;stretch/&nbsp;squeeze&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;heatmap&nbsp;squares&nbsp;in&nbsp;y&nbsp;direction.&nbsp;Defaults&nbsp;to&nbsp;None.&nbsp;For&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pivot&nbsp;=&nbsp;True&nbsp;this&nbsp;paramter&nbsp;controls&nbsp;the&nbsp;width.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Useful&nbsp;for&nbsp;very&nbsp;low&nbsp;or&nbsp;high&nbsp;number&nbsp;of&nbsp;samples.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;distance_bar_range&nbsp;(list,&nbsp;optional):&nbsp;Define&nbsp;the&nbsp;range&nbsp;of&nbsp;values<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;that&nbsp;form&nbsp;the&nbsp;colormap&nbsp;for&nbsp;the&nbsp;distance&nbsp;bar.&nbsp;Defaults&nbsp;to<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;None.&nbsp;The&nbsp;list&nbsp;is&nbsp;interpreted&nbsp;as,&nbsp;[lower_limit,&nbsp;upper_limit].&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;When&nbsp;None,&nbsp;the&nbsp;edges&nbsp;are&nbsp;defined&nbsp;to&nbsp;cover&nbsp;90%&nbsp;of&nbsp;occuring&nbsp;values&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ignoring&nbsp;outlayers.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;sum_plot_range&nbsp;(list,&nbsp;optional):&nbsp;Define&nbsp;the&nbsp;lower-&nbsp;and&nbsp;upper&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;x-limits&nbsp;for&nbsp;the&nbsp;summary&nbsp;plot.&nbsp;Defaults&nbsp;to&nbsp;None.&nbsp;The&nbsp;list&nbsp;is&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;interpreted&nbsp;as,&nbsp;[lower_limit,&nbsp;upper_limit].&nbsp;When&nbsp;None,&nbsp;the&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;x-limits&nbsp;are&nbsp;defined&nbsp;by&nbsp;adding&nbsp;15%&nbsp;to&nbsp;the&nbsp;minimum&nbsp;and&nbsp;maximum<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;values.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;genelabels_space&nbsp;(float,&nbsp;optional):&nbsp;define&nbsp;the&nbsp;size&nbsp;in&nbsp;inches<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;to&nbsp;reserve&nbsp;for&nbsp;gene&nbsp;labels,&nbsp;here,&nbsp;the&nbsp;white&nbsp;space&nbsp;on&nbsp;the<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;bottom.&nbsp;Defaults&nbsp;to&nbsp;None.&nbsp;When&nbsp;None,&nbsp;refer&nbsp;to&nbsp;the&nbsp;values&nbsp;set&nbsp;in&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;config.HM_BOTTOM.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;samplelabels_space&nbsp;(float,&nbsp;optional):&nbsp;define&nbsp;the&nbsp;size&nbsp;in&nbsp;inches<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;to&nbsp;reserve&nbsp;for&nbsp;sample&nbsp;labels,&nbsp;here,&nbsp;the&nbsp;white&nbsp;space&nbsp;on&nbsp;the<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;left.&nbsp;Defaults&nbsp;to&nbsp;None.&nbsp;When&nbsp;None,&nbsp;refer&nbsp;to&nbsp;the&nbsp;value&nbsp;set&nbsp;in&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;config.HM_LEFT.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;genelabels_size&nbsp;(float,&nbsp;optional):&nbsp;multiplier&nbsp;for&nbsp;adjusting&nbsp;gene&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;label&nbsp;size.&nbsp;Defaults&nbsp;to&nbsp;None.&nbsp;Useful&nbsp;for&nbsp;very&nbsp;high&nbsp;or&nbsp;low&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;number&nbsp;of&nbsp;genes.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;samplelabels_size&nbsp;(float,&nbsp;optional):&nbsp;multiplier&nbsp;for&nbsp;adjusting&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sample&nbsp;label&nbsp;size.&nbsp;Defaults&nbsp;to&nbsp;None.&nbsp;Useful&nbsp;for&nbsp;very&nbsp;high&nbsp;or&nbsp;low&nbsp;number&nbsp;of&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;samples.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;title&nbsp;(bool:str,&nbsp;optional):&nbsp;the&nbsp;plot&nbsp;title&nbsp;to&nbsp;set.&nbsp;Defaults&nbsp;to&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;True.&nbsp;For&nbsp;True,&nbsp;infer&nbsp;the&nbsp;title&nbsp;based&nbsp;on&nbsp;plot&nbsp;data&nbsp;inputs&nbsp;and&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#targets">targets</a>/&nbsp;samples&nbsp;name&nbsp;attribute.&nbsp;Text&nbsp;input&nbsp;will&nbsp;be&nbsp;set&nbsp;as&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;general&nbsp;title,&nbsp;False&nbsp;hides&nbsp;the&nbsp;title.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;kwargs:&nbsp;modify&nbsp;the&nbsp;constants&nbsp;defined&nbsp;in&nbsp;config.&nbsp;This&nbsp;is&nbsp;used&nbsp;as&nbsp;an&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;advanced&nbsp;adjustment&nbsp;of&nbsp;plot&nbsp;element&nbsp;sizes&nbsp;and&nbsp;the&nbsp;minimum&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;required&nbsp;marker&nbsp;genes&nbsp;detection&nbsp;proportion.&nbsp;The&nbsp;heatmaps&nbsp;may&nbsp;be<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;adjusted&nbsp;by&nbsp;the&nbsp;following&nbsp;paramters:&nbsp;DROP_TARGET_DETEC_THR,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;HM_LEFT,&nbsp;HM_TOP,&nbsp;HM_RIGHT,&nbsp;HM_BOTTOM,&nbsp;HM_WSPACE,&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;HM_HSPACE,&nbsp;HM_Y_COLORBAR,&nbsp;HM_X_COLORBAR,&nbsp;HM_DISTANCE_BAR,&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;HM_Y_DENDROGRAM,&nbsp;HM_X_DENDROGRAM,&nbsp;HM_SQUARE_SIZE,&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;G_HM_SUMPLOT_SIZEG_HM_UPDOWN_SPACE_SIZE,&nbsp;CB_LEFT,&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CB_LEFT_SEC,&nbsp;CB_TOP,&nbsp;CB_WIDTH,&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CB_HEIGHT.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;===================&nbsp;hide/show&nbsp;plot&nbsp;elements&nbsp;===================<br>
+&nbsp;&nbsp;&nbsp;&nbsp;hide_colorbar_legend&nbsp;(bool,&nbsp;optional):&nbsp;Do&nbsp;not&nbsp;plot&nbsp;the&nbsp;colorbar&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;legend.&nbsp;Defaults&nbsp;to&nbsp;False.&nbsp;Applies&nbsp;for&nbsp;all&nbsp;colorbar_legends.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;hide_distance_bar&nbsp;(bool,&nbsp;optional):&nbsp;Do&nbsp;not&nbsp;plot&nbsp;the&nbsp;distance&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;bar&nbsp;on&nbsp;top&nbsp;of&nbsp;the&nbsp;heatmap.&nbsp;Defaults&nbsp;to&nbsp;False.&nbsp;For&nbsp;the&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'euclid'&nbsp;metric,&nbsp;this&nbsp;bar&nbsp;visualizes&nbsp;the&nbsp;absolute&nbsp;similarity&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;with&nbsp;the&nbsp;gene.&nbsp;For&nbsp;the&nbsp;'intersect'&nbsp;metric,&nbsp;all&nbsp;up-markergenes<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;are&nbsp;labelled&nbsp;red,&nbsp;down&nbsp;ones&nbsp;are&nbsp;blue.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;hide_sum_plot&nbsp;(bool,&nbsp;optional):&nbsp;Do&nbsp;not&nbsp;generate&nbsp;the&nbsp;summary&nbsp;plot&nbsp;on<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;left&nbsp;visualizing&nbsp;the&nbsp;aggregated&nbsp;samples.&nbsp;Defualts&nbsp;to&nbsp;False.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This&nbsp;plot&nbsp;relies&nbsp;on&nbsp;the&nbsp;sample&nbsp;methad&nbsp;as&nbsp;the&nbsp;target&nbsp;similarity&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;measurement,&nbsp;but&nbsp;instead&nbsp;of&nbsp;using&nbsp;all&nbsp;target&nbsp;markergenes,&nbsp;only&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;displayed&nbsp;genes&nbsp;are&nbsp;used.&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;show_samplelabels_sum_plot&nbsp;(bool,&nbsp;optional):&nbsp;Plot&nbsp;additional&nbsp;sample<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;labels&nbsp;on&nbsp;the&nbsp;right&nbsp;of&nbsp;the&nbsp;plot,&nbsp;next&nbsp;to&nbsp;the&nbsp;summary&nbsp;plot.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Defualts&nbsp;to&nbsp;False.&nbsp;Useful&nbsp;for&nbsp;very&nbsp;wide&nbsp;plots.&nbsp;In&nbsp;case&nbsp;labels&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;are&nbsp;cut&nbsp;off,&nbsp;adjust&nbsp;config.HM_RIGHT.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;hide_genelabels&nbsp;(bool,&nbsp;optional):&nbsp;Do&nbsp;not&nbsp;plot&nbsp;the&nbsp;gene&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;labels&nbsp;at&nbsp;the&nbsp;bottom.&nbsp;Defaults&nbsp;to&nbsp;False.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;hide_genes_dendrogram&nbsp;(bool,&nbsp;optional):&nbsp;Do&nbsp;not&nbsp;plot&nbsp;the&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;genes&nbsp;dendrogram&nbsp;from&nbsp;clustering.&nbsp;Defaults&nbsp;to&nbsp;False.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Requires&nbsp;'cluster_genes'&nbsp;to&nbsp;be&nbsp;True.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;show_genes_colorbar&nbsp;(dict:bool,&nbsp;optional):&nbsp;Plot&nbsp;a&nbsp;genes&nbsp;colorbar&nbsp;on&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;bottom&nbsp;of&nbsp;the&nbsp;heatmap.&nbsp;Defaults&nbsp;to&nbsp;None.&nbsp;A&nbsp;dictionary&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;should&nbsp;map&nbsp;gene&nbsp;names&nbsp;to&nbsp;colors.&nbsp;Mappings&nbsp;for&nbsp;genes&nbsp;not&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;displayed&nbsp;in&nbsp;the&nbsp;plot&nbsp;are&nbsp;ignored.&nbsp;The&nbsp;color&nbsp;for&nbsp;M=missing&nbsp;gene&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;keys&nbsp;is&nbsp;set&nbsp;to&nbsp;white.&nbsp;When,&nbsp;True&nbsp;and&nbsp;`specifc_genes`&nbsp;passed,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;passed&nbsp;genes&nbsp;will&nbsp;be&nbsp;set&nbsp;to&nbsp;config.colors[1]&nbsp;(green).&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;hide_samplelabels&nbsp;(bool,&nbsp;optional):&nbsp;Do&nbsp;not&nbsp;plot&nbsp;the&nbsp;sample&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;labels&nbsp;at&nbsp;the&nbsp;left.&nbsp;Defaults&nbsp;to&nbsp;False.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;show_samples_dendrogram&nbsp;(bool,&nbsp;optional):&nbsp;Plot&nbsp;the&nbsp;samples&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;dendrogram&nbsp;from&nbsp;clustering.&nbsp;Defaults&nbsp;to&nbsp;False.&nbsp;Requires&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'cluster_samples'&nbsp;to&nbsp;be&nbsp;True.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;show_samples_colorbar&nbsp;(bool,&nbsp;optional):&nbsp;Plot&nbsp;the&nbsp;samples<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;colorbar&nbsp;on&nbsp;the&nbsp;left&nbsp;of&nbsp;the&nbsp;heatmap.&nbsp;Defaults&nbsp;to&nbsp;False.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;When&nbsp;colors&nbsp;are&nbsp;not&nbsp;set&nbsp;for&nbsp;the&nbsp;<a href="#targets">targets</a>&nbsp;using&nbsp;the&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#targets-set_colors">set_colors</a>()&nbsp;function,&nbsp;colors&nbsp;are&nbsp;set&nbsp;to&nbsp;white.&nbsp;<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;===================&nbsp;others&nbsp;===================<br>
+&nbsp;&nbsp;&nbsp;&nbsp;filename&nbsp;(str,&nbsp;optional):&nbsp;the&nbsp;filename&nbsp;for&nbsp;saving&nbsp;the&nbsp;figure.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Defaults&nbsp;to&nbsp;'gene_similarity_hm.pdf'.&nbsp;Supported&nbsp;filename&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;endings&nbsp;are&nbsp;.png&nbsp;and&nbsp;.pdf.&nbsp;If&nbsp;filename&nbsp;does&nbsp;not&nbsp;end&nbsp;with&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;these,&nbsp;the&nbsp;filetype&nbsp;is&nbsp;retrieved&nbsp;from&nbsp;conifg.SAVE_FORMAT.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;If&nbsp;None,&nbsp;the&nbsp;plot&nbsp;is&nbsp;not&nbsp;saved.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;plt_show&nbsp;(bool,&nbsp;optional)&nbsp;directly&nbsp;show&nbsp;each&nbsp;created&nbsp;plot&nbsp;in&nbsp;a&nbsp;new<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;window.&nbsp;Defaults&nbsp;to&nbsp;False.</tt></dd></dl>
+
+<dl><dt><a name="targets-plot_detec_mgs_prop"><strong>plot_detec_mgs_prop</strong></a>(self, samples, plt_show=False, filename='detec_mgs_prop.png')</dt><dd><tt>Show&nbsp;the&nbsp;proportion&nbsp;of&nbsp;detected&nbsp;markergenes&nbsp;in&nbsp;logs&nbsp;and&nbsp;a&nbsp;plot.<br>
+&nbsp;<br>
+Useful&nbsp;for&nbsp;adjuding&nbsp;the&nbsp;DROP_TARGET_DETEC_THR&nbsp;value.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;samples&nbsp;(samples):&nbsp;The&nbsp;samples&nbsp;instance&nbsp;to&nbsp;test.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;filename&nbsp;(str,&nbsp;optional):&nbsp;filename&nbsp;to&nbsp;save&nbsp;the&nbsp;plot.&nbsp;Defaults&nbsp;to<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;None&nbsp;in&nbsp;which&nbsp;case&nbsp;no&nbsp;plot&nbsp;is&nbsp;saved.<br>
+Returns:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;det:&nbsp;a&nbsp;DataFrame&nbsp;with&nbsp;detection&nbsp;values&nbsp;used&nbsp;for&nbsp;logging&nbsp;and&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;plotting</tt></dd></dl>
+
+<dl><dt><a name="targets-ranked_similarity_barplot"><strong>ranked_similarity_barplot</strong></a>(self, samples, which=None, differential=True, proportional=False, display_similarity='mgs mean', n_targets=16, display_negative=False, rank_samples=False, pivot=False, xlim_range=None, targetlabels_space=None, targetlabels_size=None, colored_bars=False, spines=False, title=True, hide_targetlabels=False, hide_colorbar=False, filename='ranked_similarity_bp.pdf', plt_show=False, **kwargs)</dt><dd><tt>Plot&nbsp;the&nbsp;ranked&nbsp;similarity&nbsp;of&nbsp;the&nbsp;samples&nbsp;with&nbsp;the&nbsp;<a href="#targets">targets</a>&nbsp;in&nbsp;a&nbsp;<br>
+barplot<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sort&nbsp;the&nbsp;similarity&nbsp;values&nbsp;of&nbsp;the&nbsp;samples&nbsp;and&nbsp;<a href="#targets">targets</a>&nbsp;to&nbsp;identify<br>
+&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;dominating&nbsp;effects&nbsp;in&nbsp;the&nbsp;samples.&nbsp;Two&nbsp;different&nbsp;metrics&nbsp;can&nbsp;be&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;picked&nbsp;to&nbsp;assess&nbsp;similarity:&nbsp;'euclid'&nbsp;for&nbsp;expression&nbsp;inputs&nbsp;or&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;'intersect'&nbsp;for&nbsp;comparison&nbsp;based&nbsp;on&nbsp;diff.&nbsp;genes/&nbsp;markergenes.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Differential&nbsp;and&nbsp;proportional&nbsp;similarity&nbsp;values&nbsp;are&nbsp;available&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;options&nbsp;for&nbsp;investagting&nbsp;the&nbsp;change&nbsp;in&nbsp;similarity.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;===================&nbsp;Plot&nbsp;data&nbsp;options&nbsp;===================<br>
+&nbsp;&nbsp;&nbsp;&nbsp;samples&nbsp;(samples):&nbsp;the&nbsp;data&nbsp;to&nbsp;rank&nbsp;similariity&nbsp;for.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;which&nbsp;(str,&nbsp;optional):&nbsp;the&nbsp;similarity&nbsp;metric&nbsp;to&nbsp;use.&nbsp;Valid&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;options&nbsp;are&nbsp;'euclid'&nbsp;and&nbsp;'intersect'.&nbsp;Defaults&nbsp;to&nbsp;None.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'euclic'&nbsp;shows&nbsp;the&nbsp;mean&nbsp;euclidean&nbsp;distance&nbsp;towards&nbsp;the&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;target&nbsp;markergenes&nbsp;expression&nbsp;levels&nbsp;and&nbsp;requires&nbsp;expression&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;input&nbsp;for&nbsp;samples&nbsp;and&nbsp;<a href="#targets">targets</a>&nbsp;(preferably&nbsp;plus&nbsp;markergenes).<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'intersect'&nbsp;will&nbsp;show&nbsp;the&nbsp;overlap&nbsp;between&nbsp;diff.&nbsp;sample&nbsp;genes&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;and&nbsp;target&nbsp;markergenes&nbsp;requiring&nbsp;differential&nbsp;gene&nbsp;input.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;When&nbsp;None,&nbsp;determine&nbsp;metric&nbsp;based&nbsp;on&nbsp;input&nbsp;data&nbsp;in&nbsp;<a href="#targets">targets</a>&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;and&nbsp;samples.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;differential&nbsp;(bool,&nbsp;optional):&nbsp;plot&nbsp;the&nbsp;differential&nbsp;(change&nbsp;in)&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;similarity&nbsp;between&nbsp;samples&nbsp;and&nbsp;<a href="#targets">targets</a>.&nbsp;Defaults&nbsp;to&nbsp;True.&nbsp;Requires&nbsp;a&nbsp;control&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;to&nbsp;be&nbsp;passed&nbsp;for&nbsp;the&nbsp;'euclid'&nbsp;metric.&nbsp;Cannot&nbsp;be&nbsp;False&nbsp;for&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'intersect'-metric.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;proportional&nbsp;(bool,&nbsp;optional):&nbsp;plot&nbsp;the&nbsp;proportional&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;differential&nbsp;similarity&nbsp;between&nbsp;samples&nbsp;and&nbsp;<a href="#targets">targets</a>.&nbsp;Defaults&nbsp;to&nbsp;False.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;For&nbsp;the&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'euclid'-metric,&nbsp;a&nbsp;proportional&nbsp;value&nbsp;of&nbsp;1&nbsp;reflects&nbsp;a&nbsp;change&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;in&nbsp;similarity&nbsp;equal&nbsp;to&nbsp;the&nbsp;absolute&nbsp;similarity&nbsp;of&nbsp;the&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;control.&nbsp;Example:&nbsp;the&nbsp;samples&nbsp;control&nbsp;has&nbsp;an&nbsp;absolute&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;similarity&nbsp;of&nbsp;3.2&nbsp;with&nbsp;target&nbsp;A.&nbsp;A&nbsp;change&nbsp;in&nbsp;similarity&nbsp;of&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sample&nbsp;A&nbsp;with&nbsp;Target&nbsp;A&nbsp;by&nbsp;0.32&nbsp;results&nbsp;in&nbsp;a&nbsp;proportional&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;differential&nbsp;value&nbsp;of&nbsp;0.1.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;For&nbsp;the&nbsp;'intersect'&nbsp;metric,&nbsp;the&nbsp;intersect&nbsp;value&nbsp;of&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;markergenes&nbsp;and&nbsp;diff.&nbsp;genes&nbsp;is&nbsp;devided&nbsp;by&nbsp;the&nbsp;number&nbsp;of&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;target&nbsp;markergenes.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;display_similarity&nbsp;(str,&nbsp;optional):&nbsp;specify&nbsp;the&nbsp;group&nbsp;of&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;markergenes&nbsp;to&nbsp;display&nbsp;similarity&nbsp;for.&nbsp;.&nbsp;Defaults&nbsp;to&nbsp;'mgs&nbsp;mean'.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Valid&nbsp;options&nbsp;are&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'mgs&nbsp;mean',&nbsp;'mgs&nbsp;up',&nbsp;'mgs&nbsp;down'.&nbsp;Relevent&nbsp;when&nbsp;<a href="#targets">targets</a>&nbsp;are&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;initiated&nbsp;with&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;down-markergenes.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;n_targets&nbsp;(int,&nbsp;optional):&nbsp;the&nbsp;number&nbsp;of&nbsp;<a href="#targets">targets</a>&nbsp;to&nbsp;display&nbsp;in&nbsp;each<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;plot.&nbsp;Defaults&nbsp;to&nbsp;16.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;display_negative&nbsp;(bool,&nbsp;optional):&nbsp;display&nbsp;the&nbsp;most&nbsp;negative&nbsp;values&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;on&nbsp;the&nbsp;bottom&nbsp;half&nbsp;of&nbsp;the&nbsp;bar&nbsp;plot.&nbsp;Defaults&nbsp;to&nbsp;False.&nbsp;<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;===================&nbsp;data&nbsp;ordering&nbsp;options&nbsp;===================<br>
+&nbsp;&nbsp;&nbsp;&nbsp;rank_samples&nbsp;(bool,&nbsp;optional):&nbsp;Rank&nbsp;the&nbsp;samples&nbsp;based&nbsp;on&nbsp;their&nbsp;most&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;positive&nbsp;value&nbsp;and&nbsp;generate&nbsp;the&nbsp;barplots&nbsp;in&nbsp;the&nbsp;same&nbsp;order.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Defaults&nbsp;to&nbsp;False.&nbsp;When&nbsp;False,&nbsp;use&nbsp;the&nbsp;default&nbsp;samples&nbsp;order.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;===================&nbsp;general&nbsp;visual&nbsp;options&nbsp;===================<br>
+&nbsp;&nbsp;&nbsp;&nbsp;pivot&nbsp;(bool,&nbsp;optional):&nbsp;pivot&nbsp;the&nbsp;barplot&nbsp;by&nbsp;90&nbsp;degrees.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Defaults&nbsp;to&nbsp;False.&nbsp;Useful&nbsp;for&nbsp;fitting&nbsp;the&nbsp;barplot&nbsp;on&nbsp;a&nbsp;canvas.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;xlim_range&nbsp;(list,&nbsp;optional):&nbsp;Define&nbsp;the&nbsp;lower-&nbsp;and&nbsp;upper&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;x-limits&nbsp;for&nbsp;the&nbsp;barplot.&nbsp;Defaults&nbsp;to&nbsp;None.&nbsp;The&nbsp;list&nbsp;is&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;interpreted&nbsp;as,&nbsp;[lower_limit,&nbsp;upper_limit].&nbsp;When&nbsp;None,&nbsp;the&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;x-limits&nbsp;are&nbsp;defined&nbsp;by&nbsp;adding&nbsp;15%&nbsp;to&nbsp;the&nbsp;minimum&nbsp;and&nbsp;maximum<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;values.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;targetlabels_space&nbsp;(float,&nbsp;optional):&nbsp;define&nbsp;the&nbsp;size&nbsp;in&nbsp;inches<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;to&nbsp;reserve&nbsp;for&nbsp;target&nbsp;labels,&nbsp;here,&nbsp;the&nbsp;white&nbsp;space&nbsp;on&nbsp;the<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;left.&nbsp;Defaults&nbsp;to&nbsp;None.&nbsp;When&nbsp;None,&nbsp;refer&nbsp;to&nbsp;the&nbsp;value&nbsp;set&nbsp;in&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;config.BP_LEFT.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;targetlabels_size&nbsp;(float,&nbsp;optional):&nbsp;multiplier&nbsp;for&nbsp;adjusting&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;target&nbsp;label&nbsp;size.&nbsp;Defaults&nbsp;to&nbsp;None.&nbsp;Useful&nbsp;for&nbsp;very&nbsp;high&nbsp;or&nbsp;low&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;number&nbsp;of&nbsp;<a href="#targets">targets</a>.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;colored_bars&nbsp;(bool,&nbsp;optional):&nbsp;colorize&nbsp;negative&nbsp;values&nbsp;in&nbsp;blue,&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;positive&nbsp;ones&nbsp;in&nbsp;red.&nbsp;Defaults&nbsp;to&nbsp;False.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;spines&nbsp;(bool,&nbsp;optional):&nbsp;in&nbsp;addition&nbsp;to&nbsp;the&nbsp;bottom&nbsp;and&nbsp;left&nbsp;spines,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;plot&nbsp;the&nbsp;top&nbsp;and&nbsp;right&nbsp;ones.&nbsp;Defaults&nbsp;to&nbsp;False.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;title&nbsp;(bool:str,&nbsp;optional):&nbsp;the&nbsp;plot&nbsp;title&nbsp;to&nbsp;set.&nbsp;Defaults&nbsp;to&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;True.&nbsp;For&nbsp;True,&nbsp;infer&nbsp;the&nbsp;title&nbsp;based&nbsp;on&nbsp;plot&nbsp;data&nbsp;inputs&nbsp;and&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#targets">targets</a>/&nbsp;samples&nbsp;name&nbsp;attribute.&nbsp;Text&nbsp;input&nbsp;will&nbsp;be&nbsp;set&nbsp;as&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;general&nbsp;title,&nbsp;False&nbsp;hides&nbsp;the&nbsp;title.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;kwargs:&nbsp;modify&nbsp;the&nbsp;constants&nbsp;defined&nbsp;in&nbsp;config.&nbsp;This&nbsp;is&nbsp;used&nbsp;as&nbsp;an&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;advanced&nbsp;adjustment&nbsp;of&nbsp;plot&nbsp;element&nbsp;sizes&nbsp;and&nbsp;the&nbsp;minimum&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;required&nbsp;marker&nbsp;genes&nbsp;detection&nbsp;proportion.&nbsp;The&nbsp;barplots&nbsp;may&nbsp;be<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;adjusted&nbsp;by&nbsp;the&nbsp;following&nbsp;paramters:&nbsp;DROP_TARGET_DETEC_THR,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BP_LEFT,&nbsp;BP_TOP,&nbsp;BP_RIGHT,&nbsp;BP_BOTTOM,&nbsp;BP_Y_COLORBAR,&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BP_BARSPACE,&nbsp;BP_BARWIDTH_SIZE.<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;===================&nbsp;hide/show&nbsp;plot&nbsp;elements&nbsp;===================<br>
+&nbsp;&nbsp;&nbsp;&nbsp;hide_targetlabels&nbsp;(bool,&nbsp;optional):&nbsp;Do&nbsp;not&nbsp;plot&nbsp;the&nbsp;target&nbsp;labels&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;at&nbsp;the&nbsp;left.&nbsp;Defaults&nbsp;to&nbsp;False.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;hide_colorbar&nbsp;(bool,&nbsp;optional):&nbsp;Do&nbsp;not&nbsp;plot&nbsp;the&nbsp;<a href="#targets">targets</a>&nbsp;colorbar&nbsp;on&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;left&nbsp;of&nbsp;the&nbsp;barplot.&nbsp;Defaults&nbsp;to&nbsp;False.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;===================&nbsp;others&nbsp;===================<br>
+&nbsp;&nbsp;&nbsp;&nbsp;filename&nbsp;(str,&nbsp;optional):&nbsp;the&nbsp;filename&nbsp;for&nbsp;saving&nbsp;the&nbsp;figure.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Defaults&nbsp;to&nbsp;'ranked_similarity_bp.png'.&nbsp;Supported&nbsp;filename&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;endings&nbsp;are&nbsp;.png&nbsp;and&nbsp;.pdf.&nbsp;If&nbsp;filename&nbsp;does&nbsp;not&nbsp;end&nbsp;with&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;these,&nbsp;the&nbsp;filetype&nbsp;is&nbsp;retrieved&nbsp;from&nbsp;conifg.SAVE_FORMAT.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;If&nbsp;None,&nbsp;the&nbsp;plot&nbsp;is&nbsp;not&nbsp;saved.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;plt_show&nbsp;(bool,&nbsp;optional)&nbsp;directly&nbsp;show&nbsp;each&nbsp;created&nbsp;plot&nbsp;in&nbsp;a&nbsp;new<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;window.&nbsp;Defaults&nbsp;to&nbsp;False.</tt></dd></dl>
+
+<dl><dt><a name="targets-target_similarity_heatmap"><strong>target_similarity_heatmap</strong></a>(self, samples, which=None, differential=True, proportional=False, display_similarity='mgs mean', cluster_targets=False, cluster_samples=False, reorder_to_distance_bar=False, pivot=False, heatmap_width=None, heatmap_height=None, heatmap_range=None, distance_bar_range=None, targetlabels_space=None, samplelabels_space=None, targetlabels_size=None, samplelabels_size=None, title=True, hide_colorbar_legend=False, hide_distance_bar=False, hide_targetlabels=False, hide_targets_dendrogram=False, hide_targets_colorbar=False, hide_samplelabels=False, show_samples_dendrogram=False, show_samples_colorbar=False, plt_show=False, filename='target_similarity_hm.png', **kwargs)</dt><dd><tt>Plot&nbsp;the&nbsp;similarity&nbsp;of&nbsp;the&nbsp;samples&nbsp;with&nbsp;the&nbsp;<a href="#targets">targets</a>&nbsp;in&nbsp;a&nbsp;heatmap.<br>
+&nbsp;<br>
+This&nbsp;gives&nbsp;a&nbsp;compact&nbsp;insight&nbsp;on&nbsp;transcriptional&nbsp;similarity&nbsp;with&nbsp;the&nbsp;<br>
+<a href="#targets">targets</a>.&nbsp;Two&nbsp;different&nbsp;metrics&nbsp;can&nbsp;be&nbsp;picked&nbsp;to&nbsp;assess&nbsp;similarity:&nbsp;<br>
+'euclid'&nbsp;for&nbsp;expression&nbsp;inputs&nbsp;or&nbsp;'intersect'&nbsp;for&nbsp;comparison&nbsp;based&nbsp;<br>
+on&nbsp;diff.&nbsp;genes/&nbsp;markergenes.&nbsp;Differential&nbsp;and&nbsp;proportional&nbsp;<br>
+similarity&nbsp;values&nbsp;are&nbsp;available&nbsp;options&nbsp;for&nbsp;investagting&nbsp;the&nbsp;change&nbsp;<br>
+in&nbsp;similarity.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;===================&nbsp;Plot&nbsp;data&nbsp;options&nbsp;===================<br>
+&nbsp;&nbsp;&nbsp;&nbsp;samples&nbsp;(samples):&nbsp;the&nbsp;data&nbsp;to&nbsp;rate&nbsp;similariity&nbsp;for.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;which&nbsp;(str,&nbsp;optional):&nbsp;the&nbsp;similarity&nbsp;metric&nbsp;to&nbsp;use.&nbsp;Valid&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;options&nbsp;are&nbsp;'euclid'&nbsp;and&nbsp;'intersect'.&nbsp;Defaults&nbsp;to&nbsp;None.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'euclic'&nbsp;shows&nbsp;the&nbsp;mean&nbsp;euclidean&nbsp;distance&nbsp;towards&nbsp;the&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;target&nbsp;markergenes&nbsp;expression&nbsp;levels&nbsp;and&nbsp;requires&nbsp;expression&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;input&nbsp;for&nbsp;samples&nbsp;and&nbsp;<a href="#targets">targets</a>&nbsp;(preferably&nbsp;plus&nbsp;markergenes).<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'intersect'&nbsp;will&nbsp;show&nbsp;the&nbsp;overlap&nbsp;between&nbsp;diff.&nbsp;sample&nbsp;genes&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;and&nbsp;target&nbsp;markergenes&nbsp;requiring&nbsp;differential&nbsp;gene&nbsp;input.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;When&nbsp;None,&nbsp;determine&nbsp;metric&nbsp;based&nbsp;on&nbsp;input&nbsp;data&nbsp;in&nbsp;<a href="#targets">targets</a>&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;and&nbsp;samples.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;differential&nbsp;(bool,&nbsp;optional):&nbsp;plot&nbsp;the&nbsp;differential&nbsp;(change&nbsp;in)&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;similarity&nbsp;between&nbsp;samples&nbsp;and&nbsp;<a href="#targets">targets</a>.&nbsp;Defaults&nbsp;to&nbsp;True.&nbsp;Requires&nbsp;a&nbsp;control&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;to&nbsp;be&nbsp;passed&nbsp;for&nbsp;the&nbsp;'euclid'&nbsp;metric.&nbsp;Cannot&nbsp;be&nbsp;False&nbsp;for&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'intersect'-metric.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;proportional&nbsp;(bool,&nbsp;optional):&nbsp;plot&nbsp;the&nbsp;proportional&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;differential&nbsp;similarity&nbsp;between&nbsp;samples&nbsp;and&nbsp;<a href="#targets">targets</a>.&nbsp;Defaults&nbsp;to&nbsp;False.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;For&nbsp;the&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'euclid'-metric,&nbsp;a&nbsp;proportional&nbsp;value&nbsp;of&nbsp;1&nbsp;reflects&nbsp;a&nbsp;change&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;in&nbsp;similarity&nbsp;equal&nbsp;to&nbsp;the&nbsp;absolute&nbsp;similarity&nbsp;of&nbsp;the&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;control.&nbsp;Example:&nbsp;the&nbsp;samples&nbsp;control&nbsp;has&nbsp;an&nbsp;absolute&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;similarity&nbsp;of&nbsp;3.2&nbsp;with&nbsp;target&nbsp;A.&nbsp;A&nbsp;change&nbsp;in&nbsp;similarity&nbsp;of&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sample&nbsp;A&nbsp;with&nbsp;Target&nbsp;A&nbsp;by&nbsp;0.32&nbsp;results&nbsp;in&nbsp;a&nbsp;proportional&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;differential&nbsp;value&nbsp;of&nbsp;0.1.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;For&nbsp;the&nbsp;'intersect'&nbsp;metric,&nbsp;the&nbsp;intersect&nbsp;value&nbsp;of&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;markergenes&nbsp;and&nbsp;diff.&nbsp;genes&nbsp;is&nbsp;devided&nbsp;by&nbsp;the&nbsp;number&nbsp;of&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;target&nbsp;markergenes.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;display_similarity&nbsp;(str,&nbsp;optional):&nbsp;specify&nbsp;the&nbsp;group&nbsp;of&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;markergenes&nbsp;to&nbsp;display&nbsp;similarity&nbsp;for.&nbsp;.&nbsp;Defaults&nbsp;to&nbsp;'mgs&nbsp;mean'.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Valid&nbsp;options&nbsp;are&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'mgs&nbsp;mean',&nbsp;'mgs&nbsp;up',&nbsp;'mgs&nbsp;down'.&nbsp;Relevent&nbsp;when&nbsp;<a href="#targets">targets</a>&nbsp;are&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;initiated&nbsp;with&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;down-markergenes.<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;===================&nbsp;data&nbsp;ordering&nbsp;options&nbsp;===================<br>
+&nbsp;&nbsp;&nbsp;&nbsp;cluster_targets&nbsp;(bool,&nbsp;optional):&nbsp;cluster&nbsp;<a href="#targets">targets</a>&nbsp;using&nbsp;the&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;euclidean&nbsp;distance.&nbsp;Defaults&nbsp;to&nbsp;False.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;cluster_samples&nbsp;(bool,&nbsp;optional):&nbsp;cluster&nbsp;samples&nbsp;using&nbsp;the&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;euclidean&nbsp;distance.&nbsp;Defaults&nbsp;to&nbsp;False.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;reorder_to_distance_bar&nbsp;(bool,&nbsp;optional):&nbsp;reorder&nbsp;the&nbsp;<a href="#targets">targets</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;from&nbsp;lowest&nbsp;to&nbsp;highest&nbsp;base&nbsp;distance.&nbsp;Defaults&nbsp;to&nbsp;False.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Cannot&nbsp;be&nbsp;True&nbsp;when&nbsp;&nbsp;'cluster_targets'&nbsp;is&nbsp;True&nbsp;aswell.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;For&nbsp;details,&nbsp;check&nbsp;the&nbsp;'hide_distance_bar'&nbsp;argument.&nbsp;<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;===================&nbsp;general&nbsp;visual&nbsp;options&nbsp;===================<br>
+&nbsp;&nbsp;&nbsp;&nbsp;pivot&nbsp;(bool,&nbsp;optional):&nbsp;pivot&nbsp;the&nbsp;heatmap&nbsp;by&nbsp;90&nbsp;degrees.&nbsp;Defaults&nbsp;to&nbsp;False.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Useful&nbsp;for&nbsp;fitting&nbsp;the&nbsp;heatmap&nbsp;on&nbsp;a&nbsp;canvas.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;heatmap_width&nbsp;(float,&nbsp;optional):&nbsp;multiplier&nbsp;to&nbsp;stretch/&nbsp;squeeze&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;heatmap&nbsp;squares&nbsp;in&nbsp;x&nbsp;direction.&nbsp;Defaults&nbsp;to&nbsp;None.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Useful&nbsp;for&nbsp;very&nbsp;low&nbsp;or&nbsp;high&nbsp;number&nbsp;of&nbsp;<a href="#targets">targets</a>.&nbsp;For&nbsp;pivot&nbsp;=&nbsp;True<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this&nbsp;paramter&nbsp;controls&nbsp;the&nbsp;height.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;heatmap_height&nbsp;(float,&nbsp;optional):&nbsp;multiplier&nbsp;to&nbsp;stretch/&nbsp;squeeze&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;heatmap&nbsp;squares&nbsp;in&nbsp;y&nbsp;direction.&nbsp;Defaults&nbsp;to&nbsp;None.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Useful&nbsp;for&nbsp;very&nbsp;low&nbsp;or&nbsp;high&nbsp;number&nbsp;of&nbsp;samples.&nbsp;For&nbsp;pivot&nbsp;=&nbsp;True<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this&nbsp;paramter&nbsp;controls&nbsp;the&nbsp;width.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;distance_bar_range&nbsp;(list,&nbsp;optional):&nbsp;Define&nbsp;the&nbsp;range&nbsp;of&nbsp;values<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;that&nbsp;form&nbsp;the&nbsp;colormap&nbsp;for&nbsp;the&nbsp;distance&nbsp;bar.&nbsp;Defaults&nbsp;to<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;None.&nbsp;The&nbsp;list&nbsp;is&nbsp;interpreted&nbsp;as,&nbsp;[lower_limit,&nbsp;upper_limit].&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;When&nbsp;None,&nbsp;the&nbsp;edges&nbsp;are&nbsp;defined&nbsp;to&nbsp;cover&nbsp;all&nbsp;occuring&nbsp;values.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;targetlabels_space&nbsp;(float,&nbsp;optional):&nbsp;define&nbsp;the&nbsp;size&nbsp;in&nbsp;inches<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;to&nbsp;reserve&nbsp;for&nbsp;target&nbsp;labels,&nbsp;here,&nbsp;the&nbsp;white&nbsp;space&nbsp;on&nbsp;the<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;bottom.&nbsp;Defaults&nbsp;to&nbsp;None.&nbsp;When&nbsp;None,&nbsp;refer&nbsp;to&nbsp;the&nbsp;values&nbsp;set&nbsp;in&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;config.HM_BOTTOM.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;samplelabels_space&nbsp;(float,&nbsp;optional):&nbsp;define&nbsp;the&nbsp;size&nbsp;in&nbsp;inches<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;to&nbsp;reserve&nbsp;for&nbsp;sample&nbsp;labels,&nbsp;here,&nbsp;the&nbsp;white&nbsp;space&nbsp;on&nbsp;the<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;left.&nbsp;Defaults&nbsp;to&nbsp;None.&nbsp;When&nbsp;None,&nbsp;refer&nbsp;to&nbsp;the&nbsp;value&nbsp;set&nbsp;in&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;config.HM_LEFT.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;targetlabels_size&nbsp;(float,&nbsp;optional):&nbsp;multiplier&nbsp;for&nbsp;adjusting&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;target&nbsp;label&nbsp;size.&nbsp;Defaults&nbsp;to&nbsp;None.&nbsp;Useful&nbsp;for&nbsp;very&nbsp;high&nbsp;or&nbsp;low&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;number&nbsp;of&nbsp;<a href="#targets">targets</a>.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;samplelabels_size&nbsp;(float,&nbsp;optional):&nbsp;multiplier&nbsp;for&nbsp;adjusting&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sample&nbsp;label&nbsp;size.&nbsp;Defaults&nbsp;to&nbsp;None.&nbsp;Useful&nbsp;for&nbsp;very&nbsp;high&nbsp;or&nbsp;low&nbsp;number&nbsp;of&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;samples.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;title&nbsp;(bool:str,&nbsp;optional):&nbsp;the&nbsp;plot&nbsp;title&nbsp;to&nbsp;set.&nbsp;Defaults&nbsp;to&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;True.&nbsp;For&nbsp;True,&nbsp;infer&nbsp;the&nbsp;title&nbsp;based&nbsp;on&nbsp;plot&nbsp;data&nbsp;inputs&nbsp;and&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#targets">targets</a>/&nbsp;samples&nbsp;name&nbsp;attribute.&nbsp;Text&nbsp;input&nbsp;will&nbsp;be&nbsp;set&nbsp;as&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;general&nbsp;title,&nbsp;False&nbsp;hides&nbsp;the&nbsp;title.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;kwargs:&nbsp;modify&nbsp;the&nbsp;constants&nbsp;defined&nbsp;in&nbsp;config.&nbsp;This&nbsp;is&nbsp;used&nbsp;as&nbsp;an&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;advanced&nbsp;adjustment&nbsp;of&nbsp;plot&nbsp;element&nbsp;sizes&nbsp;and&nbsp;the&nbsp;minimum&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;required&nbsp;marker&nbsp;genes&nbsp;detection&nbsp;proportion.&nbsp;This&nbsp;heatmap&nbsp;may&nbsp;be<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;adjusted&nbsp;by&nbsp;the&nbsp;following&nbsp;paramters:&nbsp;DROP_TARGET_DETEC_THR,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;HM_LEFT,&nbsp;HM_TOP,&nbsp;HM_RIGHT,&nbsp;HM_BOTTOM,&nbsp;HM_WSPACE,&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;HM_HSPACE,&nbsp;HM_Y_COLORBAR,&nbsp;HM_X_COLORBAR,&nbsp;HM_DISTANCE_BAR,&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;HM_Y_DENDROGRAM,&nbsp;HM_X_DENDROGRAM,&nbsp;HM_SQUARE_SIZE,&nbsp;CB_LEFT,&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CB_LEFT_SEC,&nbsp;CB_TOP,&nbsp;CB_WIDTH,&nbsp;CB_HEIGHT.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;===================&nbsp;hide/show&nbsp;plot&nbsp;elements&nbsp;===================<br>
+&nbsp;&nbsp;&nbsp;&nbsp;hide_colorbar_legend&nbsp;(bool,&nbsp;optional):&nbsp;Do&nbsp;not&nbsp;plot&nbsp;the&nbsp;colorbar&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;legend.&nbsp;Defaults&nbsp;to&nbsp;False.&nbsp;Applies&nbsp;for&nbsp;all&nbsp;colorbar_legends.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;hide_distance_bar&nbsp;(bool,&nbsp;optional):&nbsp;Do&nbsp;not&nbsp;plot&nbsp;the&nbsp;distance&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;bar&nbsp;on&nbsp;top&nbsp;of&nbsp;the&nbsp;heatmap.&nbsp;Defaults&nbsp;to&nbsp;False.&nbsp;For&nbsp;the&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'euclid'&nbsp;metric,&nbsp;this&nbsp;bar&nbsp;visualizes&nbsp;the&nbsp;absolute&nbsp;similarity&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;with&nbsp;the&nbsp;<a href="#targets">targets</a>.&nbsp;For&nbsp;the&nbsp;'intersect'&nbsp;metric,&nbsp;the&nbsp;number&nbsp;of&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;target&nbsp;markergenes&nbsp;is&nbsp;shown.&nbsp;Defaults&nbsp;to&nbsp;False.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;hide_targetlabels&nbsp;(bool,&nbsp;optional):&nbsp;Do&nbsp;not&nbsp;plot&nbsp;the&nbsp;target&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;labels&nbsp;at&nbsp;the&nbsp;bottom.&nbsp;Defaults&nbsp;to&nbsp;False.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;hide_targets_dendrogram&nbsp;(bool,&nbsp;optional):&nbsp;Do&nbsp;not&nbsp;plot&nbsp;the&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#targets">targets</a>&nbsp;dendrogram&nbsp;from&nbsp;clustering.&nbsp;Defaults&nbsp;to&nbsp;False.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Requires&nbsp;'cluster_targets'&nbsp;to&nbsp;be&nbsp;True.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;hide_targets_colorbar&nbsp;(bool,&nbsp;optional):&nbsp;Do&nbsp;not&nbsp;plot&nbsp;the&nbsp;<a href="#targets">targets</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;colorbar&nbsp;on&nbsp;the&nbsp;bottom&nbsp;of&nbsp;the&nbsp;heatmap.&nbsp;Defaults&nbsp;to&nbsp;False.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;When&nbsp;colors&nbsp;are&nbsp;not&nbsp;set&nbsp;for&nbsp;the&nbsp;<a href="#targets">targets</a>&nbsp;using&nbsp;the&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#targets-set_colors">set_colors</a>()&nbsp;function,&nbsp;colors&nbsp;are&nbsp;set&nbsp;to&nbsp;white.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;hide_samplelabels&nbsp;(bool,&nbsp;optional):&nbsp;Do&nbsp;not&nbsp;plot&nbsp;the&nbsp;sample&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;labels&nbsp;at&nbsp;the&nbsp;left.&nbsp;Defaults&nbsp;to&nbsp;False.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;show_samples_dendrogram&nbsp;(bool,&nbsp;optional):&nbsp;Plot&nbsp;the&nbsp;samples&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;dendrogram&nbsp;from&nbsp;clustering.&nbsp;Defaults&nbsp;to&nbsp;False.&nbsp;Requires&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'cluster_samples'&nbsp;to&nbsp;be&nbsp;True.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;show_samples_colorbar&nbsp;(bool,&nbsp;optional):&nbsp;Plot&nbsp;the&nbsp;samples<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;colorbar&nbsp;on&nbsp;the&nbsp;left&nbsp;of&nbsp;the&nbsp;heatmap.&nbsp;Defaults&nbsp;to&nbsp;False.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;When&nbsp;colors&nbsp;are&nbsp;not&nbsp;set&nbsp;for&nbsp;the&nbsp;<a href="#targets">targets</a>&nbsp;using&nbsp;the&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#targets-set_colors">set_colors</a>()&nbsp;function,&nbsp;colors&nbsp;are&nbsp;set&nbsp;to&nbsp;white.&nbsp;<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;===================&nbsp;others&nbsp;===================<br>
+&nbsp;&nbsp;&nbsp;&nbsp;filename&nbsp;(str,&nbsp;optional):&nbsp;the&nbsp;filename&nbsp;for&nbsp;saving&nbsp;the&nbsp;figure.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Defaults&nbsp;to&nbsp;'target_similarity_hm.png'.&nbsp;Supported&nbsp;filename&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;endings&nbsp;are&nbsp;.png&nbsp;and&nbsp;.pdf.&nbsp;If&nbsp;filename&nbsp;does&nbsp;not&nbsp;end&nbsp;with&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;these,&nbsp;the&nbsp;filetype&nbsp;is&nbsp;retrieved&nbsp;from&nbsp;conifg.SAVE_FORMAT.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;If&nbsp;None,&nbsp;the&nbsp;plot&nbsp;is&nbsp;not&nbsp;saved.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;plt_show&nbsp;(bool,&nbsp;optional)&nbsp;directly&nbsp;show&nbsp;the&nbsp;created&nbsp;plot&nbsp;in&nbsp;a&nbsp;new<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;window.&nbsp;Defaults&nbsp;to&nbsp;False.</tt></dd></dl>
+
+<hr>
+Methods inherited from <a href="DPre.main._differential.html#_differential">DPre.main._differential._differential</a>:<br>
+<dl><dt><a name="targets-__len__"><strong>__len__</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="targets-get_colors"><strong>get_colors</strong></a>(self, order=None)</dt><dd><tt>Get&nbsp;the&nbsp;<a href="#targets">targets</a>/samples&nbsp;colors&nbsp;of&nbsp;`order`<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;order&nbsp;(list,&nbsp;optional):&nbsp;A&nbsp;listing&nbsp;of&nbsp;element&nbsp;names&nbsp;in&nbsp;which&nbsp;the&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;element&nbsp;colors&nbsp;will&nbsp;be&nbsp;returned.&nbsp;Defaults&nbsp;to&nbsp;the&nbsp;instances&nbsp;element&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;order.&nbsp;<br>
+&nbsp;<br>
+Note:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Not&nbsp;contained&nbsp;element&nbsp;names&nbsp;raise&nbsp;an&nbsp;error.&nbsp;If&nbsp;the&nbsp;color&nbsp;for&nbsp;the&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;requested&nbsp;element&nbsp;hasn't&nbsp;been&nbsp;set,&nbsp;the&nbsp;color&nbsp;is&nbsp;set&nbsp;to&nbsp;white.</tt></dd></dl>
+
+<dl><dt><a name="targets-reorder"><strong>reorder</strong></a>(self, order)</dt><dd><tt>Reorder&nbsp;the&nbsp;elements&nbsp;in&nbsp;<a href="#targets">targets</a>/samples&nbsp;inplace<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;order&nbsp;(list):&nbsp;the&nbsp;new&nbsp;order&nbsp;of&nbsp;elements<br>
+&nbsp;<br>
+Note:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;If&nbsp;not&nbsp;all&nbsp;current&nbsp;element&nbsp;names&nbsp;or&nbsp;new&nbsp;element&nbsp;names&nbsp;are&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;passed,&nbsp;an&nbsp;error&nbsp;is&nbsp;raised.</tt></dd></dl>
+
+<dl><dt><a name="targets-set_colors"><strong>set_colors</strong></a>(self, colors, log=True)</dt><dd><tt>Set&nbsp;the&nbsp;colors&nbsp;for&nbsp;elements&nbsp;in&nbsp;<a href="#targets">targets</a>/samples<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;colors&nbsp;(dict:list):&nbsp;A&nbsp;mapping&nbsp;of&nbsp;element&nbsp;name&nbsp;to&nbsp;color&nbsp;or&nbsp;a&nbsp;list<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;of&nbsp;colors&nbsp;that&nbsp;is&nbsp;assigned&nbsp;to&nbsp;the&nbsp;elements&nbsp;(in&nbsp;this&nbsp;order)&nbsp;until&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;its&nbsp;end.&nbsp;If&nbsp;the&nbsp;list&nbsp;has&nbsp;only&nbsp;one&nbsp;element,&nbsp;all&nbsp;elements&nbsp;are&nbsp;set&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;to&nbsp;this&nbsp;color.&nbsp;The&nbsp;color&nbsp;value&nbsp;must&nbsp;be&nbsp;a&nbsp;valid&nbsp;input&nbsp;for&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;matplotlib,&nbsp;i.e.&nbsp;'w',&nbsp;'#ffffff',&nbsp;&nbsp;(1,&nbsp;1,&nbsp;1)&nbsp;all&nbsp;refer&nbsp;to&nbsp;white.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;log&nbsp;(bool,&nbsp;optional):&nbsp;Log&nbsp;the&nbsp;set&nbsp;colors.&nbsp;Defaults&nbsp;to&nbsp;True.<br>
+&nbsp;<br>
+Note:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Not&nbsp;contained&nbsp;element&nbsp;names&nbsp;are&nbsp;ignored.&nbsp;If&nbsp;the&nbsp;color&nbsp;is&nbsp;invalid,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;element&nbsp;color&nbsp;is&nbsp;set&nbsp;to&nbsp;white.</tt></dd></dl>
+
+<dl><dt><a name="targets-set_name"><strong>set_name</strong></a>(self, name)</dt><dd><tt>Set&nbsp;the&nbsp;<a href="#targets">targets</a>/samples&nbsp;name</tt></dd></dl>
+
+<dl><dt><a name="targets-slice_elements"><strong>slice_elements</strong></a>(self, elements, name=None, log=True)</dt><dd><tt>Slice&nbsp;the&nbsp;<a href="#targets">targets</a>/samples&nbsp;to&nbsp;a&nbsp;specific&nbsp;list&nbsp;of&nbsp;elements.&nbsp;Return&nbsp;a&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;copy&nbsp;of&nbsp;the&nbsp;original.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;elements&nbsp;(list):&nbsp;the&nbsp;list&nbsp;of&nbsp;elements&nbsp;to&nbsp;slice.&nbsp;<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;sliced:&nbsp;the&nbsp;sliced&nbsp;<a href="#targets">targets</a>/samples&nbsp;instance<br>
+&nbsp;<br>
+Note:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;If&nbsp;the&nbsp;passed&nbsp;names&nbsp;are&nbsp;not&nbsp;found&nbsp;in&nbsp;the&nbsp;current&nbsp;element&nbsp;names,&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;an&nbsp;error&nbsp;is&nbsp;raised.</tt></dd></dl>
+
+<hr>
+Data descriptors inherited from <a href="DPre.main._differential.html#_differential">DPre.main._differential._differential</a>:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>names</strong></dt>
+<dd><tt>Get&nbsp;the&nbsp;element&nbsp;names<br>
+&nbsp;<br>
+Setting&nbsp;names:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Pass&nbsp;a&nbsp;dictionary&nbsp;with&nbsp;keys&nbsp;of&nbsp;old&nbsp;names&nbsp;and&nbsp;values&nbsp;of&nbsp;new&nbsp;ones&nbsp;or<br>
+&nbsp;&nbsp;&nbsp;&nbsp;a&nbsp;list&nbsp;of&nbsp;new&nbsp;names&nbsp;that&nbsp;should&nbsp;replace&nbsp;the&nbsp;old&nbsp;names&nbsp;in&nbsp;this&nbsp;order</tt></dd>
+</dl>
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#55aa55">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><strong>log_plot</strong> = '=|=|=|=|=|=|=|=|====PLOT====|=|=|=|=|=|=|=|=|='<br>
+<strong>logger</strong> = &lt;Logger Dpre (INFO)&gt;<br>
+<strong>spacer</strong> = &lt;Logger DPre (INFO)&gt;</td></tr></table>
+</body></html>

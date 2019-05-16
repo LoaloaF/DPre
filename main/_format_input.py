@@ -8,7 +8,7 @@ import DPre.main.config as config
 import DPre.main._dpre_util as util
 
 def preset_targets(get, sort=False, preset_colors=True):
-    """Get a predefined Targets instance. 
+    """Get a predefined targets instance. 
     
         Pick a refernce dataset for comparison. Mouse (Hutchins et al. 2017, NAR)
         and Human (FANTOM5, Nature 2014) come preshipped. Specific lineages can
@@ -23,21 +23,22 @@ def preset_targets(get, sort=False, preset_colors=True):
             'm blood mesoderm' (m for mouse)
         sort (bool, optional) Sort the loaded element names alphabetically. 
             Defaults to False.
-        preset_colors (bool, optional) Trys to initiate the Targets with preset 
+        preset_colors (bool, optional) Trys to initiate the targets with preset 
             colors either from colors.tsv in the respective preset directory or 
             from config.preset_targets_colors. Defaults to True.
     
     Returns:
-        t: the Targets instance
+        t: the targets instance
     """
-    spacer.info('\n\n')
     path = os.path.dirname(__file__)
     # any folder in DPre/preset_targets is potentially valid
     valid = os.listdir(os.path.join(path, '..', 'preset_targets'))
     if get not in valid:
+        spacer.info('')
         logger.error('`{}` is not a valid preset target. Valid ones are {}'
                      .format(get, valid))
         sys.exit(1)
+    
     # try to get .gzip markergene and expression input, if not found try .tsv
     get_dir = '{}/../preset_targets/{}'.format(path, get)
     expr = mgs = None
@@ -45,12 +46,21 @@ def preset_targets(get, sort=False, preset_colors=True):
         mgs = pd.read_pickle('{}/markergenes.gzip'.format(get_dir))
     elif os.path.exists('{}/markergenes.tsv'.format(get_dir)):
         mgs = pd.read_csv('{}/markergenes.tsv'.format(get_dir), sep='\t', 
-                          index_col='ensg')
+                          index_col=0, header=[0,1])
+        mgs.to_pickle('{}/markergenes.gzip'.format(get_dir))
+    
     if os.path.exists('{}/expression.gzip'.format(get_dir)):
         expr = pd.read_pickle('{}/expression.gzip'.format(get_dir))
     elif os.path.exists('{}/expression.tsv'.format(get_dir)):
         expr = pd.read_csv('{}/expression.tsv'.format(get_dir), sep='\t', 
-                          index_col='ensg')
+                           index_col=0, header=[0,1])
+        expr.to_pickle('{}/expression.gzip'.format(get_dir))
+    elif os.path.exists('{}/expression_h1.gzip'.format(get_dir)):
+        expr1 = pd.read_pickle('{}/expression_h1.gzip'.format(get_dir))
+        expr2 = pd.read_pickle('{}/expression_h2.gzip'.format(get_dir))
+        expr = pd.concat([expr1, expr2], axis=1)
+        expr.to_pickle('{}/expression.gzip'.format(get_dir))
+
     if sort:
         mgs.sort_index(axis=1, inplace=True)
         expr.sort_index(axis=1, inplace=True)
@@ -59,12 +69,16 @@ def preset_targets(get, sort=False, preset_colors=True):
     if get == 'human':
         args = {'name': 'human FANTOM5 library', 'species': 'human'}
     elif get == 'mouse':
-        args = {'name': 'mouse lineages'}
-    else:
-        args = {'name': get[2:]+' lineage'}
-    # init Targets
-    from DPre.main.targets import Targets
-    t = Targets(markergenes=mgs, expression=expr, log=False, **args)
+        args = {'name': 'mouse lineages', 'species': 'mouse'}
+    elif get.startswith('h '):
+        args = {'name': get[2:]+' lineage', 'species': 'human'}
+    elif get.startswith('m '):
+        args = {'name': get[2:]+' lineage', 'species': 'mouse'}
+    # init targets
+    from DPre.main.targets import targets
+    t = targets(markergenes=mgs, expression=expr, log=False, **args)
+    logger.info('Default target `{}` created, name: `{}`, elements: {}'
+                .format(get, t.name, len(t)))
 
     # try to get colors first through a file, then through config
     if preset_colors:
@@ -80,9 +94,6 @@ def preset_targets(get, sort=False, preset_colors=True):
         # draw a colorlegend if defined in config
         if get in config.preset_col_legend:
             util.plot_color_legend(*config.preset_col_legend[get])
-
-    logger.info('Default target `{}` created, name: `{}`, elements: {}'
-                .format(get, t.name, len(t)))
     return t
 
 def _format_expr(expr, type_name, ctrl):
@@ -94,8 +105,8 @@ def _format_expr(expr, type_name, ctrl):
 
     Args:
         expr: a filename or Dataframe. The data to check.
-        type_name: 'Targets' or 'Samples', depending on caller
-        ctrl: control name, only passed when called from Samples
+        type_name: 'targets' or 'samples', depending on caller
+        ctrl: control name, only passed when called from samples
     
     Returns:
         expr: log2- and z-transformed columns added at column level 1
@@ -104,8 +115,7 @@ def _format_expr(expr, type_name, ctrl):
     if not isinstance(expr, pd.DataFrame):
         if not os.path.exists(expr):
             spacer.info('')
-            logger.error('Could not change directory to {}\nCheck the '
-                        'path.'.format(os.path.abspath(expr)))
+            logger.error('Invalid path: {}\n'.format(os.path.abspath(expr)))
             sys.exit(1)
 
         expr = pd.read_csv(expr, sep='\t')
@@ -117,9 +127,6 @@ def _format_expr(expr, type_name, ctrl):
     met = [c for c in ('loc', 'name', 'tss_loc', 'strand') if c in expr.columns]
     if met:
         expr.drop(met, axis=1, inplace=True)
-        spacer.warning('\n')
-        logger.warning('{} found in expression column names. These are set to '
-                       'be automatically deleted.'.format(met))
     inv = expr.columns[expr.dtypes == object].tolist()
     if inv:
         spacer.warning('\n')
@@ -134,7 +141,7 @@ def _format_expr(expr, type_name, ctrl):
         sys.exit(1)
     elif ctrl and (ctrl not in expr.columns.unique(0)):
         spacer.error('\n')
-        logger.error('The contrl name `{}` of the samples was not found in the '
+        logger.error('The contrl name of the samples `{}` was not found in the '
                     'passed expression data.'.format(ctrl))
         sys.exit(1)
 
@@ -170,7 +177,7 @@ def _format_diff_genes(diff_genes_dir, genelists_mgtype='up', type_name=None):
         diff_genes_dir: deseq2 dir, up-genelists dir or list of up- and down 
             genelist dirs.
     genelists_mgtype: which genelist type to handle. Internally used for 
-    recursion type_name: 'Targets' or 'Samples', depending on caller
+    recursion type_name: 'targets' or 'samples', depending on caller
 
     Returns:
         formatted _diff DataFrame
@@ -272,23 +279,22 @@ def _format_diff_genes(diff_genes_dir, genelists_mgtype='up', type_name=None):
                 diffs.append(s)
         return diffs
 
-    spacer.info('\n')
     direc, get_down_genelists = check_up_down_genelists()
     files = glob.glob(direc + '/*.tsv')
     inp_t, index_col = check_input_type()
-    # if the Samples are initiated from genelists, down mgs are required
-    if type_name == 'Samples' and inp_t != 'deseq2' and not get_down_genelists:
+    # if the samples are initiated from genelists, down mgs are required
+    if type_name == 'samples' and inp_t != 'deseq2' and not get_down_genelists:
         spacer.error('')
-        logger.error('When initiateing the Samples diff. genes from genelist '
+        logger.error('When initiateing the samples diff. genes from genelist '
                      'input, both an up- and down directory with respective '
                      'genelists must be passed.')
         sys.exit(1)
 
     spacer.info('')
     st_st = [f[f.rfind(os.sep)+1:] for f in (files[0], files[-1])]
+    f_type = inp_t if inp_t == 'deseq2' else genelists_mgtype
     logger.info('Formatting differential genes from {} files. {} *.tsv files '
-                'in {}:\n{} ... {}\n'.format(genelists_mgtype, inp_t, 
-                                             len(files), direc, *st_st))
+                'in {}:\n{} ... {}\n'.format(f_type, len(files), direc, *st_st))
 
     diffs = merge_files()
     if inp_t == 'genelist (up)' and get_down_genelists:

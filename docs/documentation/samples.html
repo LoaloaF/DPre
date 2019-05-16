@@ -1,0 +1,162 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module samples</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>samples</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:c%3A%5Cusers%5Cloaloa%5Canaconda3%5Clib%5Cdpre%5Cmain%5Csamples.py">c:\users\loaloa\anaconda3\lib\dpre\main\samples.py</a></font></td></tr></table>
+    <p></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ee77aa">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Classes</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl>
+<dt><font face="helvetica, arial"><a href="DPre.main._differential.html#_differential">DPre.main._differential._differential</a>(<a href="builtins.html#object">builtins.object</a>)
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="samples.html#samples">samples</a>
+</font></dt></dl>
+</dd>
+</dl>
+ <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="samples">class <strong>samples</strong></a>(<a href="DPre.main._differential.html#_differential">DPre.main._differential._differential</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt><a href="#samples">samples</a>(diff_genes=None,&nbsp;expression=None,&nbsp;ctrl=None,&nbsp;override_namematcher=False,&nbsp;name=None,&nbsp;log=True)<br>
+&nbsp;<br>
+class&nbsp;describing&nbsp;the&nbsp;data&nbsp;to&nbsp;explore&nbsp;similarity&nbsp;for<br>
+&nbsp;<br>
+<a href="#samples">samples</a>&nbsp;can&nbsp;hold&nbsp;lists&nbsp;of&nbsp;diff.&nbsp;genes&nbsp;and&nbsp;expression&nbsp;data&nbsp;identifying&nbsp;a&nbsp;<br>
+collection&nbsp;of&nbsp;<a href="#samples">samples</a>.&nbsp;A&nbsp;control&nbsp;in&nbsp;the&nbsp;data&nbsp;extends&nbsp;functionality.&nbsp;<br>
+&nbsp;<br>
+Arguments:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;diff_genes&nbsp;(optional):&nbsp;directory&nbsp;with&nbsp;deseq2&nbsp;output&nbsp;OR&nbsp;2&nbsp;directories&nbsp;with&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;up-&nbsp;and&nbsp;down&nbsp;genelists&nbsp;OR&nbsp;pandas.DataFrame.&nbsp;Defaults&nbsp;to&nbsp;None.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;For&nbsp;genelist&nbsp;input,&nbsp;filenames&nbsp;in&nbsp;the&nbsp;up-&nbsp;and&nbsp;down&nbsp;directory&nbsp;must&nbsp;be&nbsp;the<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;same.&nbsp;When&nbsp;passing&nbsp;a&nbsp;DataFrame,&nbsp;the&nbsp;index&nbsp;should&nbsp;consist&nbsp;of&nbsp;all&nbsp;genes,&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;columns&nbsp;of&nbsp;a&nbsp;pandas.MultiIndex&nbsp;with&nbsp;up&nbsp;or&nbsp;up&nbsp;and&nbsp;down&nbsp;at&nbsp;level&nbsp;0&nbsp;and&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;element&nbsp;names&nbsp;at&nbsp;level&nbsp;1.&nbsp;THe&nbsp;dtype&nbsp;is&nbsp;bool,&nbsp;diff.&nbsp;genes&nbsp;are&nbsp;marked&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;as&nbsp;True&nbsp;values.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;expression&nbsp;(optional):&nbsp;directory&nbsp;with&nbsp;expression&nbsp;tsv&nbsp;file&nbsp;OR&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pandas.DataFrame.&nbsp;Defaults&nbsp;to&nbsp;None.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;.tsv&nbsp;input&nbsp;should&nbsp;have&nbsp;an&nbsp;ensg&nbsp;key&nbsp;in&nbsp;the&nbsp;first&nbsp;column&nbsp;or&nbsp;an&nbsp;ensg&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;column&nbsp;label.&nbsp;Columns&nbsp;`loc`,&nbsp;`name`,&nbsp;`tss_loc`&nbsp;and&nbsp;`strand`&nbsp;are&nbsp;removed<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;automatically.&nbsp;The&nbsp;data&nbsp;should&nbsp;be&nbsp;exclusively&nbsp;numerical&nbsp;without&nbsp;NaN's.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;When&nbsp;passing&nbsp;a&nbsp;DataFrame,&nbsp;the&nbsp;data&nbsp;should&nbsp;be&nbsp;log2-&nbsp;and&nbsp;z-transformed.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;index&nbsp;should&nbsp;consist&nbsp;of&nbsp;all&nbsp;genes,&nbsp;the&nbsp;columns&nbsp;of&nbsp;a&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pandas.MultiIndex&nbsp;with&nbsp;the&nbsp;element&nbsp;names&nbsp;at&nbsp;level&nbsp;0,&nbsp;and&nbsp;`log2`&nbsp;&amp;&nbsp;`z`&nbsp;at&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;level&nbsp;1.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ctrl&nbsp;(str,&nbsp;optional):&nbsp;The&nbsp;name&nbsp;of&nbsp;the&nbsp;control&nbsp;found&nbsp;in&nbsp;expression&nbsp;or&nbsp;diff.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;genes.&nbsp;Defaults&nbsp;to&nbsp;None.&nbsp;Allowed&nbsp;to&nbsp;be&nbsp;missing&nbsp;in&nbsp;diff.&nbsp;genes.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;override_namematcher&nbsp;(bool,&nbsp;optional):&nbsp;When&nbsp;both&nbsp;diff_genes&nbsp;and&nbsp;expression&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;passed,&nbsp;this&nbsp;overrides&nbsp;the&nbsp;element&nbsp;names&nbsp;in&nbsp;diff.&nbsp;genes.&nbsp;Defaults&nbsp;to&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;False.&nbsp;When&nbsp;False,&nbsp;element&nbsp;names&nbsp;in&nbsp;diff.&nbsp;genes&nbsp;and&nbsp;expression&nbsp;are&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;expected&nbsp;to&nbsp;match&nbsp;perfectly.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;name&nbsp;(str,&nbsp;optional):&nbsp;Name&nbsp;label&nbsp;of&nbsp;the&nbsp;<a href="#samples">samples</a>.&nbsp;Defaults&nbsp;to&nbsp;'<a href="#samples">samples</a>'.&nbsp;Used<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;in&nbsp;logging&nbsp;and&nbsp;plot&nbsp;annotations.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;log:&nbsp;(bool,&nbsp;optional):&nbsp;Log&nbsp;the&nbsp;<a href="#samples">samples</a>&nbsp;initiation.&nbsp;Defaults&nbsp;to&nbsp;True.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+Note:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;At&nbsp;least&nbsp;one&nbsp;of&nbsp;diff_genes&nbsp;and&nbsp;expression&nbsp;must&nbsp;be&nbsp;passed.&nbsp;When&nbsp;both&nbsp;are&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;passed,&nbsp;the&nbsp;inputs&nbsp;must&nbsp;have&nbsp;the&nbsp;same&nbsp;elment&nbsp;order.&nbsp;diff.&nbsp;genes&nbsp;input&nbsp;is<br>
+&nbsp;&nbsp;&nbsp;&nbsp;alphabetically&nbsp;sorted.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="samples.html#samples">samples</a></dd>
+<dd><a href="DPre.main._differential.html#_differential">DPre.main._differential._differential</a></dd>
+<dd><a href="builtins.html#object">builtins.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="samples-__init__"><strong>__init__</strong></a>(self, diff_genes=None, expression=None, ctrl=None, override_namematcher=False, name=None, log=True)</dt><dd><tt>Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</tt></dd></dl>
+
+<dl><dt><a name="samples-__repr__"><strong>__repr__</strong></a>(self)</dt><dd><tt>Get&nbsp;a&nbsp;readable&nbsp;summary&nbsp;of&nbsp;the&nbsp;<a href="#samples">samples</a>&nbsp;instance</tt></dd></dl>
+
+<hr>
+Methods inherited from <a href="DPre.main._differential.html#_differential">DPre.main._differential._differential</a>:<br>
+<dl><dt><a name="samples-__len__"><strong>__len__</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="samples-get_colors"><strong>get_colors</strong></a>(self, order=None)</dt><dd><tt>Get&nbsp;the&nbsp;targets/<a href="#samples">samples</a>&nbsp;colors&nbsp;of&nbsp;`order`<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;order&nbsp;(list,&nbsp;optional):&nbsp;A&nbsp;listing&nbsp;of&nbsp;element&nbsp;names&nbsp;in&nbsp;which&nbsp;the&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;element&nbsp;colors&nbsp;will&nbsp;be&nbsp;returned.&nbsp;Defaults&nbsp;to&nbsp;the&nbsp;instances&nbsp;element&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;order.&nbsp;<br>
+&nbsp;<br>
+Note:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Not&nbsp;contained&nbsp;element&nbsp;names&nbsp;raise&nbsp;an&nbsp;error.&nbsp;If&nbsp;the&nbsp;color&nbsp;for&nbsp;the&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;requested&nbsp;element&nbsp;hasn't&nbsp;been&nbsp;set,&nbsp;the&nbsp;color&nbsp;is&nbsp;set&nbsp;to&nbsp;white.</tt></dd></dl>
+
+<dl><dt><a name="samples-reorder"><strong>reorder</strong></a>(self, order)</dt><dd><tt>Reorder&nbsp;the&nbsp;elements&nbsp;in&nbsp;targets/<a href="#samples">samples</a>&nbsp;inplace<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;order&nbsp;(list):&nbsp;the&nbsp;new&nbsp;order&nbsp;of&nbsp;elements<br>
+&nbsp;<br>
+Note:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;If&nbsp;not&nbsp;all&nbsp;current&nbsp;element&nbsp;names&nbsp;or&nbsp;new&nbsp;element&nbsp;names&nbsp;are&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;passed,&nbsp;an&nbsp;error&nbsp;is&nbsp;raised.</tt></dd></dl>
+
+<dl><dt><a name="samples-set_colors"><strong>set_colors</strong></a>(self, colors, log=True)</dt><dd><tt>Set&nbsp;the&nbsp;colors&nbsp;for&nbsp;elements&nbsp;in&nbsp;targets/<a href="#samples">samples</a><br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;colors&nbsp;(dict:list):&nbsp;A&nbsp;mapping&nbsp;of&nbsp;element&nbsp;name&nbsp;to&nbsp;color&nbsp;or&nbsp;a&nbsp;list<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;of&nbsp;colors&nbsp;that&nbsp;is&nbsp;assigned&nbsp;to&nbsp;the&nbsp;elements&nbsp;(in&nbsp;this&nbsp;order)&nbsp;until&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;its&nbsp;end.&nbsp;If&nbsp;the&nbsp;list&nbsp;has&nbsp;only&nbsp;one&nbsp;element,&nbsp;all&nbsp;elements&nbsp;are&nbsp;set&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;to&nbsp;this&nbsp;color.&nbsp;The&nbsp;color&nbsp;value&nbsp;must&nbsp;be&nbsp;a&nbsp;valid&nbsp;input&nbsp;for&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;matplotlib,&nbsp;i.e.&nbsp;'w',&nbsp;'#ffffff',&nbsp;&nbsp;(1,&nbsp;1,&nbsp;1)&nbsp;all&nbsp;refer&nbsp;to&nbsp;white.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;log&nbsp;(bool,&nbsp;optional):&nbsp;Log&nbsp;the&nbsp;set&nbsp;colors.&nbsp;Defaults&nbsp;to&nbsp;True.<br>
+&nbsp;<br>
+Note:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Not&nbsp;contained&nbsp;element&nbsp;names&nbsp;are&nbsp;ignored.&nbsp;If&nbsp;the&nbsp;color&nbsp;is&nbsp;invalid,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;element&nbsp;color&nbsp;is&nbsp;set&nbsp;to&nbsp;white.</tt></dd></dl>
+
+<dl><dt><a name="samples-set_name"><strong>set_name</strong></a>(self, name)</dt><dd><tt>Set&nbsp;the&nbsp;targets/<a href="#samples">samples</a>&nbsp;name</tt></dd></dl>
+
+<dl><dt><a name="samples-slice_elements"><strong>slice_elements</strong></a>(self, elements, name=None, log=True)</dt><dd><tt>Slice&nbsp;the&nbsp;targets/<a href="#samples">samples</a>&nbsp;to&nbsp;a&nbsp;specific&nbsp;list&nbsp;of&nbsp;elements.&nbsp;Return&nbsp;a&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;copy&nbsp;of&nbsp;the&nbsp;original.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;elements&nbsp;(list):&nbsp;the&nbsp;list&nbsp;of&nbsp;elements&nbsp;to&nbsp;slice.&nbsp;<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;sliced:&nbsp;the&nbsp;sliced&nbsp;targets/<a href="#samples">samples</a>&nbsp;instance<br>
+&nbsp;<br>
+Note:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;If&nbsp;the&nbsp;passed&nbsp;names&nbsp;are&nbsp;not&nbsp;found&nbsp;in&nbsp;the&nbsp;current&nbsp;element&nbsp;names,&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;an&nbsp;error&nbsp;is&nbsp;raised.</tt></dd></dl>
+
+<hr>
+Data descriptors inherited from <a href="DPre.main._differential.html#_differential">DPre.main._differential._differential</a>:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>names</strong></dt>
+<dd><tt>Get&nbsp;the&nbsp;element&nbsp;names<br>
+&nbsp;<br>
+Setting&nbsp;names:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Pass&nbsp;a&nbsp;dictionary&nbsp;with&nbsp;keys&nbsp;of&nbsp;old&nbsp;names&nbsp;and&nbsp;values&nbsp;of&nbsp;new&nbsp;ones&nbsp;or<br>
+&nbsp;&nbsp;&nbsp;&nbsp;a&nbsp;list&nbsp;of&nbsp;new&nbsp;names&nbsp;that&nbsp;should&nbsp;replace&nbsp;the&nbsp;old&nbsp;names&nbsp;in&nbsp;this&nbsp;order</tt></dd>
+</dl>
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#55aa55">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><strong>logger</strong> = &lt;Logger Dpre (INFO)&gt;<br>
+<strong>spacer</strong> = &lt;Logger DPre (INFO)&gt;</td></tr></table>
+</body></html>

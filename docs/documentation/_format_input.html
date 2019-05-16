@@ -1,0 +1,63 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module _format_input</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>_format_input</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:c%3A%5Cusers%5Cloaloa%5Canaconda3%5Clib%5Cdpre%5Cmain%5C_format_input.py">c:\users\loaloa\anaconda3\lib\dpre\main\_format_input.py</a></font></td></tr></table>
+    <p><tt>module&nbsp;handling&nbsp;user&nbsp;data&nbsp;input&nbsp;and&nbsp;initiation&nbsp;of&nbsp;preset&nbsp;targets</tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="DPre.main.config.html">DPre.main.config</a><br>
+<a href="glob.html">glob</a><br>
+</td><td width="25%" valign=top><a href="os.html">os</a><br>
+<a href="pandas.html">pandas</a><br>
+</td><td width="25%" valign=top><a href="sys.html">sys</a><br>
+<a href="DPre.main._dpre_util.html">DPre.main._dpre_util</a><br>
+</td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-preset_targets"><strong>preset_targets</strong></a>(get, sort=False, preset_colors=True)</dt><dd><tt>Get&nbsp;a&nbsp;predefined&nbsp;targets&nbsp;instance.&nbsp;<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Pick&nbsp;a&nbsp;refernce&nbsp;dataset&nbsp;for&nbsp;comparison.&nbsp;Mouse&nbsp;(Hutchins&nbsp;et&nbsp;al.&nbsp;2017,&nbsp;NAR)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;and&nbsp;Human&nbsp;(FANTOM5,&nbsp;Nature&nbsp;2014)&nbsp;come&nbsp;preshipped.&nbsp;Specific&nbsp;lineages&nbsp;can<br>
+&nbsp;&nbsp;&nbsp;&nbsp;be&nbsp;picked&nbsp;for&nbsp;the&nbsp;mouse&nbsp;reference.&nbsp;Presets&nbsp;can&nbsp;be&nbsp;added&nbsp;by&nbsp;adding&nbsp;a&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;folder&nbsp;to&nbsp;DPre/preset_targets.&nbsp;If&nbsp;a&nbsp;preset&nbsp;is&nbsp;initiated&nbsp;with&nbsp;a&nbsp;colormap<br>
+&nbsp;&nbsp;&nbsp;&nbsp;a&nbsp;color&nbsp;legend&nbsp;is&nbsp;drawn&nbsp;from&nbsp;config.preset_col_legend.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;get&nbsp;(str):&nbsp;the&nbsp;desired&nbsp;preset.&nbsp;Valid&nbsp;options&nbsp;are&nbsp;'mouse',&nbsp;'human',&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'m&nbsp;embryonic',&nbsp;'m&nbsp;germ&nbsp;cells',&nbsp;'m&nbsp;neural&nbsp;crest',&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'m&nbsp;surface&nbsp;ectoderm',&nbsp;'m&nbsp;neuroectoderm',&nbsp;'m&nbsp;mesoderm',&nbsp;'m&nbsp;endoderm',&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'m&nbsp;blood&nbsp;mesoderm'&nbsp;(m&nbsp;for&nbsp;mouse)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;sort&nbsp;(bool,&nbsp;optional)&nbsp;Sort&nbsp;the&nbsp;loaded&nbsp;element&nbsp;names&nbsp;alphabetically.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Defaults&nbsp;to&nbsp;False.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;preset_colors&nbsp;(bool,&nbsp;optional)&nbsp;Trys&nbsp;to&nbsp;initiate&nbsp;the&nbsp;targets&nbsp;with&nbsp;preset&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;colors&nbsp;either&nbsp;from&nbsp;colors.tsv&nbsp;in&nbsp;the&nbsp;respective&nbsp;preset&nbsp;directory&nbsp;or&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;from&nbsp;config.preset_targets_colors.&nbsp;Defaults&nbsp;to&nbsp;True.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;t:&nbsp;the&nbsp;targets&nbsp;instance</tt></dd></dl>
+</td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#55aa55">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><strong>logger</strong> = &lt;Logger Dpre (INFO)&gt;<br>
+<strong>spacer</strong> = &lt;Logger DPre (INFO)&gt;</td></tr></table>
+</body></html>

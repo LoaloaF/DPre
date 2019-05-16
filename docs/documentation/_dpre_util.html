@@ -1,0 +1,65 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module _dpre_util</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>_dpre_util</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:c%3A%5Cusers%5Cloaloa%5Canaconda3%5Clib%5Cdpre%5Cmain%5C_dpre_util.py">c:\users\loaloa\anaconda3\lib\dpre\main\_dpre_util.py</a></font></td></tr></table>
+    <p><tt>utility&nbsp;module&nbsp;with&nbsp;various&nbsp;helper&nbsp;functions&nbsp;and&nbsp;subplot&nbsp;producers</tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="DPre.main.config.html">DPre.main.config</a><br>
+<a href="scipy.spatial.distance.html">scipy.spatial.distance</a><br>
+</td><td width="25%" valign=top><a href="numpy.html">numpy</a><br>
+<a href="os.html">os</a><br>
+</td><td width="25%" valign=top><a href="pandas.html">pandas</a><br>
+<a href="matplotlib.pyplot.html">matplotlib.pyplot</a><br>
+</td><td width="25%" valign=top><a href="re.html">re</a><br>
+<a href="sys.html">sys</a><br>
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-add_mgtmean"><strong>add_mgtmean</strong></a>(agg)</dt><dd><tt>Prodcue&nbsp;the&nbsp;mean&nbsp;between&nbsp;aggregated&nbsp;up-&nbsp;and&nbsp;down&nbsp;mg&nbsp;similarity&nbsp;values</tt></dd></dl>
+ <dl><dt><a name="-annotate"><strong>annotate</strong></a>(index, species)</dt><dd><tt>Pass&nbsp;list/&nbsp;pd.Index&nbsp;`index`&nbsp;with&nbsp;ensg&nbsp;keys;&nbsp;returns&nbsp;the&nbsp;gene&nbsp;names</tt></dd></dl>
+ <dl><dt><a name="-get_ensgs"><strong>get_ensgs</strong></a>(names, species)</dt><dd><tt>Pass&nbsp;list/&nbsp;pd.Index&nbsp;`names`&nbsp;with&nbsp;gene&nbsp;names;&nbsp;returns&nbsp;a&nbsp;DataFrame&nbsp;with&nbsp;<br>
+a&nbsp;mapping&nbsp;of&nbsp;colmuns&nbsp;`ensg`&nbsp;and&nbsp;`name`.&nbsp;If&nbsp;a&nbsp;gene&nbsp;name&nbsp;has&nbsp;multiple<br>
+ensg&nbsp;keys,&nbsp;this&nbsp;gene&nbsp;will&nbsp;appear&nbsp;last&nbsp;in&nbsp;the&nbsp;DataFrame&nbsp;regardless&nbsp;of&nbsp;the&nbsp;<br>
+input&nbsp;order.</tt></dd></dl>
+ <dl><dt><a name="-plot_color_legend"><strong>plot_color_legend</strong></a>(labels, colors, ncolumns=1, filename='color_legend.png')</dt><dd><tt>Plot&nbsp;a&nbsp;custom&nbsp;color&nbsp;legend.<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;Takes&nbsp;a&nbsp;list&nbsp;of&nbsp;labels&nbsp;and&nbsp;colors&nbsp;and&nbsp;links&nbsp;them&nbsp;to&nbsp;produce&nbsp;a&nbsp;color&nbsp;<br>
+&nbsp;&nbsp;&nbsp;legend.&nbsp;Useful&nbsp;for&nbsp;marking&nbsp;&nbsp;sub-groups&nbsp;in&nbsp;samples/&nbsp;targets&nbsp;elements.<br>
+&nbsp;&nbsp;&nbsp;The&nbsp;legend&nbsp;elements&nbsp;are&nbsp;stacked&nbsp;vertically.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;labels&nbsp;(list):&nbsp;the&nbsp;list&nbsp;of&nbsp;labels&nbsp;in&nbsp;the&nbsp;legend<br>
+&nbsp;&nbsp;&nbsp;&nbsp;colors&nbsp;(list):&nbsp;the&nbsp;list&nbsp;of&nbsp;colors&nbsp;correspoding&nbsp;to&nbsp;the&nbsp;labels.&nbsp;Colors&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;must&nbsp;be&nbsp;interpretable&nbsp;by&nbsp;matplotlib:&nbsp;for&nbsp;example,&nbsp;'w',&nbsp;#ffffff,&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(1,1,1)&nbsp;all&nbsp;refer&nbsp;to&nbsp;white.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;filename&nbsp;(str,&nbsp;optional):&nbsp;the&nbsp;filename&nbsp;to&nbsp;save&nbsp;the&nbsp;legend.&nbsp;Defaults&nbsp;to<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'./color_legend.png'<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ncolumns&nbsp;(int,&nbsp;optional):&nbsp;the&nbsp;number&nbsp;of&nbsp;columns&nbsp;in&nbsp;the&nbsp;legend.&nbsp;Defaults&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;to&nbsp;1.</tt></dd></dl>
+</td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#55aa55">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><strong>logger</strong> = &lt;Logger Dpre (INFO)&gt;<br>
+<strong>spacer</strong> = &lt;Logger DPre (INFO)&gt;</td></tr></table>
+</body></html>

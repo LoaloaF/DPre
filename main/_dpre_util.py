@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import os
 import sys
+import re 
 from matplotlib.backends.backend_pdf import PdfPages
 from matplotlib import pyplot as plt
 from matplotlib.patches import Patch
@@ -96,10 +97,25 @@ def annotate(index, species):
         sys.exit(1)
 
 def get_ensgs(names, species):
-    """Pass list/ pd.Index `names` with gene name keys; returns the ensg keys"""
+    """Pass list/ pd.Index `names` with gene names; returns a DataFrame with 
+    a mapping of colmuns `ensg` and `name`. If a gene name has multiple
+    ensg keys, this gene will appear last in the DataFrame regardless of the 
+    input order."""
     ref = _get_gene_ann(species)
     try:
-        return ref.index[ref.name.isin(names)]
+        ann = ref.reindex(ref.index[ref.name.isin(names)]).reset_index()
+        if ann.name.duplicated().any():
+            dupl = pd.Index(ann.name).duplicated()
+            ann_dr = ann[~dupl]
+            ann_du = ann[dupl]
+            ann_dr = ann_dr.set_index('name').reindex(names).reset_index()
+            ann_dr.rename({'index': 'name'}, axis=1, inplace=1)
+            ann = ann_dr.append(ann_du, sort=False)
+            ann.index = np.arange(ann.shape[0])
+        else:
+            ann = ann.set_index('name').reindex(names).reset_index()
+            ann.rename({'index': 'name'}, axis=1, inplace=1)
+        return ann
     except Exception as e:
         logger.error('{}\nDPre references the ensembl gene annotaiton v.96. '
                      'Differently annotated datasets may cause problems.'
@@ -152,12 +168,14 @@ def _open_file(filename):
         return filename, PdfPages(filename)
     else:
         return filename, None
-
 def _save_file(fig, filename=None, pp=None):
     """Save pdf if pp is passed, otherwise use filename to save a .png"""
     if pp:
         fig.savefig(pp, format='pdf')
     elif filename:
+        replace = ['$\\mathit{', '}$']
+        for repl in replace:
+            filename = filename.replace(repl, '')
         fig.savefig(filename, format='png')
         plt.close(fig)
 
@@ -173,13 +191,13 @@ def _clean_axes(axes):
 def _make_title(differential, proportional, which, el1, el2, pref='', postf=''):
     """Produce the plot title based on plot parmaters, pref and posf are used
        for plot specific adjustments; return the title string"""
-    which_title = '(euclidean)' if which == 'euclid' else '(intersection)'
+    which_title = '(Euclidean)' if which == 'euclid' else '(intersection)'
     if differential:
-        dtype = 'change in '
+        dtype = 'Change in '
         if proportional:
-            dtype = 'proportional ' + dtype
+            dtype = 'Proportional ' + dtype.lower()
     elif which == 'euclid' and not differential:
-        dtype = 'absolute '
+        dtype = 'Absolute '
         which_title = ''
     title = '{}{}{}transcriptional similarity {}\nof {} & {}'
     return title.format(pref, dtype, postf, which_title, el1, el2)
@@ -187,7 +205,7 @@ def _make_title(differential, proportional, which, el1, el2, pref='', postf=''):
 def _heatmap_cluster(dat, where, ax, which):
     """Cluster the columns or index using scipy; return the new order"""
     ax.set_visible(True)
-    d = dat.T if which == 'columns' else dat
+    d = dat.T if which == 'columns' else dat 
     Y = pdist(d, metric='euclidean')
     Z = linkage(Y, method='complete', metric='euclidean')
     order = dendrogram(Z,
@@ -217,7 +235,7 @@ def _plot_distance_bar(axes, data, ctrl_lbl, bar_args, draw_colorbar=False,
 
     # setup the colorbar legend    
     if draw_colorbar:
-        at = (config.CB_LEFT_SEC/w, 1 - config.CB_TOP/h, config.CB_WIDTH/w, 
+        at = (config.CB_LEFT_SEC/w, 1- config.CB_TOP/h, config.CB_WIDTH/w, 
               config.CB_HEIGHT/h)
         cb = ax.figure.colorbar(im, cax=fig.add_axes(at), alpha =.3,
                                 orientation='horizontal')
@@ -229,7 +247,7 @@ def _plot_distance_bar(axes, data, ctrl_lbl, bar_args, draw_colorbar=False,
         cb.ax.set_xlabel(cb_lbl)
         cb.ax.get_xaxis().set_label_position('top')
 
-def _setup_heatmap_xy(x_y, ax, lbls, pivot, hide_lbls, trg_lbl_size, colors):
+def _setup_heatmap_xy(x_y, ax, lbls, pivot, hide_lbls, lbl_size, colors):
     """Setting all paramters for the x- and y axis of the two heatmap plots"""
     dim = len(lbls)
     if x_y == 'x':
@@ -239,7 +257,7 @@ def _setup_heatmap_xy(x_y, ax, lbls, pivot, hide_lbls, trg_lbl_size, colors):
         ax.set_xticks(ticks)
         if not hide_lbls:
             ax.tick_params(labelbottom=True)
-            fs = trg_lbl_size*config.FONTS if trg_lbl_size else config.FONTS
+            fs = lbl_size*config.FONTS if lbl_size else config.FONTS
             if not pivot:
                 ax.set_xticklabels(lbls, rotation=45, ha='right', fontsize=fs, 
                                    rotation_mode='anchor', y=.5)
@@ -254,11 +272,12 @@ def _setup_heatmap_xy(x_y, ax, lbls, pivot, hide_lbls, trg_lbl_size, colors):
         ax.set_yticks(np.arange(.5, dim))
         if not hide_lbls:
             ax.tick_params(labelleft=True) 
+            fs = lbl_size*config.FONTS if lbl_size else config.FONTS
             if not pivot:
-                ax.set_yticklabels(lbls, x=.5)
+                ax.set_yticklabels(lbls, x=.5, fontsize=fs)
             else:
                 ax.set_yticklabels(lbls, rotation=45, ha='right', x=.5,
-                                   rotation_mode='anchor')
+                                   fontsize=fs, rotation_mode='anchor')
         if colors:
             ax.bar(0, 1, color=colors, bottom=np.arange(len(lbls)))
 
@@ -267,7 +286,7 @@ def _check_args(trg, smp, which, differential, proportional,
                 cluster_hmx=None, display_similarity=False):
     """General purpose plot argument checker; returns (modified) input values"""
     def check_which(which, trg, smp, diff):
-        # check if the Samples and Targets have equivalent data to compare
+        # check if the samples and targets have equivalent data to compare
         if which is None:
             if trg._has_expr and smp._has_expr:
                 which = 'euclid'
@@ -346,11 +365,11 @@ def _check_args(trg, smp, which, differential, proportional,
     return which, differential, proportional, hide_distance_bar, \
            reorder_to_distance_bar, cluster_hmx, display_similarity
 
-def plot_color_legend(labels, colors, filename='color_legend.png'):
+def plot_color_legend(labels, colors, ncolumns=1, filename='color_legend.png'):
     """Plot a custom color legend.
     
        Takes a list of labels and colors and links them to produce a color 
-       legend. Useful for marking  sub-groups in Samples/ Targets elements.
+       legend. Useful for marking  sub-groups in samples/ targets elements.
        The legend elements are stacked vertically.
 
     Args:
@@ -358,8 +377,10 @@ def plot_color_legend(labels, colors, filename='color_legend.png'):
         colors (list): the list of colors correspoding to the labels. Colors 
             must be interpretable by matplotlib: for example, 'w', #ffffff, 
             (1,1,1) all refer to white.
-        filename(str, optional): the filename to save the legend. Defaults to
+        filename (str, optional): the filename to save the legend. Defaults to
             './color_legend.png'
+        ncolumns (int, optional): the number of columns in the legend. Defaults 
+            to 1.
     """
     spacer.info('\n\n')
     assert len(colors) == len(labels), 'colors and labels differ in length'
@@ -373,5 +394,6 @@ def plot_color_legend(labels, colors, filename='color_legend.png'):
     ax.legend(handles=[Patch(color=colors[i], label=labels[i]) 
                 for i in range(len(colors))], loc='center')
     fig.savefig(filename)
-    logger.info('Color legend generated and saved at {}/{}\n\n'
+    plt.close()
+    logger.info('Color legend generated and saved at {}/{}'
                 .format(os.path.abspath(os.curdir), filename))

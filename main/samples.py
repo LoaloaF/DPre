@@ -1,10 +1,10 @@
 from DPre.main._differential import _differential
 from DPre.main._logger import spacer, logger
 
-class Samples(_differential):
+class samples(_differential):
     """class describing the data to explore similarity for
 
-    Samples can hold lists of diff. genes and expression data identifying a 
+    samples can hold lists of diff. genes and expression data identifying a 
     collection of samples. A control in the data extends functionality. 
 
     Arguments:
@@ -30,9 +30,9 @@ class Samples(_differential):
             passed, this overrides the element names in diff. genes. Defaults to 
             False. When False, element names in diff. genes and expression are 
             expected to match perfectly.
-        name (str, optional): Name label of the Samples. Defaults to 'Samples'. Used
+        name (str, optional): Name label of the samples. Defaults to 'samples'. Used
             in logging and plot annotations.
-        log: (bool, optional): Log the Samples initiation. Defaults to True.
+        log: (bool, optional): Log the samples initiation. Defaults to True.
         
     Note:
         At least one of diff_genes and expression must be passed. When both are 
@@ -51,7 +51,8 @@ class Samples(_differential):
             spacer.info('')
             n = self._diff.sum().unstack(0).reindex(self.names).to_string()
             logger.info('Number of diff. genes: \n{}'.format(n))
-        spacer.info('\n\n')
+        if log:
+            spacer.info('\n\n')
         self._log_init(log)
 
     @property
@@ -63,8 +64,8 @@ class Samples(_differential):
         return ns
 
     def __repr__(self):
-        """Get a readable summary of the Samples instance"""
-        return ('\n=|=|= Samples-instance =|=|=\nname = {};\nelements = {};\n'
+        """Get a readable summary of the samples instance"""
+        return ('\n=|=|= samples-instance =|=|=\nname = {};\nelements = {};\n'
                 'n = {};\ndiff. genes data = {};\nexpression data = {};\n'
                 .format(self.name, self.names, len(self), self._has_diff, 
                         self._has_expr))

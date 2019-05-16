@@ -1,4 +1,5 @@
-"""module storing package wide variables, colors and plot sizes"""
+"""module storing package wide variables, colors and plot sizes. May be edited
+by the user"""
 import matplotlib as mpl
 from matplotlib.colors import LinearSegmentedColormap
 from scipy.cluster.hierarchy import set_link_color_palette
@@ -22,8 +23,8 @@ mpl.rcParams['figure.max_open_warning'] = 30
 
 # the default save format if the passed filename has no valid ending
 SAVE_FORMAT = 'pdf'
-# To give significant insight on transcriptional similarity, a minimum 
-# proportion of the Targets markergenes should be detected in the Samples.
+# To give relevant insight on transcriptional similarity, a minimum 
+# proportion of the targets markergenes should be detected in the samples.
 # If the markergene detection proportion is below the specified value, this
 # Target is dropped from the analysis. By default 15%.
 DROP_TARGET_DETEC_THR = .15
@@ -65,7 +66,14 @@ preset_targets_colors = {
     'm mesoderm': '#64bb79', 
     'm endoderm': '#843487', 
     'm blood mesoderm': '#fe7e81', 
+    'h embryonic': '#fbcc8c', 
+    'h surface ectoderm': '#9edce4',
+    'h neuroectoderm': '#5888c2', 
+    'h mesoderm': '#64bb79', 
+    'h endoderm': '#843487', 
+    'h blood mesoderm': '#fe7e81', 
 }
+
 # predefined legend parameters for annotating preset_targets with various color-
 # labeled groups. For these preset_targets, colors are defined in colors.tsv.
 preset_col_legend = {
@@ -74,10 +82,11 @@ preset_col_legend = {
                     colors[3:12]),
     'mouse': (['embryonic', 'germ cells', 'neural crest', 'surface ectoderm', 
                'neuroectoderm', 'mesoderm', 'endoderm', 'blood mesoderm'], 
-              list(preset_targets_colors.values())),
-    'human': (['surface ectoderm', 'neuroectoderm', 'mesoderm',  'endoderm', 
-              'blood mesoderm'],
-              ['#9edce4', '#5888c2', '#64bb79', '#843487', '#fe7e81']),
+              ['#fbcc8c', '#f0f0a6', '#c8b1ce', '#9edce4', '#5888c2',  
+               '#64bb79',  '#843487',  '#fe7e81']),
+    'human': (['embryonic', 'surface ectoderm', 'neuroectoderm', 'mesoderm',  
+               'endoderm', 'blood mesoderm'],
+              ['#fbcc8c', '#9edce4', '#5888c2', '#64bb79', '#843487', '#fe7e81']),
 }
 
 # custom mpl.colormap for visualizing -1, 0, 1 descrete values
@@ -91,17 +100,15 @@ set_link_color_palette(dendrogram_colors[1:])
 
 # default plot elment sizes in inches
 # HM_* args correspond to plot elements in both heatmap functions
-HM_LEFT = .8
-HM_PIVOT_LEFT = .8
-HM_TOP = .8
-HM_RIGHT = .3
-HM_BOTTOM = 1
-HM_PIVOT_BOTTOM = 1.2
+HM_LEFT = 1.1
+HM_TOP = 1
+HM_RIGHT = .2
+HM_BOTTOM = 1.35
 HM_WSPACE = .04
 HM_HSPACE = .02
 HM_Y_COLORBAR = .04
 HM_X_COLORBAR = .04
-HM_REQU_EFF_BAR = .06
+HM_DISTANCE_BAR = .06
 HM_Y_DENDROGRAM = .3
 HM_X_DENDROGRAM = .3
 HM_SQUARE_SIZE = .07
@@ -113,29 +120,33 @@ G_HM_UPDOWN_SPACE_SIZE = .4
 # CB_* args correspond to the colorbar dimensions in inches
 CB_LEFT = .3
 CB_LEFT_SEC = 1.3
-CB_TOP = .55
+CB_TOP = .25
 CB_WIDTH = .85
 CB_HEIGHT = .06
 
 # BP_* args correspond to plot elements in the barplot function
 BP_LEFT = 1.2
-BP_PIVOT_LEFT = .8
-BP_TOP = .6
-BP_RIGHT = .1
-BP_PIVOT_RIGHT = .3
-BP_BOTTOM = .3
+BP_TOP = .7
+BP_RIGHT = .5
+BP_BOTTOM = .4
 BP_Y_COLORBAR = .04
 BP_BARSPACE = .8
 BP_BARWIDTH_SIZE = .07
 
-# Aggregated plot labels; used for all except single-gene annotation
-AGG_EUCL_DIFF_NOPROP = ('mean change in expr. similarity\n'
-                        '[differential mean eulc. dist.]')
-AGG_EUCL_DIFF_PROP = ('prop. of changed expr. similarity\n'
-                      '[prop. differential mean eucl. dist.]')
-AGG_EUCL_NODIFF = ('mean abs. expr. similarity\n'
-                   '[mean abs. eucl. dist.]')
-AGG_INTE_DIFF_NOPROP = ('diff.- & marker genes similarity\n'
+# Aggregated plot labels; used for all plots except single-gene annotation
+AGG_EUCL_DIFF_NOPROP = ('Mean change in expr. similarity\n'
+                        '[differential mean Eucl. dist.]')
+AGG_EUCL_DIFF_PROP = ('Prop. of changed expr. similarity\n'
+                      '[prop. differential mean Eucl. dist.]')
+AGG_EUCL_NODIFF = ('Mean abs. expr. similarity\n'
+                   '[mean abs. Eucl. dist.]')
+AGG_INTE_DIFF_NOPROP = ('Diff.- & marker genes similarity\n'
                         '[sum of matches(1) & mism.(-1)]')
-AGG_INTE_DIFF_PROP = ('prop. of target markergene intersect\n'
+AGG_INTE_DIFF_PROP = ('Prop. of target markergene intersect\n'
                       '[sum of matches(1) & mism.(-1)]')
+
+def _update_consts(constants):
+    inv = [args for args in constants if args not in globals()]
+    if inv:
+        raise TypeError('{} are not recognized arguments.'.format(inv))
+    globals().update(constants)

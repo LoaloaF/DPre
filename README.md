@@ -36,7 +36,7 @@ For using DPre with <b>Python bindings</b>, i.e. running <i>import DPre</i> in a
 export PYTHONPATH=/Users/name/tools:$PYTHONPATH
 ```
 
-to the <i>&tilde;/.bash_profile</i> on Mac or <i>&tilde;/.bashrc</i> on Linux. On windows, edit the system variables under <i>Properties > Advanced System Settings > Environment Variables</i>
+to the <i>&#126;/.bash_profile</i> on Mac or <i>&#126;/.bashrc</i> on Linux. On windows, edit the system variables under <i>Properties > Advanced System Settings > Environment Variables</i>
 
 The <b>command line interface</b> is used by running
 

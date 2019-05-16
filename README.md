@@ -9,7 +9,7 @@ DPre is a bioinformatic tool that enables the user to explore cell type conversi
 
 ## Installation and Setup
 
-The Python packages numpy, pandas and matplotlib are required. We recommend the Anaconda distribution of Python which includes many libaries for scientific computing. 
+The Python packages numpy, pandas and matplotlib are required. We recommend the Anaconda distribution of Python which includes many libraries for scientific computing. 
 
 <b>Command line (recommended)</b>:
 Change into the directory you want DPre to be installed, for example /home/username/Anaconda3/Lib. Then run
@@ -36,7 +36,7 @@ For using DPre with <b>Python bindings</b>, i.e. running <i>import DPre</i> in a
 export PYTHONPATH=/Users/name/tools:$PYTHONPATH
 ```
 
-to the <i>~/.bash_profile</i> on Mac or <i>~/.bashrc</i> on Linux. On windows, edit the system variables under <i>Properties > Advanced System Settings > Environment Variables</i>
+to the <i>&tilde;/.bash_profile</i> on Mac or <i>&tilde;/.bashrc</i> on Linux. On windows, edit the system variables under <i>Properties > Advanced System Settings > Environment Variables</i>
 
 The <b>command line interface</b> is used by running
 

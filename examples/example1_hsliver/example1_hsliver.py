@@ -43,8 +43,8 @@ hm = t.target_similarity_heatmap(samples = s,
                                  heatmap_width = .08,
                                  hide_targetlabels = True,
                                  targetlabels_space=.1,
-                                 hide_targets_colorbar = True,
-                                 hide_distance_bar = False,
+                                 hide_targets_colorbar = False,
+                                 hide_distance_bar = True,
                                  samplelabels_space = .3,
                                  title = None,
                                  pivot = True,
@@ -85,20 +85,20 @@ hm = hep.gene_similarity_heatmap(samples = s,    # the sampels to explore simila
 
 # plot the similarity changes of the most increasing genes
 hm = hep.gene_similarity_heatmap(samples = s, 
-    display_genes = 'increasing',      # the genes with peak positve similarity values
-    gene_number = 10,        # the number of genes to extract and display
-    heatmap_range = [-6, 6],
-    pivot = True,
-    heatmap_width = .7, 
-    heatmap_height = .9, 
-    genelabels_space = .3, 
-    samplelabels_space_left = .4, 
-    title = 'most similarity increasing genes',
-    hide_distance_bar = True,
-    hide_samplelabels = True,     # the label with be shared with the marker genes plot above
-    hide_sum_plot = False,     # show the summary plot
-    G_HM_SUMPLOT_SIZE = .65,        # adjust the size constant defined in the config module
-    filename = 'hsliver_increasing_genes.png',
-   )
+                                 display_genes = 'increasing',      # the genes with peak positve similarity values
+                                 gene_number = 10,        # the number of genes to extract and display
+                                 heatmap_range = [-6, 6],
+                                 pivot = True,
+                                 heatmap_width = .7, 
+                                 heatmap_height = .9, 
+                                 genelabels_space = .3, 
+                                 samplelabels_space_left = .4, 
+                                 title = 'most similarity increasing genes',
+                                 hide_distance_bar = True,
+                                 hide_samplelabels = True,     # the label with be shared with the marker genes plot above
+                                 hide_sum_plot = False,     # show the summary plot
+                                 G_HM_SUMPLOT_SIZE = .65,        # adjust the size constant defined in the config module
+                                 filename = 'hsliver_increasing_genes.png',
+                                )
 # command 
 # 'python ../../dpre.py -pt "human" -ts "Hepatocyte" -se "hsliver_expression.tsv" -sd "./up_genelists" -sd "./down_genelists" -c "Day00"  -sn "in vitro hepatic differentiated hESCs" gene_sim -di "increasing" -ge 10 -hr -6 -hr 6 -pi -hw 0.7 -hh 0.9 -gls 0.3 -sa 0.4 -t "most similarity increasing genes" -hd -hsa -f "hsliver_increasing_genes.png"'

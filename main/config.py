@@ -1,4 +1,4 @@
-"""module storing package wide variables, colors and plot sizes. May be edited
+"""Module storing package wide variables, colors and plot sizes. May be edited
 by the user"""
 import matplotlib as mpl
 from matplotlib.colors import LinearSegmentedColormap
@@ -23,12 +23,14 @@ mpl.rcParams['figure.max_open_warning'] = 30
 
 # the default save format if the passed filename has no valid ending
 SAVE_FORMAT = 'pdf'
+
 # To give relevant insight on transcriptional similarity, a minimum 
 # proportion of the targets markergenes should be detected in the samples.
 # If the markergene detection proportion is below the specified value, this
-# Target is dropped from the analysis. By default 15%.
+# target is dropped from the analysis. By default 15%.
 DROP_TARGET_DETEC_THR = .15
-# p value when dealing with deseq2 differential input
+
+# p value when dealing with deseq2 gene list input
 DESEQ2_P = .05
 
 # predefined colors to use for labeling 
@@ -75,11 +77,8 @@ preset_targets_colors = {
 }
 
 # predefined legend parameters for annotating preset_targets with various color-
-# labeled groups. For these preset_targets, colors are defined in colors.tsv.
+# labeled groups. For presets below, colors are defined in colors.tsv.
 preset_col_legend = {
-    'm embryonic': (['pre-2C', '2C', '4C 8C', 'post-8C', 'Blastocyst', 
-                     'Naive ESCs', 'Epiblast', 'ESCs', 'late embryonic'], 
-                    colors[3:12]),
     'mouse': (['embryonic', 'germ cells', 'neural crest', 'surface ectoderm', 
                'neuroectoderm', 'mesoderm', 'endoderm', 'blood mesoderm'], 
               ['#fbcc8c', '#f0f0a6', '#c8b1ce', '#9edce4', '#5888c2',  
@@ -87,53 +86,59 @@ preset_col_legend = {
     'human': (['embryonic', 'surface ectoderm', 'neuroectoderm', 'mesoderm',  
                'endoderm', 'blood mesoderm'],
               ['#fbcc8c', '#9edce4', '#5888c2', '#64bb79', '#843487', '#fe7e81']),
+    'm embryonic': (['pre-2C', '2C', '4C 8C', 'post-8C', 'Blastocyst', 
+                     'Naive ESCs', 'Epiblast', 'ESCs', 'late embryonic'], 
+                    colors[3:12]),
 }
 
 # custom mpl.colormap for visualizing -1, 0, 1 descrete values
 RdBu_bin = LinearSegmentedColormap.from_list('RdBu_binary', 
                                              [colors[18], '#f6f7f7', colors[14]], 
                                              3)
+
 # dendrogram colors. By default set to all black.
 dendrogram_colors = ['#000000', '#000000', '#000000', '#000000']
+
 # dendrogram_colors = [colors[19], '#589909', '#0c9691', '#13bf63']
 set_link_color_palette(dendrogram_colors[1:])
 
-# default plot elment sizes in inches
+# default plot element sizes in inches
 # HM_* args correspond to plot elements in both heatmap functions
-HM_LEFT = 1.1
-HM_TOP = 1
-HM_RIGHT = .2
-HM_BOTTOM = 1.35
-HM_WSPACE = .04
-HM_HSPACE = .02
-HM_Y_COLORBAR = .04
-HM_X_COLORBAR = .04
-HM_DISTANCE_BAR = .06
-HM_Y_DENDROGRAM = .3
-HM_X_DENDROGRAM = .3
-HM_SQUARE_SIZE = .07
+HM_LEFT = 1.1                 # space left from the plot
+HM_TOP = 1                    # space on top of the plot
+HM_RIGHT = .2                 # space right from the plot
+HM_BOTTOM = 1.35              # space at the bottom of the plot
+HM_WSPACE = .04               # space between plot elements left and right
+HM_HSPACE = .02               # space between plot elements top and bottom
+HM_Y_COLORBAR = .04           # width of the colorbar on the left
+HM_X_COLORBAR = .04           # width of the colorbar on the right
+HM_DISTANCE_BAR = .06         # width of the distance bar on top of the heatmap
+HM_Y_DENDROGRAM = .3          # size of the dendrogram on the y-axis
+HM_X_DENDROGRAM = .3          # size of the dendrogram on the x-axis 
+HM_SQUARE_SIZE = .07          # the size of one heatmap square
 
 # G_HM_* args correspond to plot elements in the single-gene heatmap function
-G_HM_SUMPLOT_SIZE = .9
-G_HM_UPDOWN_SPACE_SIZE = .4
+G_HM_SUMPLOT_SIZE = .9        # size of the summary plot
+G_HM_UPDOWN_SPACE_SIZE = .4   # space between the up and down heatmaps
 
 # CB_* args correspond to the colorbar dimensions in inches
-CB_LEFT = .3
-CB_LEFT_SEC = 1.3
-CB_TOP = .25
-CB_WIDTH = .85
-CB_HEIGHT = .06
+CB_LEFT = .3                  # space left from the colorbar
+CB_LEFT_SEC = 1.3             # space left from the second colorbar
+CB_TOP = .25                  # space on top of the colorbar
+CB_WIDTH = .85                # width of the colorbar
+CB_HEIGHT = .06               # height of the colorbar
 
 # BP_* args correspond to plot elements in the barplot function
-BP_LEFT = 1.2
-BP_TOP = .7
-BP_RIGHT = .5
-BP_BOTTOM = .4
-BP_Y_COLORBAR = .04
-BP_BARSPACE = .8
-BP_BARWIDTH_SIZE = .07
+BP_LEFT = 1.2                 # space left from the bar plot 
+BP_TOP = .7                   # space on top of the bar plot
+BP_RIGHT = .5                 # space right from the bar plot
+BP_BOTTOM = .4                # space on the bootom of the bar plot  
+BP_Y_COLORBAR = .04           # width of the colorbar on the left
+BP_BARSPACE = .8              # size of the bar plot
+BP_BARWIDTH_SIZE = .07        # width of the single bars
 
-# Aggregated plot labels; used for all plots except single-gene annotation
+# Aggregated plot labels; used for all plots except single-gene- and distance 
+# bar annotation
 AGG_EUCL_DIFF_NOPROP = ('Mean change in expr. similarity\n'
                         '[differential mean Eucl. dist.]')
 AGG_EUCL_DIFF_PROP = ('Prop. of changed expr. similarity\n'
@@ -146,6 +151,7 @@ AGG_INTE_DIFF_PROP = ('Prop. of target markergene intersect\n'
                       '[sum of matches(1) & mism.(-1)]')
 
 def _update_consts(constants):
+    """take in the kwargs passed to the plot and override the config constans"""
     inv = [args for args in constants if args not in globals()]
     if inv:
         raise TypeError('{} are not recognized arguments.'.format(inv))

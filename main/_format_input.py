@@ -1,4 +1,4 @@
-""" module handling user data input and initiation of preset targets """
+"""Handles user data input and initiation of preset targets"""
 import os, sys
 import glob
 import pandas as pd
@@ -8,27 +8,29 @@ import DPre.main.config as config
 import DPre.main._dpre_util as util
 
 def preset_targets(get, sort=False, preset_colors=True):
-    """Get a predefined targets instance. 
+    """Generate one of the predefined targets instances and return it. 
     
-        Pick a refernce dataset for comparison. Mouse (Hutchins et al. 2017, NAR)
-        and Human (FANTOM5, Nature 2014) come preshipped. Specific lineages can
-        be picked for the mouse reference. Presets can be added by adding a 
-        folder to DPre/preset_targets. If a preset is initiated with a colormap
-        a color legend is drawn from config.preset_col_legend.
+        Pick a reference dataset for comparison. Mouse (Hutchins et al. 2017, 
+        NAR) and Human (FANTOM5 project, Nature 2014) are included. Specific 
+        doamins can be picked for both species references. If the targets are 
+        initiated with 'preset_colors', a color legend is generated and saved 
+        in the current working directory. Custom presets can be created by 
+        adding a folder (with an 'm' or 'h' prefix) to DPre/preset_targets. 
 
     Args:
         get (str): the desired preset. Valid options are 'mouse', 'human', 
             'm embryonic', 'm germ cells', 'm neural crest', 
             'm surface ectoderm', 'm neuroectoderm', 'm mesoderm', 'm endoderm', 
-            'm blood mesoderm' (m for mouse)
-        sort (bool, optional) Sort the loaded element names alphabetically. 
+            'm blood mesoderm', 'h surface ectoderm', 'h neuroectoderm', 
+            'h mesoderm', 'h endoderm', 'h blood mesoderm'; m = mouse, h = human
+        sort (bool, optional): Sort the loaded element names alphabetically. 
             Defaults to False.
-        preset_colors (bool, optional) Trys to initiate the targets with preset 
+        preset_colors (bool, optional): Tries to initiate the targets with preset 
             colors either from colors.tsv in the respective preset directory or 
-            from config.preset_targets_colors. Defaults to True.
+            when not found from config.preset_targets_colors. Defaults to True.
     
     Returns:
-        t: the targets instance
+        t: the preset targets instance
     """
     path = os.path.dirname(__file__)
     # any folder in DPre/preset_targets is potentially valid
@@ -64,8 +66,8 @@ def preset_targets(get, sort=False, preset_colors=True):
     if sort:
         mgs.sort_index(axis=1, inplace=True)
         expr.sort_index(axis=1, inplace=True)
-
-    # manual part of the script that needs adjustment if a preset is added    
+    
+    # explicit part of the script that might need adjustmet for cumstom presets
     if get == 'human':
         args = {'name': 'human FANTOM5 library', 'species': 'human'}
     elif get == 'mouse':
@@ -77,7 +79,7 @@ def preset_targets(get, sort=False, preset_colors=True):
     # init targets
     from DPre.main.targets import targets
     t = targets(markergenes=mgs, expression=expr, log=False, **args)
-    logger.info('Default target `{}` created, name: `{}`, elements: {}'
+    logger.info('Default targets `{}` created, name: `{}`, elements: {}'
                 .format(get, t.name, len(t)))
 
     # try to get colors first through a file, then through config
@@ -90,26 +92,30 @@ def preset_targets(get, sort=False, preset_colors=True):
             if get in config.preset_targets_colors:
                 t.set_colors([config.preset_targets_colors[get]], log=False)
             else:
-                logger.warning('No colors set for preset targets {}'.format(get))
+                logger.warning('No colors found for preset targets {}'
+                               .format(get))
         # draw a colorlegend if defined in config
         if get in config.preset_col_legend:
-            util.plot_color_legend(*config.preset_col_legend[get])
+            util.plot_color_legend(*config.preset_col_legend[get], 
+                                   filename=get+'_color_legend.png')
     return t
 
-def _format_expr(expr, type_name, ctrl):
-    """ take user expression input and format
+def _format_expr(expr, type_name, ctrl=None):
+    """ Take user expression input validate and format
 
-    If an tsv file is passed, load in the expression data as a DataFrame. Check
-    if the DataFrame has a valid format. CHeck if the control is present if 
-    passed. Fiannly, generate and add the log2- and z-transformed data.
+    If a TSV file is passed, read the expresion file as a DataFrame. Check
+    if the DataFrame has a valid format. If the control is passed,check if it's
+    found in expression. Finally, generate and add the log2- and z-transformed 
+    data.
 
     Args:
-        expr: a filename or Dataframe. The data to check.
+        expr: Filename or Dataframe. The data to check.
         type_name: 'targets' or 'samples', depending on caller
-        ctrl: control name, only passed when called from samples
+        ctrl: Control name, only passed when called from samples
     
     Returns:
-        expr: log2- and z-transformed columns added at column level 1
+        expr: Expression DataFrame with log2- and z-transformed data at column 
+            level 1
 
     """
     if not isinstance(expr, pd.DataFrame):
@@ -141,8 +147,8 @@ def _format_expr(expr, type_name, ctrl):
         sys.exit(1)
     elif ctrl and (ctrl not in expr.columns.unique(0)):
         spacer.error('\n')
-        logger.error('The contrl name of the samples `{}` was not found in the '
-                    'passed expression data.'.format(ctrl))
+        logger.error('The control name of the samples `{}` was not found in '
+                     'the passed expression data.'.format(ctrl))
         sys.exit(1)
 
     if expr.columns.nlevels > 1:
@@ -166,23 +172,24 @@ def _format_expr(expr, type_name, ctrl):
         return util._add_log2_z(expr)
 
 def _format_diff_genes(diff_genes_dir, genelists_mgtype='up', type_name=None): 
-    """take user differential directory input and format
+    """Take user gene list input input and format
 
-    A single directory with deseq2 output files, a single dir with up-genelist 
-    files or 2 dirs with up- and down- genelists are formatted here. A bool 
+    A single directory with deseq2 output files, a single dir. with up-genelist 
+    files or 2 dirs. with up- and down- genelists are formatted here. A bool 
     DataFrame that holds the up- (and optionally down) differential genes is 
     returned.
 
     Args:
-        diff_genes_dir: deseq2 dir, up-genelists dir or list of up- and down 
-            genelist dirs.
-    genelists_mgtype: which genelist type to handle. Internally used for 
-    recursion type_name: 'targets' or 'samples', depending on caller
+        diff_genes_dir: deseq2 directory, up-genelists dir. or list of up- and 
+        down genelist dirs..
+    genelists_mgtype: Which genelist type to handle. Internally used for 
+        recursion 
+    type_name: 'targets' or 'samples', depending on caller
 
     Returns:
         formatted _diff DataFrame
     """
-    # check if path exists and contains .tsv files
+    # check if path exists and contains TSV files
     def check_path(direc):
         if not os.path.exists(direc):
             spacer.info('')
@@ -200,10 +207,10 @@ def _format_diff_genes(diff_genes_dir, genelists_mgtype='up', type_name=None):
     def check_up_down_genelists():
         # check if 2 elements were passed, i.e. up+down genelist input
         if isinstance(diff_genes_dir, (list, tuple)) and len(diff_genes_dir) == 2:
-            #check if paths are valid 
+            # check if paths are valid 
             check_path(diff_genes_dir[0])
             check_path(diff_genes_dir[1])
-            # get the single tsv filenames
+            # get the single TSV filenames
             up_dir = glob.glob(diff_genes_dir[0]+'/*.tsv')
             down_dir = glob.glob(diff_genes_dir[1]+'/*.tsv')
             # up and down must have the same number of elements

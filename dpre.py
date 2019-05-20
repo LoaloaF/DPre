@@ -1,10 +1,8 @@
-"""frontend implementing an argparse command line interface"""
+"""Frontend implementing an argparse command line interface"""
 import os
 import sys
 import argparse
 
-# if os.path.abspath(os.path.dirname(__file__)) not in sys.path:
-#      sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 import DPre
 
 # initaite and return the targets and samples for the plots
@@ -39,7 +37,7 @@ def _do_target_sim(args):
                     # plot data
                     samples = s, 
                     which = args['which'], 
-                    differential = args['absolut'],
+                    differential = args['absolute'],
                     proportional = args['proportional'], 
                     display_similarity = args['display_similarity'],
                     # data ordering
@@ -75,7 +73,7 @@ def _do_gene_sim(args):
                     # plot data
                     samples = s,  
                     which = args['which'],
-                    differential = args['absolut'],
+                    differential = args['absolute'],
                     proportional = args['proportional'],
                     display_genes = args['display_genes'],
                     gene_number = args['gene_number'],
@@ -117,7 +115,7 @@ def _do_ranked_sim(args):
                     # plot data
                     samples = s,
                     which = args['which'],
-                    differential = args['absolut'],
+                    differential = args['absolute'],
                     proportional = args['proportional'],
                     display_similarity = args['display_similarity'],
                     n_targets = args['n_targets'],
@@ -137,18 +135,19 @@ def _do_ranked_sim(args):
                     hide_targetlabels = args['hide_targetlabels'],
                     filename = args['filename'])
 
-
 # create the base parser
 d = ('DPre - visualizing transcriptional similarity between samples and targets')
 u = ('\n\n\n\n\n\nPass the input --> Choose the plot --> specify the plot:\n'
-    '$ ./dpre.py <targets> <samples> <plot> <plot args> (optional)\n')
+    '$ ./dpre.py <targets> <samples> <plot> <plot args> (optional)\nExample:\n'
+     'python dpre.py -pt "h endoderm" -se "examples/example1_hsliver/hsliver_e'
+     'xpression.tsv" -c "Day00" target_sim -w "euclid"')
 parser = argparse.ArgumentParser(description=d, usage=u, allow_abbrev=False,
                                  add_help=False)
 
 # create a group from the parser for the target data input
 trg_grp = parser.add_argument_group('targets', description='input comparison '
-                                    'data, pass `preset_targets` or '
-                                    '`targets_markergenes` & `targets_expression`')
+                                    'data, pass `preset_targets` or `targets_'
+                                    'markergenes` & `targets_expression`')
 trg_grp.add_argument('--preset_targets', '-pt', type=str, 
                      help='load a default targets profile (all other options '
                      'are ignored)')
@@ -171,8 +170,8 @@ trg_grp.add_argument('--targets_slice', '-ts', action='append', type=str,
 
 # create a group from the parser for the samples data input
 smp_grp = parser.add_argument_group('samples', description='input data to '
-                                    'explore similarity for, pass `targets_diff_genes` '
-                                    'and/or `samples_expression`', )
+                                    'explore similarity for, pass `targets_diff'
+                                    '_genes` and/or `samples_expression`')
 smp_grp.add_argument('--samples_diff_genes', '-sd', action='append', type=str, 
                      help='directory/ies with differential gene files (up or '
                      'up & down)')
@@ -216,8 +215,8 @@ d = 'main parameters to control the presented similarity'
 dat_grp = trg_sim_parser.add_argument_group('Data options', description=d)
 dat_grp.add_argument('--which', '-w', type=str, choices=('euclid', 'intersect'),
                      help='select the similarity metric')
-dat_grp.add_argument('--absolut', '-a', action='store_false', help='plot the '
-                     'absolut similarity, `euclid` only. Will appear as '
+dat_grp.add_argument('--absolute', '-a', action='store_false', help='plot the '
+                     'absolute similarity, `euclid` only. Will appear as '
                      'differential=False in logs.')
 dat_grp.add_argument('--proportional', '-p', action='store_true',
                      help='plot the proportional changes in similarity')
@@ -294,8 +293,8 @@ d = 'main parameters to control the presented similarity'
 dat_grp = gene_sim_parser.add_argument_group('Data options', description=d)
 dat_grp.add_argument('--which', '-w', type=str, choices=('euclid', 'intersect'),
                      help='select the similarity metric')
-dat_grp.add_argument('--absolut', '-a', action='store_false', help='plot the '
-                     'absolut similarity, `euclid` only. Will appear as '
+dat_grp.add_argument('--absolute', '-a', action='store_false', help='plot the '
+                     'absolute similarity, `euclid` only. Will appear as '
                      'differential=False in logs.')
 dat_grp.add_argument('--proportional', '-p', action='store_true',
                      help='plot the proportional changes in similarity')
@@ -388,8 +387,8 @@ d ='main parameters to control the presented similarity'
 dat_grp = rank_sim_parser.add_argument_group('Data options', description = d)
 dat_grp.add_argument('--which', '-w', type=str, choices=('euclid', 'intersect'),
                      help='select the similarity metric')
-dat_grp.add_argument('--absolut', '-a', action='store_false', help='plot the '
-                     'absolut similarity, `euclid` only. Will appear as '
+dat_grp.add_argument('--absolute', '-a', action='store_false', help='plot the '
+                     'absolute similarity, `euclid` only. Will appear as '
                      'differential=False in logs.')
 dat_grp.add_argument('--proportional', '-p', action='store_true',
                      help='plot the proportional changes in similarity')

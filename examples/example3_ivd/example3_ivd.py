@@ -1,7 +1,7 @@
 from DPre import samples
 from DPre import preset_targets
 import pandas as pd
-
+from DPre import targets
 # iniatite multiple sample data instances because of different controls
 ivd_expr = pd.read_csv('ivd_expression.tsv', sep='\t', index_col='ensg')
 # cardiomyocytes 

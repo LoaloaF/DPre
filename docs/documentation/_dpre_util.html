@@ -1,65 +1,633 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<html><head><title>Python: module _dpre_util</title>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-</head><body bgcolor="#f0f0f8">
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.6.1" />
+<title>_dpre_util API documentation</title>
+<meta name="description" content="Utility module with various helper functions and subplot generaters" />
+<link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
+<link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase;cursor:pointer}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>_dpre_util</code></h1>
+</header>
+<section id="section-intro">
+<p>Utility module with various helper functions and subplot generaters</p>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">&#34;&#34;&#34; Utility module with various helper functions and subplot generaters&#34;&#34;&#34;
+import pandas as pd
+import numpy as np
+import os
+import sys
+import re 
+from matplotlib.backends.backend_pdf import PdfPages
+from matplotlib import pyplot as plt
+from matplotlib.patches import Patch
+from matplotlib.colors import is_color_like
+from scipy.cluster.hierarchy import distance
+from scipy.cluster.hierarchy import linkage 
+from scipy.cluster.hierarchy import dendrogram 
+from scipy.cluster.hierarchy import optimal_leaf_ordering
+from scipy.spatial.distance import pdist
 
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
-<tr bgcolor="#7799ee">
-<td valign=bottom>&nbsp;<br>
-<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>_dpre_util</strong></big></big></font></td
-><td align=right valign=bottom
-><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:c%3A%5Cusers%5Cloaloa%5Canaconda3%5Clib%5Cdpre%5Cmain%5C_dpre_util.py">c:\users\loaloa\anaconda3\lib\dpre\main\_dpre_util.py</a></font></td></tr></table>
-    <p><tt>utility&nbsp;module&nbsp;with&nbsp;various&nbsp;helper&nbsp;functions&nbsp;and&nbsp;subplot&nbsp;producers</tt></p>
-<p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#aa55cc">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+import DPre.main.config as config
+from DPre.main._logger import logger, spacer
+
+
+def _add_mg_types(data, down):
+    &#34;&#34;&#34;Add markergene type index (up and down) to columns at level 0&#34;&#34;&#34;
+    orig_order = data.columns.unique(0)
+    updown_idx = [&#39;up&#39;]*data.shape[1]
+    if down:
+        updown_idx.extend([&#39;down&#39;]*data.shape[1])
+        data = pd.concat((data, data), axis=1)
+    data.columns = _add_level(data.columns, updown_idx)
+    return data.reindex(orig_order, axis=1, level=1)
+
+def _diff_to_int_updown_notation(_diff, trans_updown):
+    &#34;&#34;&#34;Take _diff input and convert up-genes to +1, down-genes to -1, optionally 
+       transfer up- and down values to each other makeing up- and down subframes
+       equal&#34;&#34;&#34;
+    int_diff = _diff.astype(int)
+    if &#39;down&#39; in _diff.columns.unique(0):
+        int_diff[&#39;down&#39;] *= -1
+    if trans_updown and &#39;down&#39; in _diff.columns.unique(0):
+        int_diff[&#39;up&#39;] = int_diff[&#39;up&#39;].mask(_diff[&#39;down&#39;], -1)
+        int_diff[&#39;down&#39;] = int_diff[&#39;down&#39;].mask(_diff[&#39;up&#39;], 1)
+    return int_diff
+
+def _add_mgtmean(agg):
+    &#34;&#34;&#34;Prodcue the mean between aggregated up- and down mg similarity values&#34;&#34;&#34;
+    agg_mean = agg.groupby(axis=1, level=1, sort=False).mean()
+    agg_mean.columns = _add_level(agg_mean.columns, &#39;mean&#39;)
+    return pd.concat([agg, agg_mean], axis=1)
+
+def _add_log2_z(expr, rowwise_sd=False):
+    &#34;&#34;&#34;Compute log2 and z-transformed expression data. Substitute read count in
+       expression. Optionally, compute the standad deviation row(gene)-wise. 
+       Is used for large datasets like reference transcriptome libraries. 
+    &#34;&#34;&#34;
+    expr = np.log2(expr +1)
+    expr.columns = _add_level(expr.columns, &#39;log2&#39;, at=1)
+
+    m = expr.values.mean()
+    s = expr.values.std() if not rowwise_sd else expr.std(1)
+        
+    z_expr = expr.apply(lambda c: (c-m) /s)
+    z_expr.columns = _add_level(z_expr.columns, &#39;z&#39;, 1)
+    return pd.concat((expr, z_expr), axis=1).reindex(expr.columns.unique(0), 
+                                                     axis=1, level=0)
+
+def _add_level(index, label, at=0, replace=False, name=&#39;&#39;):
+    &#34;&#34;&#34;Add a level with labels &#39;label&#39; to a pd.MultiIndex&#34;&#34;&#34;
+    index = pd.DataFrame(index=index)
+    if replace:
+        index.reset_index(level=at, drop=True, inplace=True)
+    index[name] = label
+    order = list(range(index.index.nlevels))
+    order.insert(at, -1)
+    return index.set_index(name, append=True).reorder_levels(order).index
+
+def _get_gene_ann(species):
+    &#34;&#34;&#34;Open the gene annotation reference file (mouse/ human) and return it&#34;&#34;&#34;
+    path = os.path.dirname(__file__)
+    if species == &#39;mouse&#39;:
+        return pd.read_pickle(path + &#39;/../gene_ann/mg_ensembl96_GRCm38.p6.gzip&#39;)
+    elif species == &#39;human&#39;:
+        return pd.read_pickle(path + &#39;/../gene_ann/hg_GRCh38.p12.gzip&#39;)
+    else:
+        logger.info(&#39;&#39;)
+        logger.error(&#39;Invalid input for species: `{}`. Valid are `mouse` and &#39;
+                     &#39;`human`&#39;.format(species))
+        sys.exit(1)
+
+def annotate(ensgs, species):
+    &#34;&#34;&#34; Annotate mouse or human ensg keys. Return the gene names.
+
+    DPre references the ensembl gene annotation v.96 located at 
+    DPre/gene_ann. 
+
+    Args:
+        ensgs (list, pandas.Index): The collection of ensg keys to annotate
+        species (str): The origin species of the genes, &#39;mouse&#39; or &#39;human&#39;.
     
-<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
-<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="DPre.main.config.html">DPre.main.config</a><br>
-<a href="scipy.spatial.distance.html">scipy.spatial.distance</a><br>
-</td><td width="25%" valign=top><a href="numpy.html">numpy</a><br>
-<a href="os.html">os</a><br>
-</td><td width="25%" valign=top><a href="pandas.html">pandas</a><br>
-<a href="matplotlib.pyplot.html">matplotlib.pyplot</a><br>
-</td><td width="25%" valign=top><a href="re.html">re</a><br>
-<a href="sys.html">sys</a><br>
-</td></tr></table></td></tr></table><p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#eeaa77">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    Returns:
+        annotated pandas.Index
+    &#34;&#34;&#34;
+    ref = _get_gene_ann(species)
+    try:
+        return pd.Index(ref.reindex(ensgs).name.values)
+    except Exception as e:
+        logger.error(&#39;{}\nDPre references the ensembl gene annotaiton v.96. &#39;
+                     &#39;Differently annotated datasets may cause problems.&#39;
+                     .format(e))
+        sys.exit(1)
+
+def get_ensgs(names, species):
+    &#34;&#34;&#34; Return the ensg keys for a list of gene names.
+
+    DPre references the ensembl gene annotation v.96 located at 
+    DPre/gene_ann. If a gene name has multiple ensg keys, this gene will appear 
+    last in the DataFrame regardless of the input order.
     
-<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
-<td width="100%"><dl><dt><a name="-add_mgtmean"><strong>add_mgtmean</strong></a>(agg)</dt><dd><tt>Prodcue&nbsp;the&nbsp;mean&nbsp;between&nbsp;aggregated&nbsp;up-&nbsp;and&nbsp;down&nbsp;mg&nbsp;similarity&nbsp;values</tt></dd></dl>
- <dl><dt><a name="-annotate"><strong>annotate</strong></a>(index, species)</dt><dd><tt>Pass&nbsp;list/&nbsp;pd.Index&nbsp;`index`&nbsp;with&nbsp;ensg&nbsp;keys;&nbsp;returns&nbsp;the&nbsp;gene&nbsp;names</tt></dd></dl>
- <dl><dt><a name="-get_ensgs"><strong>get_ensgs</strong></a>(names, species)</dt><dd><tt>Pass&nbsp;list/&nbsp;pd.Index&nbsp;`names`&nbsp;with&nbsp;gene&nbsp;names;&nbsp;returns&nbsp;a&nbsp;DataFrame&nbsp;with&nbsp;<br>
-a&nbsp;mapping&nbsp;of&nbsp;colmuns&nbsp;`ensg`&nbsp;and&nbsp;`name`.&nbsp;If&nbsp;a&nbsp;gene&nbsp;name&nbsp;has&nbsp;multiple<br>
-ensg&nbsp;keys,&nbsp;this&nbsp;gene&nbsp;will&nbsp;appear&nbsp;last&nbsp;in&nbsp;the&nbsp;DataFrame&nbsp;regardless&nbsp;of&nbsp;the&nbsp;<br>
-input&nbsp;order.</tt></dd></dl>
- <dl><dt><a name="-plot_color_legend"><strong>plot_color_legend</strong></a>(labels, colors, ncolumns=1, filename='color_legend.png')</dt><dd><tt>Plot&nbsp;a&nbsp;custom&nbsp;color&nbsp;legend.<br>
-&nbsp;<br>
-&nbsp;&nbsp;&nbsp;Takes&nbsp;a&nbsp;list&nbsp;of&nbsp;labels&nbsp;and&nbsp;colors&nbsp;and&nbsp;links&nbsp;them&nbsp;to&nbsp;produce&nbsp;a&nbsp;color&nbsp;<br>
-&nbsp;&nbsp;&nbsp;legend.&nbsp;Useful&nbsp;for&nbsp;marking&nbsp;&nbsp;sub-groups&nbsp;in&nbsp;samples/&nbsp;targets&nbsp;elements.<br>
-&nbsp;&nbsp;&nbsp;The&nbsp;legend&nbsp;elements&nbsp;are&nbsp;stacked&nbsp;vertically.<br>
-&nbsp;<br>
-Args:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;labels&nbsp;(list):&nbsp;the&nbsp;list&nbsp;of&nbsp;labels&nbsp;in&nbsp;the&nbsp;legend<br>
-&nbsp;&nbsp;&nbsp;&nbsp;colors&nbsp;(list):&nbsp;the&nbsp;list&nbsp;of&nbsp;colors&nbsp;correspoding&nbsp;to&nbsp;the&nbsp;labels.&nbsp;Colors&nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;must&nbsp;be&nbsp;interpretable&nbsp;by&nbsp;matplotlib:&nbsp;for&nbsp;example,&nbsp;'w',&nbsp;#ffffff,&nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(1,1,1)&nbsp;all&nbsp;refer&nbsp;to&nbsp;white.<br>
-&nbsp;&nbsp;&nbsp;&nbsp;filename&nbsp;(str,&nbsp;optional):&nbsp;the&nbsp;filename&nbsp;to&nbsp;save&nbsp;the&nbsp;legend.&nbsp;Defaults&nbsp;to<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'./color_legend.png'<br>
-&nbsp;&nbsp;&nbsp;&nbsp;ncolumns&nbsp;(int,&nbsp;optional):&nbsp;the&nbsp;number&nbsp;of&nbsp;columns&nbsp;in&nbsp;the&nbsp;legend.&nbsp;Defaults&nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;to&nbsp;1.</tt></dd></dl>
-</td></tr></table><p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#55aa55">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    Args:
+        names (list pandas.Index): The collection of names to return ensg keys 
+            for
+        species (str): The origin species of the genes, &#39;mouse&#39; or &#39;human&#39;.
     
-<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
-<td width="100%"><strong>logger</strong> = &lt;Logger Dpre (INFO)&gt;<br>
-<strong>spacer</strong> = &lt;Logger DPre (INFO)&gt;</td></tr></table>
-</body></html>
+    Returns:
+        pandas.Index of ensg keys 
+    &#34;&#34;&#34;
+    ref = _get_gene_ann(species)
+    try:
+        ann = ref.reindex(ref.index[ref.name.isin(names)]).reset_index()
+        if ann.name.duplicated().any():
+            dupl = pd.Index(ann.name).duplicated()
+            ann_dr = ann[~dupl]
+            ann_du = ann[dupl]
+            ann_dr = ann_dr.set_index(&#39;name&#39;).reindex(names).reset_index()
+            ann_dr.rename({&#39;index&#39;: &#39;name&#39;}, axis=1, inplace=1)
+            ann = ann_dr.append(ann_du, sort=False)
+            ann.index = np.arange(ann.shape[0])
+        else:
+            ann = ann.set_index(&#39;name&#39;).reindex(names).reset_index()
+            ann.rename({&#39;index&#39;: &#39;name&#39;}, axis=1, inplace=1)
+        return ann
+    except Exception as e:
+        logger.error(&#39;{}\nDPre references the ensembl gene annotaiton v.96. &#39;
+                     &#39;Differently annotated datasets may cause problems.&#39;
+                     .format(e))
+        sys.exit(1)
+
+def _align_indices(data, order, axis=1):
+    &#34;&#34;&#34;Align the indices/ columns in a collection of pandas objects to order&#34;&#34;&#34;
+    for i in range(len(data)):
+        if data[i] is not None:
+            data[i] = data[i].reindex(order, axis=axis)
+    return data
+
+
+def _init_figure(fig_widths, fig_heights, nplts, spacers):
+    &#34;&#34;&#34;Calculate the size proportion of each plot element, create figure&#34;&#34;&#34;
+    width, height = sum(fig_widths), sum(fig_heights)
+    ratio = {&#39;width_ratios&#39;: list(map(lambda w: w/width, 
+                                        fig_widths[1:-2])),
+             &#39;height_ratios&#39;: list(map(lambda h: h/height, 
+                                        fig_heights[1:-2]))}
+    # init figure
+    fig, axes = plt.subplots(*nplts, figsize=(width, height), 
+                                gridspec_kw=ratio)
+    if not isinstance(axes, np.ndarray):
+        axes = np.array([axes])
+    axes = _clean_axes(axes)
+    
+    wspace_prop = spacers[0] /np.array(fig_widths[1:-2]).mean()
+    hspace_prop = spacers[1] /np.array(fig_heights[1:-2]).mean()
+    adj_args = {&#39;left&#39;: fig_widths[0] /width, 
+                &#39;wspace&#39;: wspace_prop,
+                &#39;right&#39;: 1 - fig_widths[-1] /width,
+                &#39;top&#39;: 1 - fig_heights[0] /height, 
+                &#39;hspace&#39;: hspace_prop,
+                &#39;bottom&#39;: fig_heights[-1] /height}
+    fig.subplots_adjust(**adj_args)
+    return fig, axes
+
+def _open_file(filename):
+    &#34;&#34;&#34;Open a .pdf or .png file based on the filename ending or if not present
+       on config.SAVE_FORMAT&#34;&#34;&#34;
+    if not (filename.endswith(&#39;.png&#39;) or filename.endswith(&#39;.pdf&#39;)):
+        filename += &#39;.&#39;+config.SAVE_FORMAT
+    if filename.endswith(&#39;.pdf&#39;):
+        return filename, PdfPages(filename)
+    else:
+        return filename, None
+def _save_file(fig, filename=None, pp=None):
+    &#34;&#34;&#34;Save pdf if pp is passed, otherwise use filename to save a .png&#34;&#34;&#34;
+    if pp:
+        fig.savefig(pp, format=&#39;pdf&#39;)
+    elif filename:
+        replace = [&#39;$\\mathit{&#39;, &#39;}$&#39;]
+        for repl in replace:
+            filename = filename.replace(repl, &#39;&#39;)
+        fig.savefig(filename, format=&#39;png&#39;)
+        plt.close(fig)
+
+def _clean_axes(axes):
+    &#34;&#34;&#34;Remove all spines, ticks and tickalabels&#34;&#34;&#34;
+    np.array([axes])
+    for ax in axes.flatten():
+        [s.set_visible(False) for s in ax.spines.values()]
+        ax.tick_params(bottom=False, left=False, labelbottom=False, 
+                       labelleft=False)
+    return axes
+
+def _make_title(differential, proportional, which, el1, el2, pref=&#39;&#39;, postf=&#39;&#39;):
+    &#34;&#34;&#34;Produce the plot title based on plot parmaters, pref and posf are used
+       for plot specific adjustments; return the title string&#34;&#34;&#34;
+    which_title = &#39;(Euclidean)&#39; if which == &#39;euclid&#39; else &#39;(intersection)&#39;
+    if differential:
+        dtype = &#39;Change in &#39;
+        if proportional:
+            dtype = &#39;Proportional &#39; + dtype.lower()
+    elif which == &#39;euclid&#39; and not differential:
+        dtype = &#39;Absolute &#39;
+        which_title = &#39;&#39;
+    title = &#39;{}{}{}transcriptional similarity {}\nof {} &amp; {}&#39;
+    return title.format(pref, dtype, postf, which_title, el1, el2)
+
+def _heatmap_cluster(dat, where, ax, which):
+    &#34;&#34;&#34;Cluster the columns or index with scipy; return the new order&#34;&#34;&#34;
+    ax.set_visible(True)
+    d = dat.T if which == &#39;columns&#39; else dat 
+    Y = pdist(d, metric=&#39;euclidean&#39;)
+    Z = linkage(Y, method=&#39;complete&#39;, metric=&#39;euclidean&#39;)
+    order = dendrogram(Z,
+                        count_sort = True,
+                        no_labels = True,
+                        orientation = where, 
+                        labels = d.index, 
+                        above_threshold_color = config.dendrogram_colors[0],
+                        ax = ax)[&#39;ivl&#39;]
+    if which == &#39;rows&#39;:
+        # for some reason reversed?
+        order = order[::-1]
+    return order
+
+def _plot_distance_bar(axes, data, ctrl_lbl, bar_args, draw_colorbar=False, 
+                       cb_lbl=None, fig=None, pivot=None, w=None, h=None):
+    &#34;&#34;&#34;Draw the distance bar on top of the heatmap&#34;&#34;&#34;
+    # set ylabel on the left 
+    axes[0].tick_params(labelleft=True)
+    axes[0].set_ylim(0, 1)
+    axes[0].set_yticks((.5,))
+    axes[0].set_yticklabels((ctrl_lbl,), x=.5)
+    # draw the heatmap
+    ax = axes[1]
+    [s.set_visible(True) for s in ax.spines.values()]
+    im = ax.imshow(data.values, aspect=&#39;auto&#39;, **bar_args)
+
+    # setup the colorbar legend    
+    if draw_colorbar:
+        at = (config.CB_LEFT_SEC/w, 1- config.CB_TOP/h, config.CB_WIDTH/w, 
+              config.CB_HEIGHT/h)
+        cb = ax.figure.colorbar(im, cax=fig.add_axes(at), alpha =.3,
+                                orientation=&#39;horizontal&#39;)
+        bar_ticks = (bar_args[&#39;vmin&#39;], bar_args[&#39;vmax&#39;])
+        cb.set_ticks(bar_ticks)
+        cb.ax.set_xticklabels(bar_ticks)
+        if pivot:
+            cb.ax.tick_params(labelrotation=90)
+        cb.ax.set_xlabel(cb_lbl)
+        cb.ax.get_xaxis().set_label_position(&#39;top&#39;)
+
+def _setup_heatmap_xy(x_y, ax, lbls, pivot, hide_lbls, lbl_size, colors):
+    &#34;&#34;&#34;Setting all paramters for the x- and y axis of the two heatmap plots&#34;&#34;&#34;
+    dim = len(lbls)
+    if x_y == &#39;x&#39;:
+        # X-axis setup, colorbar bottom
+        ax.set_xlim(0, dim)
+        ticks = np.arange(.5, dim)
+        ax.set_xticks(ticks)
+        if not hide_lbls:
+            ax.tick_params(labelbottom=True)
+            fs = lbl_size*config.FONTS if lbl_size else config.FONTS
+            if not pivot:
+                ax.set_xticklabels(lbls, rotation=45, ha=&#39;right&#39;, fontsize=fs, 
+                                   rotation_mode=&#39;anchor&#39;, y=.5)
+            else:
+                ax.set_xticklabels(lbls, rotation=90, ha=&#39;right&#39;, va=&#39;center&#39;, 
+                                   fontsize=fs, rotation_mode=&#39;anchor&#39;, y=.5)
+        if colors:
+            ax.bar(ticks, 1, 1, color=colors)
+    
+    elif x_y == &#39;y&#39;:
+        ax.set_ylim((-.1, dim +.01))
+        ax.set_yticks(np.arange(.5, dim))
+        if not hide_lbls:
+            ax.tick_params(labelleft=True) 
+            fs = lbl_size*config.FONTS if lbl_size else config.FONTS
+            if not pivot:
+                ax.set_yticklabels(lbls, x=.5, fontsize=fs)
+            else:
+                ax.set_yticklabels(lbls, rotation=45, ha=&#39;right&#39;, x=.5,
+                                   fontsize=fs, rotation_mode=&#39;anchor&#39;)
+        if colors:
+            ax.bar(0, 1, color=colors, bottom=np.arange(len(lbls)))
+
+def _check_args(trg, smp, which, differential, proportional, 
+                hide_distance_bar=None, reorder_to_distance_bar=None,
+                cluster_hmx=None, display_similarity=False):
+    &#34;&#34;&#34;General purpose plot argument checker; returns (modified) input values&#34;&#34;&#34;
+    def check_which(which, trg, smp, diff):
+        # check if the samples and targets have equivalent data to compare
+        if which is None:
+            if trg._has_expr and smp._has_expr:
+                which = &#39;euclid&#39;
+            elif trg._has_diff and smp._has_diff:
+                which = &#39;intersect&#39;
+            else:
+                logger.error(&#39;Either initiate targets and samples with &#39;
+                             &#39;expression or with markergenes and diff genes.&#39;)
+                sys.exit(1)
+        msg = &#39;The {} were initiated without {} data. Cannot use `{}` similarity.&#39;
+        if which not in (&#39;euclid&#39;, &#39;intersect&#39;):
+            logger.error(&#39;Invalid `which` input: `{}`. Valid are `euclid` and &#39;
+                        &#39;`intersect`&#39;.format(which))
+        elif (which == &#39;euclid&#39;) and not trg._has_expr:
+            logger.error(msg.format(&#39;targets&#39;, &#39;expression&#39;, &#39;euclid&#39;))
+        elif (which == &#39;euclid&#39;) and not smp._has_expr:
+            logger.error(msg.format(&#39;samples&#39;, &#39;expression&#39;, &#39;euclid&#39;))
+        elif (which == &#39;intersect&#39;) and not trg._has_diff:
+            logger.error(msg.format(&#39;targets&#39;, &#39;merker gene&#39;, &#39;intersect&#39;))
+        elif (which == &#39;intersect&#39;) and not smp._has_diff:
+            logger.error(msg.format(&#39;samples&#39;, &#39;diff genes&#39;, &#39;intersect&#39;))
+        elif which == &#39;euclid&#39; and diff and not smp._ctrl:
+            logger.error(&#39;To plot the changes in transcriptional similarity &#39;
+                         &#39;with which = `euclid`, the samples must be initiated &#39;
+                         &#39;with a control.&#39;)
+        else:
+            # valid which
+            return which
+        # invalid which
+        sys.exit(1)
+
+    # checks for all plots
+    which = check_which(which, trg, smp, differential)
+    if which == &#39;intersect&#39; and not differential:
+        differential = True
+        logger.warning(&#39;For the `intersect` similarity metric, &#39;
+                       &#39;differential cannot be False. Was set to True.&#39;)
+    if proportional and not differential:
+                    proportional = False
+                    logger.warning(&#39;`proportional` can only be used if &#39;
+                                   &#39;`differential` is True aswell. Set to False.&#39;)
+
+    # checks for 2 heatmaps
+    if which == &#39;euclid&#39; and not hide_distance_bar and not smp._ctrl:
+        hide_distance_bar = True
+        logger.warning(&#39;`hide_distance_bar` cannot be False &#39;
+                    &#39;for which = `euclid` if the samples data is &#39;
+                    &#39;initialized without a control. Set to True.&#39;)
+    if reorder_to_distance_bar and hide_distance_bar:
+        reorder_to_distance_bar = False
+        logger.warning(&#39;When `reorder_to_distance_bar` is True, &#39;
+                        &#39;`hide_distance_bar` cannot be True. Set &#39;
+                        &#39;to False.&#39;)
+    if reorder_to_distance_bar and cluster_hmx:
+        cluster_hmx = False
+        logger.warning(&#39;Both `reorder_to_distance_bar` and &#39;
+                        &#39;`cluster_genes` were set as True. &#39;
+                        &#39;`cluster_genes` will be ignored.&#39;)                    
+
+    if display_similarity is not False:
+        # checks for target_sim and ranked_sim plots
+        val = [&#39;mgs mean&#39;, &#39;mgs up&#39;, &#39;mgs down&#39;]
+        if display_similarity not in val:
+            logger.warning(&#39;Invalid input for display_similarity: `{}`. &#39; 
+                               &#39;Valid are {}. Set to default `{}`&#39;
+                               .format(display_similarity, val, val[0]))
+            display_similarity = val[0] 
+
+        if display_similarity == val[2] and not trg._down_mgs: 
+            logger.error(&#39;Cannot display down markergene similarity because&#39;
+                         &#39; the targets were not initiated with down &#39;
+                         &#39;markergenes.&#39;)
+            sys.exit(1)
+        display_similarity = display_similarity[4:]
+
+    return which, differential, proportional, hide_distance_bar, \
+           reorder_to_distance_bar, cluster_hmx, display_similarity
+
+def plot_color_legend(labels, colors, ncolumns=1, filename=&#39;color_legend.png&#39;):
+    &#34;&#34;&#34;Plot a custom color legend.
+    
+       Takes a list of labels and colors and links them to produce a color 
+       legend. Useful for marking  sub-groups in samples/ targets elements.
+
+    Args:
+        labels (list): the list of labels in the legend
+        colors (list): the list of colors correspoding to the labels. Colors 
+            must be interpretable by matplotlib: for example, &#39;w&#39;, #ffffff, 
+            (1,1,1) all refer to white.
+        filename (str, optional): the filename to save the legend. Defaults to
+            &#39;./color_legend.png&#39;
+        ncolumns (int, optional): the number of columns in the legend. Defaults 
+            to 1.
+    &#34;&#34;&#34;
+    spacer.info(&#39;\n\n&#39;)
+    assert len(colors) == len(labels), &#39;colors and labels differ in length&#39;
+    inv_cols = [c for c in colors if not is_color_like(c)]
+    if inv_cols:
+        logger.error(&#39;The following colors are not recognized as colors by &#39;
+                     &#39;matplotlib: {}&#39;.format(inv_cols))
+        sys.exit(1)
+    fig, ax = plt.subplots(1, 1, figsize=(2, 2))
+    _clean_axes(np.array([ax]))
+    ax.legend(handles=[Patch(color=colors[i], label=labels[i]) 
+                for i in range(len(colors))], loc=&#39;center&#39;, ncol=ncolumns)
+    fig.savefig(filename)
+    plt.close()
+    logger.info(&#39;Color legend generated and saved at {}/{}&#39;
+                .format(os.path.abspath(os.curdir), filename))</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="_dpre_util.annotate"><code class="name flex">
+<span>def <span class="ident">annotate</span></span>(<span>ensgs, species)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Annotate mouse or human ensg keys. Return the gene names.</p>
+<p>DPre references the ensembl gene annotation v.96 located at
+DPre/gene_ann. </p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>ensgs</code></strong> :&ensp;<code>list</code>, <code>pandas.Index</code></dt>
+<dd>The collection of ensg keys to annotate</dd>
+<dt><strong><code>species</code></strong> :&ensp;<code>str</code></dt>
+<dd>The origin species of the genes, 'mouse' or 'human'.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>annotated pandas.Index</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def annotate(ensgs, species):
+    &#34;&#34;&#34; Annotate mouse or human ensg keys. Return the gene names.
+
+    DPre references the ensembl gene annotation v.96 located at 
+    DPre/gene_ann. 
+
+    Args:
+        ensgs (list, pandas.Index): The collection of ensg keys to annotate
+        species (str): The origin species of the genes, &#39;mouse&#39; or &#39;human&#39;.
+    
+    Returns:
+        annotated pandas.Index
+    &#34;&#34;&#34;
+    ref = _get_gene_ann(species)
+    try:
+        return pd.Index(ref.reindex(ensgs).name.values)
+    except Exception as e:
+        logger.error(&#39;{}\nDPre references the ensembl gene annotaiton v.96. &#39;
+                     &#39;Differently annotated datasets may cause problems.&#39;
+                     .format(e))
+        sys.exit(1)</code></pre>
+</details>
+</dd>
+<dt id="_dpre_util.get_ensgs"><code class="name flex">
+<span>def <span class="ident">get_ensgs</span></span>(<span>names, species)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Return the ensg keys for a list of gene names.</p>
+<p>DPre references the ensembl gene annotation v.96 located at
+DPre/gene_ann. If a gene name has multiple ensg keys, this gene will appear
+last in the DataFrame regardless of the input order.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>names</code></strong> :&ensp;<code>list</code> <code>pandas.Index</code></dt>
+<dd>The collection of names to return ensg keys
+for</dd>
+<dt><strong><code>species</code></strong> :&ensp;<code>str</code></dt>
+<dd>The origin species of the genes, 'mouse' or 'human'.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>pandas.Index of ensg keys</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def get_ensgs(names, species):
+    &#34;&#34;&#34; Return the ensg keys for a list of gene names.
+
+    DPre references the ensembl gene annotation v.96 located at 
+    DPre/gene_ann. If a gene name has multiple ensg keys, this gene will appear 
+    last in the DataFrame regardless of the input order.
+    
+    Args:
+        names (list pandas.Index): The collection of names to return ensg keys 
+            for
+        species (str): The origin species of the genes, &#39;mouse&#39; or &#39;human&#39;.
+    
+    Returns:
+        pandas.Index of ensg keys 
+    &#34;&#34;&#34;
+    ref = _get_gene_ann(species)
+    try:
+        ann = ref.reindex(ref.index[ref.name.isin(names)]).reset_index()
+        if ann.name.duplicated().any():
+            dupl = pd.Index(ann.name).duplicated()
+            ann_dr = ann[~dupl]
+            ann_du = ann[dupl]
+            ann_dr = ann_dr.set_index(&#39;name&#39;).reindex(names).reset_index()
+            ann_dr.rename({&#39;index&#39;: &#39;name&#39;}, axis=1, inplace=1)
+            ann = ann_dr.append(ann_du, sort=False)
+            ann.index = np.arange(ann.shape[0])
+        else:
+            ann = ann.set_index(&#39;name&#39;).reindex(names).reset_index()
+            ann.rename({&#39;index&#39;: &#39;name&#39;}, axis=1, inplace=1)
+        return ann
+    except Exception as e:
+        logger.error(&#39;{}\nDPre references the ensembl gene annotaiton v.96. &#39;
+                     &#39;Differently annotated datasets may cause problems.&#39;
+                     .format(e))
+        sys.exit(1)</code></pre>
+</details>
+</dd>
+<dt id="_dpre_util.plot_color_legend"><code class="name flex">
+<span>def <span class="ident">plot_color_legend</span></span>(<span>labels, colors, ncolumns=1, filename='color_legend.png')</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Plot a custom color legend.</p>
+<p>Takes a list of labels and colors and links them to produce a color
+legend. Useful for marking
+sub-groups in samples/ targets elements.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>labels</code></strong> :&ensp;<code>list</code></dt>
+<dd>the list of labels in the legend</dd>
+<dt><strong><code>colors</code></strong> :&ensp;<code>list</code></dt>
+<dd>the list of colors correspoding to the labels. Colors
+must be interpretable by matplotlib: for example, 'w', #ffffff,
+(1,1,1) all refer to white.</dd>
+<dt><strong><code>filename</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>the filename to save the legend. Defaults to
+'./color_legend.png'</dd>
+<dt><strong><code>ncolumns</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>the number of columns in the legend. Defaults
+to 1.</dd>
+</dl></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def plot_color_legend(labels, colors, ncolumns=1, filename=&#39;color_legend.png&#39;):
+    &#34;&#34;&#34;Plot a custom color legend.
+    
+       Takes a list of labels and colors and links them to produce a color 
+       legend. Useful for marking  sub-groups in samples/ targets elements.
+
+    Args:
+        labels (list): the list of labels in the legend
+        colors (list): the list of colors correspoding to the labels. Colors 
+            must be interpretable by matplotlib: for example, &#39;w&#39;, #ffffff, 
+            (1,1,1) all refer to white.
+        filename (str, optional): the filename to save the legend. Defaults to
+            &#39;./color_legend.png&#39;
+        ncolumns (int, optional): the number of columns in the legend. Defaults 
+            to 1.
+    &#34;&#34;&#34;
+    spacer.info(&#39;\n\n&#39;)
+    assert len(colors) == len(labels), &#39;colors and labels differ in length&#39;
+    inv_cols = [c for c in colors if not is_color_like(c)]
+    if inv_cols:
+        logger.error(&#39;The following colors are not recognized as colors by &#39;
+                     &#39;matplotlib: {}&#39;.format(inv_cols))
+        sys.exit(1)
+    fig, ax = plt.subplots(1, 1, figsize=(2, 2))
+    _clean_axes(np.array([ax]))
+    ax.legend(handles=[Patch(color=colors[i], label=labels[i]) 
+                for i in range(len(colors))], loc=&#39;center&#39;, ncol=ncolumns)
+    fig.savefig(filename)
+    plt.close()
+    logger.info(&#39;Color legend generated and saved at {}/{}&#39;
+                .format(os.path.abspath(os.curdir), filename))</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="_dpre_util.annotate" href="#_dpre_util.annotate">annotate</a></code></li>
+<li><code><a title="_dpre_util.get_ensgs" href="#_dpre_util.get_ensgs">get_ensgs</a></code></li>
+<li><code><a title="_dpre_util.plot_color_legend" href="#_dpre_util.plot_color_legend">plot_color_legend</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.6.1</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad()</script>
+</body>
+</html>

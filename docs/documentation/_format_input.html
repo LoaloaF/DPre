@@ -1,63 +1,503 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<html><head><title>Python: module _format_input</title>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-</head><body bgcolor="#f0f0f8">
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.6.1" />
+<title>_format_input API documentation</title>
+<meta name="description" content="Handles user data input and initiation of preset targets" />
+<link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
+<link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase;cursor:pointer}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>_format_input</code></h1>
+</header>
+<section id="section-intro">
+<p>Handles user data input and initiation of preset targets</p>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">&#34;&#34;&#34;Handles user data input and initiation of preset targets&#34;&#34;&#34;
+import os, sys
+import glob
+import pandas as pd
 
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
-<tr bgcolor="#7799ee">
-<td valign=bottom>&nbsp;<br>
-<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>_format_input</strong></big></big></font></td
-><td align=right valign=bottom
-><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:c%3A%5Cusers%5Cloaloa%5Canaconda3%5Clib%5Cdpre%5Cmain%5C_format_input.py">c:\users\loaloa\anaconda3\lib\dpre\main\_format_input.py</a></font></td></tr></table>
-    <p><tt>module&nbsp;handling&nbsp;user&nbsp;data&nbsp;input&nbsp;and&nbsp;initiation&nbsp;of&nbsp;preset&nbsp;targets</tt></p>
-<p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#aa55cc">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+from DPre.main._logger import logger, spacer
+import DPre.main.config as config
+import DPre.main._dpre_util as util
+
+def preset_targets(get, sort=False, preset_colors=True):
+    &#34;&#34;&#34;Generate one of the predefined targets instances and return it. 
     
-<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
-<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="DPre.main.config.html">DPre.main.config</a><br>
-<a href="glob.html">glob</a><br>
-</td><td width="25%" valign=top><a href="os.html">os</a><br>
-<a href="pandas.html">pandas</a><br>
-</td><td width="25%" valign=top><a href="sys.html">sys</a><br>
-<a href="DPre.main._dpre_util.html">DPre.main._dpre_util</a><br>
-</td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#eeaa77">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+        Pick a reference dataset for comparison. Mouse (Hutchins et al. 2017, 
+        NAR) and Human (FANTOM5 project, Nature 2014) are included. Specific 
+        doamins can be picked for both species references. If the targets are 
+        initiated with &#39;preset_colors&#39;, a color legend is generated and saved 
+        in the current working directory. Custom presets can be created by 
+        adding a folder (with an &#39;m&#39; or &#39;h&#39; prefix) to DPre/preset_targets. 
+
+    Args:
+        get (str): the desired preset. Valid options are &#39;mouse&#39;, &#39;human&#39;, 
+            &#39;m embryonic&#39;, &#39;m germ cells&#39;, &#39;m neural crest&#39;, 
+            &#39;m surface ectoderm&#39;, &#39;m neuroectoderm&#39;, &#39;m mesoderm&#39;, &#39;m endoderm&#39;, 
+            &#39;m blood mesoderm&#39;, &#39;h surface ectoderm&#39;, &#39;h neuroectoderm&#39;, 
+            &#39;h mesoderm&#39;, &#39;h endoderm&#39;, &#39;h blood mesoderm&#39;; m = mouse, h = human
+        sort (bool, optional): Sort the loaded element names alphabetically. 
+            Defaults to False.
+        preset_colors (bool, optional): Tries to initiate the targets with preset 
+            colors either from colors.tsv in the respective preset directory or 
+            when not found from config.preset_targets_colors. Defaults to True.
     
-<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
-<td width="100%"><dl><dt><a name="-preset_targets"><strong>preset_targets</strong></a>(get, sort=False, preset_colors=True)</dt><dd><tt>Get&nbsp;a&nbsp;predefined&nbsp;targets&nbsp;instance.&nbsp;<br>
-&nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Pick&nbsp;a&nbsp;refernce&nbsp;dataset&nbsp;for&nbsp;comparison.&nbsp;Mouse&nbsp;(Hutchins&nbsp;et&nbsp;al.&nbsp;2017,&nbsp;NAR)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;and&nbsp;Human&nbsp;(FANTOM5,&nbsp;Nature&nbsp;2014)&nbsp;come&nbsp;preshipped.&nbsp;Specific&nbsp;lineages&nbsp;can<br>
-&nbsp;&nbsp;&nbsp;&nbsp;be&nbsp;picked&nbsp;for&nbsp;the&nbsp;mouse&nbsp;reference.&nbsp;Presets&nbsp;can&nbsp;be&nbsp;added&nbsp;by&nbsp;adding&nbsp;a&nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;folder&nbsp;to&nbsp;DPre/preset_targets.&nbsp;If&nbsp;a&nbsp;preset&nbsp;is&nbsp;initiated&nbsp;with&nbsp;a&nbsp;colormap<br>
-&nbsp;&nbsp;&nbsp;&nbsp;a&nbsp;color&nbsp;legend&nbsp;is&nbsp;drawn&nbsp;from&nbsp;config.preset_col_legend.<br>
-&nbsp;<br>
-Args:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;get&nbsp;(str):&nbsp;the&nbsp;desired&nbsp;preset.&nbsp;Valid&nbsp;options&nbsp;are&nbsp;'mouse',&nbsp;'human',&nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'m&nbsp;embryonic',&nbsp;'m&nbsp;germ&nbsp;cells',&nbsp;'m&nbsp;neural&nbsp;crest',&nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'m&nbsp;surface&nbsp;ectoderm',&nbsp;'m&nbsp;neuroectoderm',&nbsp;'m&nbsp;mesoderm',&nbsp;'m&nbsp;endoderm',&nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'m&nbsp;blood&nbsp;mesoderm'&nbsp;(m&nbsp;for&nbsp;mouse)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;sort&nbsp;(bool,&nbsp;optional)&nbsp;Sort&nbsp;the&nbsp;loaded&nbsp;element&nbsp;names&nbsp;alphabetically.&nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Defaults&nbsp;to&nbsp;False.<br>
-&nbsp;&nbsp;&nbsp;&nbsp;preset_colors&nbsp;(bool,&nbsp;optional)&nbsp;Trys&nbsp;to&nbsp;initiate&nbsp;the&nbsp;targets&nbsp;with&nbsp;preset&nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;colors&nbsp;either&nbsp;from&nbsp;colors.tsv&nbsp;in&nbsp;the&nbsp;respective&nbsp;preset&nbsp;directory&nbsp;or&nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;from&nbsp;config.preset_targets_colors.&nbsp;Defaults&nbsp;to&nbsp;True.<br>
-&nbsp;<br>
-Returns:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;t:&nbsp;the&nbsp;targets&nbsp;instance</tt></dd></dl>
-</td></tr></table><p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#55aa55">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    Returns:
+        t: the preset targets instance
+    &#34;&#34;&#34;
+    path = os.path.dirname(__file__)
+    # any folder in DPre/preset_targets is potentially valid
+    valid = os.listdir(os.path.join(path, &#39;..&#39;, &#39;preset_targets&#39;))
+    if get not in valid:
+        spacer.info(&#39;&#39;)
+        logger.error(&#39;`{}` is not a valid preset target. Valid ones are {}&#39;
+                     .format(get, valid))
+        sys.exit(1)
     
-<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
-<td width="100%"><strong>logger</strong> = &lt;Logger Dpre (INFO)&gt;<br>
-<strong>spacer</strong> = &lt;Logger DPre (INFO)&gt;</td></tr></table>
-</body></html>
+    # try to get .gzip markergene and expression input, if not found try .tsv
+    get_dir = &#39;{}/../preset_targets/{}&#39;.format(path, get)
+    expr = mgs = None
+    if os.path.exists(&#39;{}/markergenes.gzip&#39;.format(get_dir)):
+        mgs = pd.read_pickle(&#39;{}/markergenes.gzip&#39;.format(get_dir))
+    elif os.path.exists(&#39;{}/markergenes.tsv&#39;.format(get_dir)):
+        mgs = pd.read_csv(&#39;{}/markergenes.tsv&#39;.format(get_dir), sep=&#39;\t&#39;, 
+                          index_col=0, header=[0,1])
+        mgs.to_pickle(&#39;{}/markergenes.gzip&#39;.format(get_dir))
+    
+    if os.path.exists(&#39;{}/expression.gzip&#39;.format(get_dir)):
+        expr = pd.read_pickle(&#39;{}/expression.gzip&#39;.format(get_dir))
+    elif os.path.exists(&#39;{}/expression.tsv&#39;.format(get_dir)):
+        expr = pd.read_csv(&#39;{}/expression.tsv&#39;.format(get_dir), sep=&#39;\t&#39;, 
+                           index_col=0, header=[0,1])
+        expr.to_pickle(&#39;{}/expression.gzip&#39;.format(get_dir))
+    elif os.path.exists(&#39;{}/expression_h1.gzip&#39;.format(get_dir)):
+        expr1 = pd.read_pickle(&#39;{}/expression_h1.gzip&#39;.format(get_dir))
+        expr2 = pd.read_pickle(&#39;{}/expression_h2.gzip&#39;.format(get_dir))
+        expr = pd.concat([expr1, expr2], axis=1)
+        expr.to_pickle(&#39;{}/expression.gzip&#39;.format(get_dir))
+
+    if sort:
+        mgs.sort_index(axis=1, inplace=True)
+        expr.sort_index(axis=1, inplace=True)
+    
+    # explicit part of the script that might need adjustmet for cumstom presets
+    if get == &#39;human&#39;:
+        args = {&#39;name&#39;: &#39;human FANTOM5 library&#39;, &#39;species&#39;: &#39;human&#39;}
+    elif get == &#39;mouse&#39;:
+        args = {&#39;name&#39;: &#39;mouse lineages&#39;, &#39;species&#39;: &#39;mouse&#39;}
+    elif get.startswith(&#39;h &#39;):
+        args = {&#39;name&#39;: get[2:]+&#39; lineage&#39;, &#39;species&#39;: &#39;human&#39;}
+    elif get.startswith(&#39;m &#39;):
+        args = {&#39;name&#39;: get[2:]+&#39; lineage&#39;, &#39;species&#39;: &#39;mouse&#39;}
+    # init targets
+    from DPre.main.targets import targets
+    t = targets(markergenes=mgs, expression=expr, log=False, **args)
+    logger.info(&#39;Default targets `{}` created, name: `{}`, elements: {}&#39;
+                .format(get, t.name, len(t)))
+
+    # try to get colors first through a file, then through config
+    if preset_colors:
+        try:
+            df_colors = pd.read_csv(&#39;{}/colors.tsv&#39;.format(get_dir), sep=&#39;\t&#39;, 
+                                    index_col=0)
+            t.set_colors(dict(zip(df_colors.index, df_colors.color)), log=False)
+        except FileNotFoundError:
+            if get in config.preset_targets_colors:
+                t.set_colors([config.preset_targets_colors[get]], log=False)
+            else:
+                logger.warning(&#39;No colors found for preset targets {}&#39;
+                               .format(get))
+        # draw a colorlegend if defined in config
+        if get in config.preset_col_legend:
+            util.plot_color_legend(*config.preset_col_legend[get], 
+                                   filename=get+&#39;_color_legend.png&#39;)
+    return t
+
+def _format_expr(expr, type_name, ctrl=None):
+    &#34;&#34;&#34; Take user expression input validate and format
+
+    If a TSV file is passed, read the expresion file as a DataFrame. Check
+    if the DataFrame has a valid format. If the control is passed,check if it&#39;s
+    found in expression. Finally, generate and add the log2- and z-transformed 
+    data.
+
+    Args:
+        expr: Filename or Dataframe. The data to check.
+        type_name: &#39;targets&#39; or &#39;samples&#39;, depending on caller
+        ctrl: Control name, only passed when called from samples
+    
+    Returns:
+        expr: Expression DataFrame with log2- and z-transformed data at column 
+            level 1
+
+    &#34;&#34;&#34;
+    if not isinstance(expr, pd.DataFrame):
+        if not os.path.exists(expr):
+            spacer.info(&#39;&#39;)
+            logger.error(&#39;Invalid path: {}\n&#39;.format(os.path.abspath(expr)))
+            sys.exit(1)
+
+        expr = pd.read_csv(expr, sep=&#39;\t&#39;)
+        if &#39;ensg&#39; in expr.columns:
+            expr.set_index(&#39;ensg&#39;, inplace=True)
+        else:
+            expr.set_index(expr.columns[0], inplace=True)
+
+    met = [c for c in (&#39;loc&#39;, &#39;name&#39;, &#39;tss_loc&#39;, &#39;strand&#39;) if c in expr.columns]
+    if met:
+        expr.drop(met, axis=1, inplace=True)
+    inv = expr.columns[expr.dtypes == object].tolist()
+    if inv:
+        spacer.warning(&#39;\n&#39;)
+        logger.warning(&#39;Invalid columns of datatype `object` (often text) &#39;
+                        &#39;in expression data: {}\nThese columns will be &#39;
+                        &#39;removed.&#39;.format(inv))
+        expr.drop(inv, axis=1, inplace=True)
+    isna = expr.isna()
+    if isna.any().any():
+        spacer.error(&#39;\n&#39;)
+        logger.error(&#39;Invalid expression data: data contains NaN values.&#39;)
+        sys.exit(1)
+    elif ctrl and (ctrl not in expr.columns.unique(0)):
+        spacer.error(&#39;\n&#39;)
+        logger.error(&#39;The control name of the samples `{}` was not found in &#39;
+                     &#39;the passed expression data.&#39;.format(ctrl))
+        sys.exit(1)
+
+    if expr.columns.nlevels &gt; 1:
+        exp_idx = [(name, dt) for name in expr.columns.unique(0) 
+                    for dt in [&#39;log2&#39;, &#39;z&#39;]]
+        idx = expr.columns.values.tolist()
+        misma = list(filter(lambda i: i not in exp_idx, idx))
+        if any(misma):
+            spacer.error(&#39;&#39;)
+            msg = (&#39;\tInvalid expresion data. When passing data with log2- and &#39;
+                   &#39;z-data, the columns must be a MultiIndex in which level 0 &#39;
+                   &#39;holds the names: [`name1`, ...] and level 1 the data types:&#39;
+                   &#39; [`log2`, `z`]. Expected column indices ({}):\n\t\t{}\n\t &#39;
+                   &#39;Passed, unexpected column indices ({}):\n\t\t{}&#39;
+                    .format(len(exp_idx), exp_idx, len(misma), misma))
+            logger.error(msg)
+            sys.exit(1)
+        else:
+            return expr
+    else:
+        return util._add_log2_z(expr)
+
+def _format_diff_genes(diff_genes_dir, genelists_mgtype=&#39;up&#39;, type_name=None): 
+    &#34;&#34;&#34;Take user gene list input input and format
+
+    A single directory with deseq2 output files, a single dir. with up-genelist 
+    files or 2 dirs. with up- and down- genelists are formatted here. A bool 
+    DataFrame that holds the up- (and optionally down) differential genes is 
+    returned.
+
+    Args:
+        diff_genes_dir: deseq2 directory, up-genelists dir. or list of up- and 
+        down genelist dirs..
+    genelists_mgtype: Which genelist type to handle. Internally used for 
+        recursion 
+    type_name: &#39;targets&#39; or &#39;samples&#39;, depending on caller
+
+    Returns:
+        formatted _diff DataFrame
+    &#34;&#34;&#34;
+    # check if path exists and contains TSV files
+    def check_path(direc):
+        if not os.path.exists(direc):
+            spacer.info(&#39;&#39;)
+            logger.error(&#39;Could not change directory to {}\nCheck the &#39;
+                        &#39;path.&#39;.format(os.path.abspath(direc)))
+            sys.exit(1)
+        files = glob.glob(direc + &#39;/*.tsv&#39;)
+        if not files:
+            spacer.info(&#39;&#39;)
+            logger.error(&#39;No *.tsv files found in {}\nCheck the path.&#39;
+                        .format(os.path.abspath(direc)))
+            sys.exit(1)
+            
+    # check if up and down genelist directories are compatible
+    def check_up_down_genelists():
+        # check if 2 elements were passed, i.e. up+down genelist input
+        if isinstance(diff_genes_dir, (list, tuple)) and len(diff_genes_dir) == 2:
+            # check if paths are valid 
+            check_path(diff_genes_dir[0])
+            check_path(diff_genes_dir[1])
+            # get the single TSV filenames
+            up_dir = glob.glob(diff_genes_dir[0]+&#39;/*.tsv&#39;)
+            down_dir = glob.glob(diff_genes_dir[1]+&#39;/*.tsv&#39;)
+            # up and down must have the same number of elements
+            if len(up_dir) != len(down_dir):
+                msg = (&#39;Number of up- and down genelist files differ. Found {} &#39;
+                       &#39;*.tsv files in up directory\n{}\n{} *tsv files in down &#39;
+                       &#39;directory:\n{}\n&#39;.format(len(up_dir), 
+                       os.path.abspath(diff_genes_dir[0]), len(down_dir), 
+                       os.path.abspath(diff_genes_dir[1])))
+                logger.error(msg)
+                sys.exit(1)
+            # to match up and down together safely, filenames must be the same
+            f_up = [f[f.rfind(os.sep)+1:] for f in up_dir]
+            f_down = [f[f.rfind(os.sep)+1:] for f in down_dir]
+            is_single = lambda n: (n not in f_up) or (n not in f_down)
+            singles = list(filter(is_single, set((*f_up, *f_down))))
+            if singles:
+                logger.error(&#39;Names of up- and down genelist files differ. &#39;
+                             &#39;Names only found in one of the two &#39;
+                             &#39;directories ({}):\n{}&#39;
+                             .format(len(singles), singles))
+                sys.exit(1)
+            # return the the up directory and that down mgs were passed
+            return diff_genes_dir[0], True
+        # a list of len=1 is treated as one element, both don&#39;t have down mgs
+        elif isinstance(diff_genes_dir, (list, tuple)):
+            check_path(diff_genes_dir[0])
+            return diff_genes_dir[0], False
+        else:
+            check_path(diff_genes_dir)
+            return diff_genes_dir, False
+
+    # check whether deseq2 files or genelist files were passed
+    def check_input_type():
+        test_df = pd.read_csv(files[0], sep=&#39;\t&#39;)
+            # check test dataframe for proper ensg index
+        index_col = &#39;ensg&#39;
+        if &#39;ensg&#39; not in test_df.columns:
+            index_col = test_df.columns[0]
+            if not str(test_df[index_col][0]).startswith(&#39;ENS&#39;):
+                spacer.error(&#39;&#39;)
+                logger.error(&#39;The *.tsv files holding the gene keys do not &#39;
+                             &#39;have  a column `ENS*` nor do they seem to have &#39;
+                             &#39;an ensg index in the first column: {}, {}, ...&#39;
+                            .format(*test_df[index_col][:2].tolist()))
+                sys.exit(1)
+        # deseq2 output is identified based on the column names
+        deseq2_cols = [&#39;Unnamed: 0&#39;, &#39;baseMean&#39;, &#39;log2FoldChange&#39;, &#39;lfcSE&#39;, 
+                       &#39;stat&#39;, &#39;pvalue&#39;, &#39;padj&#39;]
+        inp_type =  &#39;deseq2&#39; if test_df.columns.tolist() == deseq2_cols \
+                            else &#39;genelist ({})&#39;.format(genelists_mgtype)
+        return inp_type, index_col
+
+    # glue files together; return a list of pd.Series (columns)
+    def merge_files():
+        diffs = []
+        for file in files:
+            name = file[file.rfind(&#39;\\&#39;)+1:-4]
+            usecols = (0, 2, 6) if inp_t == &#39;deseq2&#39; else None
+            d = pd.read_csv(file, sep=&#39;\t&#39;, index_col=index_col, usecols=usecols)
+            if d.isna().any().any():
+                spacer.info(&#39;&#39;)
+                logger.warning(&#39;{} NaN values found and deleted in {}.tsv&#39;
+                            .format(d.isna().any(1).sum(), name))
+            if inp_t == &#39;deseq2&#39;:
+                sig = d.padj &lt; config.DESEQ2_P
+                up_reg = (sig &amp; (d.log2FoldChange &gt; 0)).rename((&#39;up&#39;, name))
+                down_reg = (sig &amp; (d.log2FoldChange &lt; 0)).rename((&#39;down&#39;, name))
+                diffs.append(pd.concat((up_reg, down_reg), axis=1))
+            else:
+                # genelists_mgtype is `down` in recursive function call
+                s = pd.Series(True, index=d.index, name=(genelists_mgtype, name))
+                diffs.append(s)
+        return diffs
+
+    direc, get_down_genelists = check_up_down_genelists()
+    files = glob.glob(direc + &#39;/*.tsv&#39;)
+    inp_t, index_col = check_input_type()
+    # if the samples are initiated from genelists, down mgs are required
+    if type_name == &#39;samples&#39; and inp_t != &#39;deseq2&#39; and not get_down_genelists:
+        spacer.error(&#39;&#39;)
+        logger.error(&#39;When initiateing the samples diff. genes from genelist &#39;
+                     &#39;input, both an up- and down directory with respective &#39;
+                     &#39;genelists must be passed.&#39;)
+        sys.exit(1)
+
+    spacer.info(&#39;&#39;)
+    st_st = [f[f.rfind(os.sep)+1:] for f in (files[0], files[-1])]
+    f_type = inp_t if inp_t == &#39;deseq2&#39; else genelists_mgtype
+    logger.info(&#39;Formatting differential genes from {} files. {} *.tsv files &#39;
+                &#39;in {}:\n{} ... {}\n&#39;.format(f_type, len(files), direc, *st_st))
+
+    diffs = merge_files()
+    if inp_t == &#39;genelist (up)&#39; and get_down_genelists:
+        # for genelist data with down mgs, run function recursively with a 
+        # single directory input, the down directory 
+        diffs.extend(_format_diff_genes(diff_genes_dir[1], &#39;down&#39;))
+    elif inp_t == &#39;genelist (down)&#39;:
+        # inside recursion: exit
+        return diffs
+    return pd.concat(diffs, axis=1, sort=True).fillna(False).sort_index(axis=1)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="_format_input.preset_targets"><code class="name flex">
+<span>def <span class="ident">preset_targets</span></span>(<span>get, sort=False, preset_colors=True)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Generate one of the predefined targets instances and return it. </p>
+<pre><code>Pick a reference dataset for comparison. Mouse (Hutchins et al. 2017, 
+NAR) and Human (FANTOM5 project, Nature 2014) are included. Specific 
+doamins can be picked for both species references. If the targets are 
+initiated with 'preset_colors', a color legend is generated and saved 
+in the current working directory. Custom presets can be created by 
+adding a folder (with an 'm' or 'h' prefix) to DPre/preset_targets.
+</code></pre>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>get</code></strong> :&ensp;<code>str</code></dt>
+<dd>the desired preset. Valid options are 'mouse', 'human',
+'m embryonic', 'm germ cells', 'm neural crest',
+'m surface ectoderm', 'm neuroectoderm', 'm mesoderm', 'm endoderm',
+'m blood mesoderm', 'h surface ectoderm', 'h neuroectoderm',
+'h mesoderm', 'h endoderm', 'h blood mesoderm'; m = mouse, h = human</dd>
+<dt><strong><code>sort</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>Sort the loaded element names alphabetically.
+Defaults to False.</dd>
+<dt><strong><code>preset_colors</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>Tries to initiate the targets with preset
+colors either from colors.tsv in the respective preset directory or
+when not found from config.preset_targets_colors. Defaults to True.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>t</code></strong></dt>
+<dd>the preset targets instance</dd>
+</dl></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def preset_targets(get, sort=False, preset_colors=True):
+    &#34;&#34;&#34;Generate one of the predefined targets instances and return it. 
+    
+        Pick a reference dataset for comparison. Mouse (Hutchins et al. 2017, 
+        NAR) and Human (FANTOM5 project, Nature 2014) are included. Specific 
+        doamins can be picked for both species references. If the targets are 
+        initiated with &#39;preset_colors&#39;, a color legend is generated and saved 
+        in the current working directory. Custom presets can be created by 
+        adding a folder (with an &#39;m&#39; or &#39;h&#39; prefix) to DPre/preset_targets. 
+
+    Args:
+        get (str): the desired preset. Valid options are &#39;mouse&#39;, &#39;human&#39;, 
+            &#39;m embryonic&#39;, &#39;m germ cells&#39;, &#39;m neural crest&#39;, 
+            &#39;m surface ectoderm&#39;, &#39;m neuroectoderm&#39;, &#39;m mesoderm&#39;, &#39;m endoderm&#39;, 
+            &#39;m blood mesoderm&#39;, &#39;h surface ectoderm&#39;, &#39;h neuroectoderm&#39;, 
+            &#39;h mesoderm&#39;, &#39;h endoderm&#39;, &#39;h blood mesoderm&#39;; m = mouse, h = human
+        sort (bool, optional): Sort the loaded element names alphabetically. 
+            Defaults to False.
+        preset_colors (bool, optional): Tries to initiate the targets with preset 
+            colors either from colors.tsv in the respective preset directory or 
+            when not found from config.preset_targets_colors. Defaults to True.
+    
+    Returns:
+        t: the preset targets instance
+    &#34;&#34;&#34;
+    path = os.path.dirname(__file__)
+    # any folder in DPre/preset_targets is potentially valid
+    valid = os.listdir(os.path.join(path, &#39;..&#39;, &#39;preset_targets&#39;))
+    if get not in valid:
+        spacer.info(&#39;&#39;)
+        logger.error(&#39;`{}` is not a valid preset target. Valid ones are {}&#39;
+                     .format(get, valid))
+        sys.exit(1)
+    
+    # try to get .gzip markergene and expression input, if not found try .tsv
+    get_dir = &#39;{}/../preset_targets/{}&#39;.format(path, get)
+    expr = mgs = None
+    if os.path.exists(&#39;{}/markergenes.gzip&#39;.format(get_dir)):
+        mgs = pd.read_pickle(&#39;{}/markergenes.gzip&#39;.format(get_dir))
+    elif os.path.exists(&#39;{}/markergenes.tsv&#39;.format(get_dir)):
+        mgs = pd.read_csv(&#39;{}/markergenes.tsv&#39;.format(get_dir), sep=&#39;\t&#39;, 
+                          index_col=0, header=[0,1])
+        mgs.to_pickle(&#39;{}/markergenes.gzip&#39;.format(get_dir))
+    
+    if os.path.exists(&#39;{}/expression.gzip&#39;.format(get_dir)):
+        expr = pd.read_pickle(&#39;{}/expression.gzip&#39;.format(get_dir))
+    elif os.path.exists(&#39;{}/expression.tsv&#39;.format(get_dir)):
+        expr = pd.read_csv(&#39;{}/expression.tsv&#39;.format(get_dir), sep=&#39;\t&#39;, 
+                           index_col=0, header=[0,1])
+        expr.to_pickle(&#39;{}/expression.gzip&#39;.format(get_dir))
+    elif os.path.exists(&#39;{}/expression_h1.gzip&#39;.format(get_dir)):
+        expr1 = pd.read_pickle(&#39;{}/expression_h1.gzip&#39;.format(get_dir))
+        expr2 = pd.read_pickle(&#39;{}/expression_h2.gzip&#39;.format(get_dir))
+        expr = pd.concat([expr1, expr2], axis=1)
+        expr.to_pickle(&#39;{}/expression.gzip&#39;.format(get_dir))
+
+    if sort:
+        mgs.sort_index(axis=1, inplace=True)
+        expr.sort_index(axis=1, inplace=True)
+    
+    # explicit part of the script that might need adjustmet for cumstom presets
+    if get == &#39;human&#39;:
+        args = {&#39;name&#39;: &#39;human FANTOM5 library&#39;, &#39;species&#39;: &#39;human&#39;}
+    elif get == &#39;mouse&#39;:
+        args = {&#39;name&#39;: &#39;mouse lineages&#39;, &#39;species&#39;: &#39;mouse&#39;}
+    elif get.startswith(&#39;h &#39;):
+        args = {&#39;name&#39;: get[2:]+&#39; lineage&#39;, &#39;species&#39;: &#39;human&#39;}
+    elif get.startswith(&#39;m &#39;):
+        args = {&#39;name&#39;: get[2:]+&#39; lineage&#39;, &#39;species&#39;: &#39;mouse&#39;}
+    # init targets
+    from DPre.main.targets import targets
+    t = targets(markergenes=mgs, expression=expr, log=False, **args)
+    logger.info(&#39;Default targets `{}` created, name: `{}`, elements: {}&#39;
+                .format(get, t.name, len(t)))
+
+    # try to get colors first through a file, then through config
+    if preset_colors:
+        try:
+            df_colors = pd.read_csv(&#39;{}/colors.tsv&#39;.format(get_dir), sep=&#39;\t&#39;, 
+                                    index_col=0)
+            t.set_colors(dict(zip(df_colors.index, df_colors.color)), log=False)
+        except FileNotFoundError:
+            if get in config.preset_targets_colors:
+                t.set_colors([config.preset_targets_colors[get]], log=False)
+            else:
+                logger.warning(&#39;No colors found for preset targets {}&#39;
+                               .format(get))
+        # draw a colorlegend if defined in config
+        if get in config.preset_col_legend:
+            util.plot_color_legend(*config.preset_col_legend[get], 
+                                   filename=get+&#39;_color_legend.png&#39;)
+    return t</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="_format_input.preset_targets" href="#_format_input.preset_targets">preset_targets</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.6.1</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad()</script>
+</body>
+</html>

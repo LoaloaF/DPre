@@ -1,4 +1,4 @@
-""" utility module with various helper functions and subplot producers"""
+""" Utility module with various helper functions and subplot generaters"""
 import pandas as pd
 import numpy as np
 import os
@@ -73,7 +73,7 @@ def _add_level(index, label, at=0, replace=False, name=''):
     return index.set_index(name, append=True).reorder_levels(order).index
 
 def _get_gene_ann(species):
-    """Open the gene annotation refernce file (mouse/ human) and return it"""
+    """Open the gene annotation reference file (mouse/ human) and return it"""
     path = os.path.dirname(__file__)
     if species == 'mouse':
         return pd.read_pickle(path + '/../gene_ann/mg_ensembl96_GRCm38.p6.gzip')
@@ -85,11 +85,22 @@ def _get_gene_ann(species):
                      '`human`'.format(species))
         sys.exit(1)
 
-def annotate(index, species):
-    """Pass list/ pd.Index `index` with ensg keys; returns the gene names"""
+def annotate(ensgs, species):
+    """ Annotate mouse or human ensg keys. Return the gene names.
+
+    DPre references the ensembl gene annotation v.96 located at 
+    DPre/gene_ann. 
+
+    Args:
+        ensgs (list, pandas.Index): The collection of ensg keys to annotate
+        species (str): The origin species of the genes, 'mouse' or 'human'.
+    
+    Returns:
+        annotated pandas.Index
+    """
     ref = _get_gene_ann(species)
     try:
-        return pd.Index(ref.reindex(index).name.values)
+        return pd.Index(ref.reindex(ensgs).name.values)
     except Exception as e:
         logger.error('{}\nDPre references the ensembl gene annotaiton v.96. '
                      'Differently annotated datasets may cause problems.'
@@ -97,10 +108,20 @@ def annotate(index, species):
         sys.exit(1)
 
 def get_ensgs(names, species):
-    """Pass list/ pd.Index `names` with gene names; returns a DataFrame with 
-    a mapping of colmuns `ensg` and `name`. If a gene name has multiple
-    ensg keys, this gene will appear last in the DataFrame regardless of the 
-    input order."""
+    """ Return the ensg keys for a list of gene names.
+
+    DPre references the ensembl gene annotation v.96 located at 
+    DPre/gene_ann. If a gene name has multiple ensg keys, this gene will appear 
+    last in the DataFrame regardless of the input order.
+    
+    Args:
+        names (list pandas.Index): The collection of names to return ensg keys 
+            for
+        species (str): The origin species of the genes, 'mouse' or 'human'.
+    
+    Returns:
+        pandas.Index of ensg keys 
+    """
     ref = _get_gene_ann(species)
     try:
         ann = ref.reindex(ref.index[ref.name.isin(names)]).reset_index()
@@ -128,10 +149,6 @@ def _align_indices(data, order, axis=1):
         if data[i] is not None:
             data[i] = data[i].reindex(order, axis=axis)
     return data
-
-
-
-
 
 
 def _init_figure(fig_widths, fig_heights, nplts, spacers):
@@ -203,7 +220,7 @@ def _make_title(differential, proportional, which, el1, el2, pref='', postf=''):
     return title.format(pref, dtype, postf, which_title, el1, el2)
 
 def _heatmap_cluster(dat, where, ax, which):
-    """Cluster the columns or index using scipy; return the new order"""
+    """Cluster the columns or index with scipy; return the new order"""
     ax.set_visible(True)
     d = dat.T if which == 'columns' else dat 
     Y = pdist(d, metric='euclidean')
@@ -370,7 +387,6 @@ def plot_color_legend(labels, colors, ncolumns=1, filename='color_legend.png'):
     
        Takes a list of labels and colors and links them to produce a color 
        legend. Useful for marking  sub-groups in samples/ targets elements.
-       The legend elements are stacked vertically.
 
     Args:
         labels (list): the list of labels in the legend
@@ -392,7 +408,7 @@ def plot_color_legend(labels, colors, ncolumns=1, filename='color_legend.png'):
     fig, ax = plt.subplots(1, 1, figsize=(2, 2))
     _clean_axes(np.array([ax]))
     ax.legend(handles=[Patch(color=colors[i], label=labels[i]) 
-                for i in range(len(colors))], loc='center')
+                for i in range(len(colors))], loc='center', ncol=ncolumns)
     fig.savefig(filename)
     plt.close()
     logger.info('Color legend generated and saved at {}/{}'

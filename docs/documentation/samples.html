@@ -1,162 +1,260 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<html><head><title>Python: module samples</title>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-</head><body bgcolor="#f0f0f8">
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.6.1" />
+<title>samples API documentation</title>
+<meta name="description" content="" />
+<link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
+<link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase;cursor:pointer}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>samples</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">from DPre.main._differential import _differential
+from DPre.main._logger import spacer, logger
 
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
-<tr bgcolor="#7799ee">
-<td valign=bottom>&nbsp;<br>
-<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>samples</strong></big></big></font></td
-><td align=right valign=bottom
-><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:c%3A%5Cusers%5Cloaloa%5Canaconda3%5Clib%5Cdpre%5Cmain%5Csamples.py">c:\users\loaloa\anaconda3\lib\dpre\main\samples.py</a></font></td></tr></table>
-    <p></p>
-<p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#ee77aa">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#ffffff" face="helvetica, arial"><big><strong>Classes</strong></big></font></td></tr>
-    
-<tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
-<td width="100%"><dl>
-<dt><font face="helvetica, arial"><a href="DPre.main._differential.html#_differential">DPre.main._differential._differential</a>(<a href="builtins.html#object">builtins.object</a>)
-</font></dt><dd>
+class samples(_differential):
+    &#34;&#34;&#34;The data to explore similarity for.
+
+    samples can hold lists of differential genes and expression data identifying 
+    a collection of experimental samples. A control in the data enables the 
+    computation of differential transcriptional similarity.
+
+    Arguments:
+        diff_genes (optional): Directory with deseq2 output, 2 directories
+            with up- and down genelists or pandas.DataFrame. 
+            For gene list input, filenames in the up- and down directory must be 
+            the same. When passing a DataFrame, the index should consist of ensg
+            keys, the columns of a pandas.MultiIndex with &#39;up&#39; &amp; &#39;down&#39; at 
+            level 0 and the element names at level 1. The dtype is bool, diff. 
+            genes are marked as True values. 
+        expression (optional): directory with expression TSV file or 
+            pandas.DataFrame. Defaults to None.
+            The TSV input should have an ensg key in the first column or an ensg 
+            column label. Columns `loc`, `name`, `tss_loc` and `strand` are 
+            removed automatically. The data should be exclusively numerical 
+            without NaN&#39;s. When passing a DataFrame, the data can be log2- 
+            and z-transformed with an ensg key index and pandas.MultiIndex 
+            columns with the element names at level 0, and `log2` &amp; `z` at 
+            level 1. 
+        ctrl (str, optional): The name of the control found in &#39;expression&#39;.
+            Defaults to None. Allowed to be missing in &#39;diff_genes&#39;.
+        override_namematcher (bool, optional): When both &#39;diff_genes&#39; and 
+            &#39;expression&#39; passed, this overrides the element names in diff_genes. 
+            Defaults to False. When False, element names in &#39;diff_genes&#39; and 
+            &#39;expression&#39; are expected to match perfectly.
+        name (str, optional): Name label of the samples. Defaults to &#39;Samples&#39;. 
+            Used in logging and plot annotations.
+        log: (bool, optional): Log the samples initiation. Defaults to True.
+        
+    Note:
+        At least one of &#39;diff_genes&#39; and &#39;expression&#39; must be passed. When both 
+        are passed, the inputs must have the same element order. Gene list
+        data is automatically alphabetically sorted, hence the expression order
+        should concur with this.
+    &#34;&#34;&#34;
+    def __init__(self, diff_genes=None, expression=None, ctrl=None,
+                 override_namematcher=False, name=None, log=True):
+        self._ctrl = ctrl
+        # call _differential __init__
+        super().__init__(diff_genes=diff_genes, expression=expression, name=name,
+                         override_namematcher=override_namematcher, log=log)
+        
+        # log the number of found differential genes
+        if self._has_diff and log:
+            spacer.info(&#39;&#39;)
+            n = self._diff.sum().unstack(0).reindex(self.names).to_string()
+            logger.info(&#39;Number of diff. genes: \n{}&#39;.format(n))
+        if log:
+            spacer.info(&#39;\n\n&#39;)
+        self._log_init(log)
+
+    @property
+    def _names_noctrl(self):
+        &#34;&#34;&#34;Return the element names without the control&#34;&#34;&#34;
+        ns = self.names
+        if self._ctrl and self._ctrl in ns:
+            ns.remove(self._ctrl)
+        return ns
+
+    def __repr__(self):
+        &#34;&#34;&#34;Get a readable summary of the samples instance&#34;&#34;&#34;
+        return (&#39;\n=|=|= samples-instance =|=|=\nname = {};\nelements = {};\n&#39;
+                &#39;n = {};\ndiff. genes data = {};\nexpression data = {};\n&#39;
+                .format(self.name, self.names, len(self), self._has_diff, 
+                        self._has_expr))</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
-<dt><font face="helvetica, arial"><a href="samples.html#samples">samples</a>
-</font></dt></dl>
+<dt id="samples.samples"><code class="flex name class">
+<span>class <span class="ident">samples</span></span>
+<span>(</span><span>diff_genes=None, expression=None, ctrl=None, override_namematcher=False, name=None, log=True)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The data to explore similarity for.</p>
+<p>samples can hold lists of differential genes and expression data identifying
+a collection of experimental samples. A control in the data enables the
+computation of differential transcriptional similarity.</p>
+<h2 id="arguments">Arguments</h2>
+<dl>
+<dt><strong><code>diff_genes</code></strong> :&ensp;optional</dt>
+<dd>Directory with deseq2 output, 2 directories
+with up- and down genelists or pandas.DataFrame.
+For gene list input, filenames in the up- and down directory must be
+the same. When passing a DataFrame, the index should consist of ensg
+keys, the columns of a pandas.MultiIndex with 'up' &amp; 'down' at
+level 0 and the element names at level 1. The dtype is bool, diff.
+genes are marked as True values. </dd>
+<dt><strong><code>expression</code></strong> :&ensp;optional</dt>
+<dd>directory with expression TSV file or
+pandas.DataFrame. Defaults to None.
+The TSV input should have an ensg key in the first column or an ensg
+column label. Columns <code>loc</code>, <code>name</code>, <code>tss_loc</code> and <code>strand</code> are
+removed automatically. The data should be exclusively numerical
+without NaN's. When passing a DataFrame, the data can be log2-
+and z-transformed with an ensg key index and pandas.MultiIndex
+columns with the element names at level 0, and <code>log2</code> &amp; <code>z</code> at
+level 1. </dd>
+<dt><strong><code>ctrl</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>The name of the control found in 'expression'.
+Defaults to None. Allowed to be missing in 'diff_genes'.</dd>
+<dt><strong><code>override_namematcher</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>When both 'diff_genes' and
+'expression' passed, this overrides the element names in diff_genes.
+Defaults to False. When False, element names in 'diff_genes' and
+'expression' are expected to match perfectly.</dd>
+<dt><strong><code>name</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Name label of the samples. Defaults to 'Samples'.
+Used in logging and plot annotations.</dd>
+<dt><strong><code>log</code></strong></dt>
+<dd>(bool, optional): Log the samples initiation. Defaults to True.</dd>
+</dl>
+<h2 id="note">Note</h2>
+<p>At least one of 'diff_genes' and 'expression' must be passed. When both
+are passed, the inputs must have the same element order. Gene list
+data is automatically alphabetically sorted, hence the expression order
+should concur with this.</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">class samples(_differential):
+    &#34;&#34;&#34;The data to explore similarity for.
+
+    samples can hold lists of differential genes and expression data identifying 
+    a collection of experimental samples. A control in the data enables the 
+    computation of differential transcriptional similarity.
+
+    Arguments:
+        diff_genes (optional): Directory with deseq2 output, 2 directories
+            with up- and down genelists or pandas.DataFrame. 
+            For gene list input, filenames in the up- and down directory must be 
+            the same. When passing a DataFrame, the index should consist of ensg
+            keys, the columns of a pandas.MultiIndex with &#39;up&#39; &amp; &#39;down&#39; at 
+            level 0 and the element names at level 1. The dtype is bool, diff. 
+            genes are marked as True values. 
+        expression (optional): directory with expression TSV file or 
+            pandas.DataFrame. Defaults to None.
+            The TSV input should have an ensg key in the first column or an ensg 
+            column label. Columns `loc`, `name`, `tss_loc` and `strand` are 
+            removed automatically. The data should be exclusively numerical 
+            without NaN&#39;s. When passing a DataFrame, the data can be log2- 
+            and z-transformed with an ensg key index and pandas.MultiIndex 
+            columns with the element names at level 0, and `log2` &amp; `z` at 
+            level 1. 
+        ctrl (str, optional): The name of the control found in &#39;expression&#39;.
+            Defaults to None. Allowed to be missing in &#39;diff_genes&#39;.
+        override_namematcher (bool, optional): When both &#39;diff_genes&#39; and 
+            &#39;expression&#39; passed, this overrides the element names in diff_genes. 
+            Defaults to False. When False, element names in &#39;diff_genes&#39; and 
+            &#39;expression&#39; are expected to match perfectly.
+        name (str, optional): Name label of the samples. Defaults to &#39;Samples&#39;. 
+            Used in logging and plot annotations.
+        log: (bool, optional): Log the samples initiation. Defaults to True.
+        
+    Note:
+        At least one of &#39;diff_genes&#39; and &#39;expression&#39; must be passed. When both 
+        are passed, the inputs must have the same element order. Gene list
+        data is automatically alphabetically sorted, hence the expression order
+        should concur with this.
+    &#34;&#34;&#34;
+    def __init__(self, diff_genes=None, expression=None, ctrl=None,
+                 override_namematcher=False, name=None, log=True):
+        self._ctrl = ctrl
+        # call _differential __init__
+        super().__init__(diff_genes=diff_genes, expression=expression, name=name,
+                         override_namematcher=override_namematcher, log=log)
+        
+        # log the number of found differential genes
+        if self._has_diff and log:
+            spacer.info(&#39;&#39;)
+            n = self._diff.sum().unstack(0).reindex(self.names).to_string()
+            logger.info(&#39;Number of diff. genes: \n{}&#39;.format(n))
+        if log:
+            spacer.info(&#39;\n\n&#39;)
+        self._log_init(log)
+
+    @property
+    def _names_noctrl(self):
+        &#34;&#34;&#34;Return the element names without the control&#34;&#34;&#34;
+        ns = self.names
+        if self._ctrl and self._ctrl in ns:
+            ns.remove(self._ctrl)
+        return ns
+
+    def __repr__(self):
+        &#34;&#34;&#34;Get a readable summary of the samples instance&#34;&#34;&#34;
+        return (&#39;\n=|=|= samples-instance =|=|=\nname = {};\nelements = {};\n&#39;
+                &#39;n = {};\ndiff. genes data = {};\nexpression data = {};\n&#39;
+                .format(self.name, self.names, len(self), self._has_diff, 
+                        self._has_expr))</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>DPre.main._differential._differential</li>
+</ul>
 </dd>
 </dl>
- <p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#ffc8d8">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="samples">class <strong>samples</strong></a>(<a href="DPre.main._differential.html#_differential">DPre.main._differential._differential</a>)</font></td></tr>
-    
-<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
-<td colspan=2><tt><a href="#samples">samples</a>(diff_genes=None,&nbsp;expression=None,&nbsp;ctrl=None,&nbsp;override_namematcher=False,&nbsp;name=None,&nbsp;log=True)<br>
-&nbsp;<br>
-class&nbsp;describing&nbsp;the&nbsp;data&nbsp;to&nbsp;explore&nbsp;similarity&nbsp;for<br>
-&nbsp;<br>
-<a href="#samples">samples</a>&nbsp;can&nbsp;hold&nbsp;lists&nbsp;of&nbsp;diff.&nbsp;genes&nbsp;and&nbsp;expression&nbsp;data&nbsp;identifying&nbsp;a&nbsp;<br>
-collection&nbsp;of&nbsp;<a href="#samples">samples</a>.&nbsp;A&nbsp;control&nbsp;in&nbsp;the&nbsp;data&nbsp;extends&nbsp;functionality.&nbsp;<br>
-&nbsp;<br>
-Arguments:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;diff_genes&nbsp;(optional):&nbsp;directory&nbsp;with&nbsp;deseq2&nbsp;output&nbsp;OR&nbsp;2&nbsp;directories&nbsp;with&nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;up-&nbsp;and&nbsp;down&nbsp;genelists&nbsp;OR&nbsp;pandas.DataFrame.&nbsp;Defaults&nbsp;to&nbsp;None.<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;For&nbsp;genelist&nbsp;input,&nbsp;filenames&nbsp;in&nbsp;the&nbsp;up-&nbsp;and&nbsp;down&nbsp;directory&nbsp;must&nbsp;be&nbsp;the<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;same.&nbsp;When&nbsp;passing&nbsp;a&nbsp;DataFrame,&nbsp;the&nbsp;index&nbsp;should&nbsp;consist&nbsp;of&nbsp;all&nbsp;genes,&nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;columns&nbsp;of&nbsp;a&nbsp;pandas.MultiIndex&nbsp;with&nbsp;up&nbsp;or&nbsp;up&nbsp;and&nbsp;down&nbsp;at&nbsp;level&nbsp;0&nbsp;and&nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;element&nbsp;names&nbsp;at&nbsp;level&nbsp;1.&nbsp;THe&nbsp;dtype&nbsp;is&nbsp;bool,&nbsp;diff.&nbsp;genes&nbsp;are&nbsp;marked&nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;as&nbsp;True&nbsp;values.&nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;expression&nbsp;(optional):&nbsp;directory&nbsp;with&nbsp;expression&nbsp;tsv&nbsp;file&nbsp;OR&nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pandas.DataFrame.&nbsp;Defaults&nbsp;to&nbsp;None.<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;.tsv&nbsp;input&nbsp;should&nbsp;have&nbsp;an&nbsp;ensg&nbsp;key&nbsp;in&nbsp;the&nbsp;first&nbsp;column&nbsp;or&nbsp;an&nbsp;ensg&nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;column&nbsp;label.&nbsp;Columns&nbsp;`loc`,&nbsp;`name`,&nbsp;`tss_loc`&nbsp;and&nbsp;`strand`&nbsp;are&nbsp;removed<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;automatically.&nbsp;The&nbsp;data&nbsp;should&nbsp;be&nbsp;exclusively&nbsp;numerical&nbsp;without&nbsp;NaN's.<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;When&nbsp;passing&nbsp;a&nbsp;DataFrame,&nbsp;the&nbsp;data&nbsp;should&nbsp;be&nbsp;log2-&nbsp;and&nbsp;z-transformed.&nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;index&nbsp;should&nbsp;consist&nbsp;of&nbsp;all&nbsp;genes,&nbsp;the&nbsp;columns&nbsp;of&nbsp;a&nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pandas.MultiIndex&nbsp;with&nbsp;the&nbsp;element&nbsp;names&nbsp;at&nbsp;level&nbsp;0,&nbsp;and&nbsp;`log2`&nbsp;&amp;&nbsp;`z`&nbsp;at&nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;level&nbsp;1.<br>
-&nbsp;&nbsp;&nbsp;&nbsp;ctrl&nbsp;(str,&nbsp;optional):&nbsp;The&nbsp;name&nbsp;of&nbsp;the&nbsp;control&nbsp;found&nbsp;in&nbsp;expression&nbsp;or&nbsp;diff.&nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;genes.&nbsp;Defaults&nbsp;to&nbsp;None.&nbsp;Allowed&nbsp;to&nbsp;be&nbsp;missing&nbsp;in&nbsp;diff.&nbsp;genes.<br>
-&nbsp;&nbsp;&nbsp;&nbsp;override_namematcher&nbsp;(bool,&nbsp;optional):&nbsp;When&nbsp;both&nbsp;diff_genes&nbsp;and&nbsp;expression&nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;passed,&nbsp;this&nbsp;overrides&nbsp;the&nbsp;element&nbsp;names&nbsp;in&nbsp;diff.&nbsp;genes.&nbsp;Defaults&nbsp;to&nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;False.&nbsp;When&nbsp;False,&nbsp;element&nbsp;names&nbsp;in&nbsp;diff.&nbsp;genes&nbsp;and&nbsp;expression&nbsp;are&nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;expected&nbsp;to&nbsp;match&nbsp;perfectly.<br>
-&nbsp;&nbsp;&nbsp;&nbsp;name&nbsp;(str,&nbsp;optional):&nbsp;Name&nbsp;label&nbsp;of&nbsp;the&nbsp;<a href="#samples">samples</a>.&nbsp;Defaults&nbsp;to&nbsp;'<a href="#samples">samples</a>'.&nbsp;Used<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;in&nbsp;logging&nbsp;and&nbsp;plot&nbsp;annotations.<br>
-&nbsp;&nbsp;&nbsp;&nbsp;log:&nbsp;(bool,&nbsp;optional):&nbsp;Log&nbsp;the&nbsp;<a href="#samples">samples</a>&nbsp;initiation.&nbsp;Defaults&nbsp;to&nbsp;True.<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<br>
-Note:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;At&nbsp;least&nbsp;one&nbsp;of&nbsp;diff_genes&nbsp;and&nbsp;expression&nbsp;must&nbsp;be&nbsp;passed.&nbsp;When&nbsp;both&nbsp;are&nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;passed,&nbsp;the&nbsp;inputs&nbsp;must&nbsp;have&nbsp;the&nbsp;same&nbsp;elment&nbsp;order.&nbsp;diff.&nbsp;genes&nbsp;input&nbsp;is<br>
-&nbsp;&nbsp;&nbsp;&nbsp;alphabetically&nbsp;sorted.<br>&nbsp;</tt></td></tr>
-<tr><td>&nbsp;</td>
-<td width="100%"><dl><dt>Method resolution order:</dt>
-<dd><a href="samples.html#samples">samples</a></dd>
-<dd><a href="DPre.main._differential.html#_differential">DPre.main._differential._differential</a></dd>
-<dd><a href="builtins.html#object">builtins.object</a></dd>
-</dl>
-<hr>
-Methods defined here:<br>
-<dl><dt><a name="samples-__init__"><strong>__init__</strong></a>(self, diff_genes=None, expression=None, ctrl=None, override_namematcher=False, name=None, log=True)</dt><dd><tt>Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</tt></dd></dl>
-
-<dl><dt><a name="samples-__repr__"><strong>__repr__</strong></a>(self)</dt><dd><tt>Get&nbsp;a&nbsp;readable&nbsp;summary&nbsp;of&nbsp;the&nbsp;<a href="#samples">samples</a>&nbsp;instance</tt></dd></dl>
-
-<hr>
-Methods inherited from <a href="DPre.main._differential.html#_differential">DPre.main._differential._differential</a>:<br>
-<dl><dt><a name="samples-__len__"><strong>__len__</strong></a>(self)</dt></dl>
-
-<dl><dt><a name="samples-get_colors"><strong>get_colors</strong></a>(self, order=None)</dt><dd><tt>Get&nbsp;the&nbsp;targets/<a href="#samples">samples</a>&nbsp;colors&nbsp;of&nbsp;`order`<br>
-&nbsp;<br>
-Args:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;order&nbsp;(list,&nbsp;optional):&nbsp;A&nbsp;listing&nbsp;of&nbsp;element&nbsp;names&nbsp;in&nbsp;which&nbsp;the&nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;element&nbsp;colors&nbsp;will&nbsp;be&nbsp;returned.&nbsp;Defaults&nbsp;to&nbsp;the&nbsp;instances&nbsp;element&nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;order.&nbsp;<br>
-&nbsp;<br>
-Note:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Not&nbsp;contained&nbsp;element&nbsp;names&nbsp;raise&nbsp;an&nbsp;error.&nbsp;If&nbsp;the&nbsp;color&nbsp;for&nbsp;the&nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;requested&nbsp;element&nbsp;hasn't&nbsp;been&nbsp;set,&nbsp;the&nbsp;color&nbsp;is&nbsp;set&nbsp;to&nbsp;white.</tt></dd></dl>
-
-<dl><dt><a name="samples-reorder"><strong>reorder</strong></a>(self, order)</dt><dd><tt>Reorder&nbsp;the&nbsp;elements&nbsp;in&nbsp;targets/<a href="#samples">samples</a>&nbsp;inplace<br>
-&nbsp;<br>
-Args:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;order&nbsp;(list):&nbsp;the&nbsp;new&nbsp;order&nbsp;of&nbsp;elements<br>
-&nbsp;<br>
-Note:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;If&nbsp;not&nbsp;all&nbsp;current&nbsp;element&nbsp;names&nbsp;or&nbsp;new&nbsp;element&nbsp;names&nbsp;are&nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;passed,&nbsp;an&nbsp;error&nbsp;is&nbsp;raised.</tt></dd></dl>
-
-<dl><dt><a name="samples-set_colors"><strong>set_colors</strong></a>(self, colors, log=True)</dt><dd><tt>Set&nbsp;the&nbsp;colors&nbsp;for&nbsp;elements&nbsp;in&nbsp;targets/<a href="#samples">samples</a><br>
-&nbsp;<br>
-Args:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;colors&nbsp;(dict:list):&nbsp;A&nbsp;mapping&nbsp;of&nbsp;element&nbsp;name&nbsp;to&nbsp;color&nbsp;or&nbsp;a&nbsp;list<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;of&nbsp;colors&nbsp;that&nbsp;is&nbsp;assigned&nbsp;to&nbsp;the&nbsp;elements&nbsp;(in&nbsp;this&nbsp;order)&nbsp;until&nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;its&nbsp;end.&nbsp;If&nbsp;the&nbsp;list&nbsp;has&nbsp;only&nbsp;one&nbsp;element,&nbsp;all&nbsp;elements&nbsp;are&nbsp;set&nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;to&nbsp;this&nbsp;color.&nbsp;The&nbsp;color&nbsp;value&nbsp;must&nbsp;be&nbsp;a&nbsp;valid&nbsp;input&nbsp;for&nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;matplotlib,&nbsp;i.e.&nbsp;'w',&nbsp;'#ffffff',&nbsp;&nbsp;(1,&nbsp;1,&nbsp;1)&nbsp;all&nbsp;refer&nbsp;to&nbsp;white.<br>
-&nbsp;&nbsp;&nbsp;&nbsp;log&nbsp;(bool,&nbsp;optional):&nbsp;Log&nbsp;the&nbsp;set&nbsp;colors.&nbsp;Defaults&nbsp;to&nbsp;True.<br>
-&nbsp;<br>
-Note:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Not&nbsp;contained&nbsp;element&nbsp;names&nbsp;are&nbsp;ignored.&nbsp;If&nbsp;the&nbsp;color&nbsp;is&nbsp;invalid,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;element&nbsp;color&nbsp;is&nbsp;set&nbsp;to&nbsp;white.</tt></dd></dl>
-
-<dl><dt><a name="samples-set_name"><strong>set_name</strong></a>(self, name)</dt><dd><tt>Set&nbsp;the&nbsp;targets/<a href="#samples">samples</a>&nbsp;name</tt></dd></dl>
-
-<dl><dt><a name="samples-slice_elements"><strong>slice_elements</strong></a>(self, elements, name=None, log=True)</dt><dd><tt>Slice&nbsp;the&nbsp;targets/<a href="#samples">samples</a>&nbsp;to&nbsp;a&nbsp;specific&nbsp;list&nbsp;of&nbsp;elements.&nbsp;Return&nbsp;a&nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;copy&nbsp;of&nbsp;the&nbsp;original.<br>
-&nbsp;<br>
-Args:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;elements&nbsp;(list):&nbsp;the&nbsp;list&nbsp;of&nbsp;elements&nbsp;to&nbsp;slice.&nbsp;<br>
-&nbsp;<br>
-Returns:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;sliced:&nbsp;the&nbsp;sliced&nbsp;targets/<a href="#samples">samples</a>&nbsp;instance<br>
-&nbsp;<br>
-Note:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;If&nbsp;the&nbsp;passed&nbsp;names&nbsp;are&nbsp;not&nbsp;found&nbsp;in&nbsp;the&nbsp;current&nbsp;element&nbsp;names,&nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;an&nbsp;error&nbsp;is&nbsp;raised.</tt></dd></dl>
-
-<hr>
-Data descriptors inherited from <a href="DPre.main._differential.html#_differential">DPre.main._differential._differential</a>:<br>
-<dl><dt><strong>__dict__</strong></dt>
-<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
-</dl>
-<dl><dt><strong>__weakref__</strong></dt>
-<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
-</dl>
-<dl><dt><strong>names</strong></dt>
-<dd><tt>Get&nbsp;the&nbsp;element&nbsp;names<br>
-&nbsp;<br>
-Setting&nbsp;names:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Pass&nbsp;a&nbsp;dictionary&nbsp;with&nbsp;keys&nbsp;of&nbsp;old&nbsp;names&nbsp;and&nbsp;values&nbsp;of&nbsp;new&nbsp;ones&nbsp;or<br>
-&nbsp;&nbsp;&nbsp;&nbsp;a&nbsp;list&nbsp;of&nbsp;new&nbsp;names&nbsp;that&nbsp;should&nbsp;replace&nbsp;the&nbsp;old&nbsp;names&nbsp;in&nbsp;this&nbsp;order</tt></dd>
-</dl>
-</td></tr></table></td></tr></table><p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#55aa55">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
-    
-<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
-<td width="100%"><strong>logger</strong> = &lt;Logger Dpre (INFO)&gt;<br>
-<strong>spacer</strong> = &lt;Logger DPre (INFO)&gt;</td></tr></table>
-</body></html>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="samples.samples" href="#samples.samples">samples</a></code></h4>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.6.1</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad()</script>
+</body>
+</html>

@@ -9,25 +9,27 @@ import DPre.main.config as config
 from DPre.main._logger import logger, spacer, log_init
 
 class _differential:
-    """base class of the core classes targets and Drivers
+    """Base of the core classes 'targets' and 'samples'.
     
     This class provides the basic functionality of an RNAseq dataset container 
-    holding expression- and differential genelist data
+    holding expression- and differential gene list data. Also, adjustments to
+    the elements /order are defined here. 
 
     Attributes:
-        _expr (pd.DataFrame): expression data (float). ENSG keys make up the,
+        _expr (pd.DataFrame): Expression data (float). ensg keys make up the,
             index, the columns have the element names at level 0 (MultiIndex); 
-            each element has a log2 and z column.
-        _diff (pd.DataFrame): differential gene data for samples, markergene 
-            data for targets. Only the naming is differnt, the data structure
-            for both is the same. The index is the same as the expression one,
-            the columns are split in up and down markergenes, then the element
-            names at level 1. A differentially regualted gene (or markergene
-            respectively) has a True value.
-        _has_diff (bool): instance was initiated with differential input
-        _has_diff (bool): instance was initiated with expression input
-        name (str): the name used in logging messages and plot annotations
-        _colors (dict): a mapping of all elements name and their color
+            each element name has a 'log2'- and 'z' column.
+        _diff (pd.DataFrame): Differential gene data for samples, marker gene 
+            data for targets. Only the naming is different, the data structure
+            for both is the same. The index equals the one in expression, 
+            the columns are split in up and down markergenes at level 0,
+            and the element names are at level 1. A differentially regulated 
+            gene (or marker gene respectively) is stored as 'True'.
+        _has_diff (bool): Instance was initiated with differential input
+        _has_diff (bool): Instance was initiated with expression input
+        _colors (dict): A mapping of all element names and their color
+        name (str): The instance name used in logging messages and plot 
+            annotations
     """
     def __init__(self, diff_genes, expression, name, override_namematcher, log):
         # set the _expr attribute with experssion input if passed
@@ -51,8 +53,9 @@ class _differential:
                 self._is_expr_diff_compatible(override_namematcher)
         
         # set basic attributes name and colors
-        self.name = name if name else self._type_name
+        self.name = name if name else self._type_name.capitalize()
         self._colors = {}
+
 
     @property
     def names(self):
@@ -60,8 +63,10 @@ class _differential:
         
         Setting names:
             Pass a dictionary with keys of old names and values of new ones or
-            a list of new names that should replace the old names in this order
-            
+            a list of new names that should replace the old names in this order.  
+
+        Returns:
+            liar of element names
         """
         name_from, at = (self._expr, 0) if self._has_expr else (self._diff, 1)
         return name_from.columns.unique(at).tolist()
@@ -94,21 +99,22 @@ class _differential:
                         if pn in self._colors}
         if self._ctrl and (self._ctrl in names):
             self._ctrl = names[self._ctrl]
-
-        logger.info('`{}` renamed. New names:\n{}'.format(self.name, self.names))
+        logger.info('`{}` renamed. New names:\n{}'.format(self.name, 
+                                                          self.names))
     
     @property
     def _detec_genes(self):
-        """Get an pandas.Index of the detected genes in targets/samples"""
+        """Return a pandas.Index of the detected genes in targets/samples"""
         genes_from = self._expr if self._has_expr else self._diff
         return genes_from.index
 
     @property
     def _type_name(self):
-        """Get instance type name, `targets` or `samples`"""
+        """Return the instance type name, `targets` or `samples`"""
         return self.__class__.__name__
 
     def __len__(self):
+        """Return the number of elements"""
         return len(self.names)
 
     def set_name(self, name):
@@ -125,8 +131,10 @@ class _differential:
         
         Note:
             Not contained element names raise an error. If the color for the 
-            requested element hasn't been set, the color is set to white.
+            requested element hasn't been set, the color is set to white. 
         
+        Return:
+            list of list of colors
         """
         if not self._colors:
             self.set_colors(['#ffffff'], log=False)
@@ -192,7 +200,8 @@ class _differential:
         if log:
             str_cols = ',\n\t'.join([key+': '+str(col) 
                                     for key, col in self._colors.items()])
-            logger.info('Colors set for `{}`:\n\t{}'.format(self.name, str_cols)) 
+            logger.info('Colors set for `{}`:\n\t{}'.format(self.name, 
+                                                            str_cols)) 
                     
 
 
@@ -226,17 +235,17 @@ class _differential:
 
     def slice_elements(self, elements, name=None, log=True):
         """Slice the targets/samples to a specific list of elements. Return a 
-            copy of the original.
+        copy of the original.
 
         Args:
             elements (list): the list of elements to slice. 
         
-        Returns:
-            sliced: the sliced targets/samples instance
-        
         Note:
             If the passed names are not found in the current element names, 
             an error is raised.
+
+        Returns:
+            sliced: the sliced targets/samples instance
         """
         if log:
             spacer.info('\n\n')
@@ -272,7 +281,7 @@ class _differential:
 
         Args:
             override_namematcher: Whether a misalignment between expression- and
-                differnetial names should be ignored. Useful when names refer to
+                gene list names should be ignored. Useful when names refer to
                 the same data but labels differ partially.
         """
         expr_ns = self.names

@@ -1,3 +1,6 @@
+""" Initiation of DPre and import checking. Runs when `import DPre` is called. 
+Defines which modules and functions are accessable through DPre.*
+"""
 import os, sys
 sys.path.insert(0, os.path.dirname(__file__))
 del os, sys

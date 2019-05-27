@@ -1,0 +1,46 @@
+""	color
+Oocytes	#4363d8
+Pronuclei	#4363d8
+Zygote	#4363d8
+2C Embryo (early)	#4363d8
+2C Embryo (middle)	#f58231
+2C Embryo	#f58231
+2C Embryo (late)	#f58231
+4C Embryo (single-cell)	#911eb4
+4C Embryo	#911eb4
+8C Embryo (single-cell)	#911eb4
+8C Embryo	#911eb4
+Morula (single-cell)	#42d4f4
+Morula	#42d4f4
+Inner cell mass (E3.5)	#42d4f4
+Inner cell mass (E3.75)	#42d4f4
+Blastocyst (Early) TE	#f032e6
+Blastocyst (Early) ICM	#f032e6
+Blastocyst (Mid) TE	#f032e6
+Blastocyst (Mid) ICM	#f032e6
+Blastocyst (Late) TE	#f032e6
+Blastocyst (Late) PrE	#f032e6
+Blastocyst	#f032e6
+Naive ESC (Hex-)	#469990
+Naive ESC (Hex+)	#469990
+Naive ESCs (2iL)	#469990
+Naive ESCs (2iLGO)	#469990
+Epiblast (E6.5) anterior-dorsal	#e6beff
+Epiblast (E6.5) anterior-proximal	#e6beff
+Epiblast (E6.5) posterior-dorsal	#e6beff
+Epiblast (E6.5) posterior-proximal	#e6beff
+ESCs (E14)	#9A6324
+ESCs (B6J)	#9A6324
+ESCs (ZHBTc4)	#9A6324
+ESCs (V6.5)	#9A6324
+ESCs (groundstate)	#9A6324
+ESCs (PDL)	#9A6324
+EpiSC	#9A6324
+EpiSC (region-selective)	#9A6324
+Ectoplacental cone	#fffac8
+PGC (female)	#fffac8
+PGC (male)	#fffac8
+Trophoblast stem cells	#fffac8
+Polyploid trophoblast giant cells (E9.5)	#fffac8
+XEN cells	#fffac8
+Placenta	#fffac8

@@ -1,0 +1,272 @@
+B cell (active)
+B cell (germinal center)
+B cell (naive)
+B cell (resting)
+B cells CD19+
+B cells CD43-
+BMDM
+BMDM +CpolyG
+BMDM +IFNa
+BMDM +IFNg
+BMDM +IL-1b
+BMDM +IL-4
+BMDM +MALP2
+BMDM +TGFb
+BMDM +lipidA 360 mins
+BMDM -lipidA
+Basophilic erythroblast
+Bone marrow
+Bone marrow macrophages
+CD4+ T NKG2D+ cells
+CD4+ T NKG2D- cells
+CD4+ T cells
+CD4+ T cells +IL-21
+CD4+ T cells -IL-21
+CD4+ Th1 cells
+CD4+ Th17 cells 
+CD4+ Th2 cells
+CD4+ Th9 cells
+CD4+ Treg cells
+CD4+ iTreg cells
+CD4T DP CD3hi
+CD4T DP CD3lo
+CD8+ T cells
+CD8+ T cells +IL-2
+Common lymphoid progenitor
+Common myeloid progenitor
+DC CD11+
+DC CD8+
+DN1e
+Dendritic cells (BMDC)
+Double negative 1 (DN1) thymic cells
+Double negative 2a (DN2a) thymic cells
+Double negative 2b (DN2b) thymic cells
+Double negative 3 (DN3) thymic cells
+Double positive thymic cells
+Eosinophils -IL-10 +LPS
+Eosinophils -IL-10 -LPS
+Erythroblast
+Erythrocytes type A
+Erythrocytes type B
+Erythroid cells (TER119+)
+Erythroid progenitor
+Granulocyte-monocyte progenitor
+Granulocytes
+Hematopoietic stem cells
+Hematopoietic stem cells (MPP1)
+Hematopoietic stem cells (MPP2)
+Hematopoietic stem cells (MPP3)
+Hematopoietic stem cells (MPP4)
+Innate lymphoid cell (Type 2)
+Invariant NKT
+Long-term HSC
+Macrophages +IL10 +LPS
+Macrophages +IL10 -LPS
+Macrophages -IL10 +LPS
+Macrophages -IL10 -LPS
+Mast cell +IL10 +LPS
+Mast cell +IL10 -LPS
+Mast cell -IL10 +LPS
+Mast cell -IL10 -LPS
+Mast cells (CD25+)
+Mast cells (CD25-)
+Megakaryoblast
+Megakaryocyte erythroid progenitor
+Microglia
+Monocyte
+Monocytes
+Multipotent progenitor
+Myelocytes
+Myeloid cells
+NKT (derived) 
+NKT stage1
+NKT stage2
+NKT stage3
+Naive CD4+ T cells, anti-CD3-28 treated
+Natural killer cells
+Neutrophil +IL10 +LPS
+Neutrophil +IL10 -LPS
+Neutrophil -IL10 +LPS
+Neutrophil -IL10 -LPS
+Orthochromatic erythroblast
+Polychromatic erythroblast
+Proerythroblast
+Promyelocytes
+Spleen
+Thymus
+pre-B cells
+pro-B (fraction B)
+pro-B (fraction CC`)
+pro-B cells
+splenic B cells
+splenic DC +IL10 +LPS
+splenic DC +IL10 -LPS
+splenic DC -IL10 +LPS
+splenic DC -IL10 -LPS
+Oocytes
+Pronuclei
+Zygote
+2C Embryo
+2C Embryo (early)
+2C Embryo (late)
+2C Embryo (middle)
+4C Embryo
+4C Embryo (single-cell)
+8C Embryo
+8C Embryo (single-cell)
+Morula
+Morula (single-cell)
+Inner cell mass (E3.5)
+Inner cell mass (E3.75)
+Blastocyst
+Blastocyst (Early) ICM
+Blastocyst (Early) TE
+Blastocyst (Late) PrE
+Blastocyst (Late) TE
+Blastocyst (Mid) ICM
+Blastocyst (Mid) TE
+EpiSC
+EpiSC (region-selective)
+Epiblast (E6.5) anterior-dorsal
+Epiblast (E6.5) anterior-proximal
+Epiblast (E6.5) posterior-dorsal
+Epiblast (E6.5) posterior-proximal
+Naive ESC (Hex-)
+Naive ESC (Hex+)
+Naive ESCs (2iL)
+Naive ESCs (2iLGO)
+ESCs (B6J)
+ESCs (E14)
+ESCs (PDL)
+ESCs (V6.5)
+ESCs (ZHBTc4)
+ESCs (groundstate)
+Ectoplacental cone
+PGC (female)
+PGC (male)
+Placenta
+Polyploid trophoblast giant cells (E9.5)
+Trophoblast stem cells
+XEN cells
+Caecum (E13.5)
+Colon
+Colon epithelial cells
+Ileum
+Intestinal stem cell
+Intestine
+Large intestine
+Liver
+Lung
+Medullary thymic epithelial
+Medullary thymic epithelial cell (immature)
+Medullary thymic epithelial cell (mature)
+Pancreatic cell (alpha)
+Pancreatic cell (beta)
+Prostate basal cells
+Prostate luminal cells
+Small intestine cells
+Mature sperm
+Spermatids
+Spermatids (elongated)
+Spermatids (round)
+Spermatocytes
+Spermatogonia
+Testicular cells
+Adipocytes (brown)
+Adipocytes (cultured, brown)
+Adipocytes (cultured, white)
+Adipocytes (white)
+Adipose
+Adrenal medulla
+Atrioventricular canal (E12.5)
+Carotid body
+Chondrocyte (Rib)
+Cortical thymic epithelial
+Dermal fibroblast
+Embryonic kidney fibroblast
+Epididymis
+Fatpad
+Heart
+Intestinal subepithelial myofibroblasts (adult)
+Intestinal subepithelial myofibroblasts (neonatal)
+Kidney
+Lung fibroblasts
+MEF
+MSC (bone)
+MSC (skin)
+MSC (thymus)
+Mammary tissue
+Myoblast
+Neonatal tail fibroblast
+Oviduct
+Skeletal muscle
+Somatic gonadal cell
+Striated muscle
+Tail fibroblast
+Uterus
+Vas deferens
+pre-Adipocytes (brown)
+pre-Adipocytes (white)
+Caudal brain neural epithelium (E8.5)
+Central neural epithelium (E10.5)
+Cranial mesenchyme (E9.5)
+Dorsal control neural epithelium (E10.5)
+Epidermal ectoderm (E9.5)
+Floor plate (E8.5)
+Lateral nasal prominence (E10.5)
+Lateral prominence neural epithelium (E10.5)
+Lower molar
+Mandibular arch (E10.5)
+Mandibular arch (E9.5)
+Maxillary arch (E10.5)
+Maxillary arch (E9.5)
+Mesoderm (E8.5)
+Non-floor plate neural epithelium (E8.5)
+Olfactory pit (E10.5)
+Upper molar
+Astrocyte
+Brain
+Cerebellar granular neurons
+Cerebellum
+Cortex
+Cortex neuron
+Cortical neurons (E16.5)
+Dentate gyrus
+Dorsal root ganglia
+Eye
+Frontal cortex
+Hippocampus
+Hippocampus neuron
+Hippocampus tissue
+Medial ganglionic eminence neurons
+Motor neurons
+Neocortex cortical plate
+Neocortex subventricular zone
+Neocortex ventricular zone
+Neural progenitor cell
+Neuron
+Nucleus accumbens
+Olfactory bulb
+Oligodendrocyte (myelinating)
+Oligodendrocyte (newly formed)
+Oligodendrocyte (precursor)
+Pineal gland
+Retina
+Spinal cord
+Striatum
+Substantia nigra
+Subventricular zone
+Telencephalon
+Ventral tegmental
+White-matter glia
+Zona limitans intrathalamica
+Basal epidermis (E14.5)
+Dermis (E18.5)
+Epidermis (E18.5)
+Hair follicle
+Hair follicle stem cells
+Hair follicle transit amplifying cells
+Keratinocyte
+Skin (E16.5)
+Skin epithelial
+Suprabasal epidermis (E14.5)

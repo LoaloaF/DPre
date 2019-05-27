@@ -1,0 +1,273 @@
+	color
+B cell (active)	#fe7e81
+B cell (germinal center)	#fe7e81
+B cell (naive)	#fe7e81
+B cell (resting)	#fe7e81
+B cells CD19+	#fe7e81
+B cells CD43-	#fe7e81
+BMDM	#fe7e81
+BMDM +CpolyG	#fe7e81
+BMDM +IFNa	#fe7e81
+BMDM +IFNg	#fe7e81
+BMDM +IL-1b	#fe7e81
+BMDM +IL-4	#fe7e81
+BMDM +MALP2	#fe7e81
+BMDM +TGFb	#fe7e81
+BMDM +lipidA 360 mins	#fe7e81
+BMDM -lipidA	#fe7e81
+Basophilic erythroblast	#fe7e81
+Bone marrow	#fe7e81
+Bone marrow macrophages	#fe7e81
+CD4+ T NKG2D+ cells	#fe7e81
+CD4+ T NKG2D- cells	#fe7e81
+CD4+ T cells	#fe7e81
+CD4+ T cells +IL-21	#fe7e81
+CD4+ T cells -IL-21	#fe7e81
+CD4+ Th1 cells	#fe7e81
+CD4+ Th17 cells 	#fe7e81
+CD4+ Th2 cells	#fe7e81
+CD4+ Th9 cells	#fe7e81
+CD4+ Treg cells	#fe7e81
+CD4+ iTreg cells	#fe7e81
+CD4T DP CD3hi	#fe7e81
+CD4T DP CD3lo	#fe7e81
+CD8+ T cells	#fe7e81
+CD8+ T cells +IL-2	#fe7e81
+Common lymphoid progenitor	#fe7e81
+Common myeloid progenitor	#fe7e81
+DC CD11+	#fe7e81
+DC CD8+	#fe7e81
+DN1e	#fe7e81
+Dendritic cells (BMDC)	#fe7e81
+Double negative 1 (DN1) thymic cells	#fe7e81
+Double negative 2a (DN2a) thymic cells	#fe7e81
+Double negative 2b (DN2b) thymic cells	#fe7e81
+Double negative 3 (DN3) thymic cells	#fe7e81
+Double positive thymic cells	#fe7e81
+Eosinophils -IL-10 +LPS	#fe7e81
+Eosinophils -IL-10 -LPS	#fe7e81
+Erythroblast	#fe7e81
+Erythrocytes type A	#fe7e81
+Erythrocytes type B	#fe7e81
+Erythroid cells (TER119+)	#fe7e81
+Erythroid progenitor	#fe7e81
+Granulocyte-monocyte progenitor	#fe7e81
+Granulocytes	#fe7e81
+Hematopoietic stem cells	#fe7e81
+Hematopoietic stem cells (MPP1)	#fe7e81
+Hematopoietic stem cells (MPP2)	#fe7e81
+Hematopoietic stem cells (MPP3)	#fe7e81
+Hematopoietic stem cells (MPP4)	#fe7e81
+Innate lymphoid cell (Type 2)	#fe7e81
+Invariant NKT	#fe7e81
+Long-term HSC	#fe7e81
+Macrophages +IL10 +LPS	#fe7e81
+Macrophages +IL10 -LPS	#fe7e81
+Macrophages -IL10 +LPS	#fe7e81
+Macrophages -IL10 -LPS	#fe7e81
+Mast cell +IL10 +LPS	#fe7e81
+Mast cell +IL10 -LPS	#fe7e81
+Mast cell -IL10 +LPS	#fe7e81
+Mast cell -IL10 -LPS	#fe7e81
+Mast cells (CD25+)	#fe7e81
+Mast cells (CD25-)	#fe7e81
+Megakaryoblast	#fe7e81
+Megakaryocyte erythroid progenitor	#fe7e81
+Microglia	#fe7e81
+Monocyte	#fe7e81
+Monocytes	#fe7e81
+Multipotent progenitor	#fe7e81
+Myelocytes	#fe7e81
+Myeloid cells	#fe7e81
+NKT (derived) 	#fe7e81
+NKT stage1	#fe7e81
+NKT stage2	#fe7e81
+NKT stage3	#fe7e81
+Naive CD4+ T cells, anti-CD3-28 treated	#fe7e81
+Natural killer cells	#fe7e81
+Neutrophil +IL10 +LPS	#fe7e81
+Neutrophil +IL10 -LPS	#fe7e81
+Neutrophil -IL10 +LPS	#fe7e81
+Neutrophil -IL10 -LPS	#fe7e81
+Orthochromatic erythroblast	#fe7e81
+Polychromatic erythroblast	#fe7e81
+Proerythroblast	#fe7e81
+Promyelocytes	#fe7e81
+Spleen	#fe7e81
+Thymus	#fe7e81
+pre-B cells	#fe7e81
+pro-B (fraction B)	#fe7e81
+pro-B (fraction CC`)	#fe7e81
+pro-B cells	#fe7e81
+splenic B cells	#fe7e81
+splenic DC +IL10 +LPS	#fe7e81
+splenic DC +IL10 -LPS	#fe7e81
+splenic DC -IL10 +LPS	#fe7e81
+splenic DC -IL10 -LPS	#fe7e81
+2C Embryo	#fbcc8c
+2C Embryo (early)	#fbcc8c
+2C Embryo (late)	#fbcc8c
+2C Embryo (middle)	#fbcc8c
+4C Embryo	#fbcc8c
+4C Embryo (single-cell)	#fbcc8c
+8C Embryo	#fbcc8c
+8C Embryo (single-cell)	#fbcc8c
+Blastocyst	#fbcc8c
+Blastocyst (Early) ICM	#fbcc8c
+Blastocyst (Early) TE	#fbcc8c
+Blastocyst (Late) PrE	#fbcc8c
+Blastocyst (Late) TE	#fbcc8c
+Blastocyst (Mid) ICM	#fbcc8c
+Blastocyst (Mid) TE	#fbcc8c
+ESCs (B6J)	#fbcc8c
+ESCs (E14)	#fbcc8c
+ESCs (PDL)	#fbcc8c
+ESCs (V6.5)	#fbcc8c
+ESCs (ZHBTc4)	#fbcc8c
+ESCs (groundstate)	#fbcc8c
+Ectoplacental cone	#fbcc8c
+EpiSC	#fbcc8c
+EpiSC (region-selective)	#fbcc8c
+Epiblast (E6.5) anterior-dorsal	#fbcc8c
+Epiblast (E6.5) anterior-proximal	#fbcc8c
+Epiblast (E6.5) posterior-dorsal	#fbcc8c
+Epiblast (E6.5) posterior-proximal	#fbcc8c
+Inner cell mass (E3.5)	#fbcc8c
+Inner cell mass (E3.75)	#fbcc8c
+Morula	#fbcc8c
+Morula (single-cell)	#fbcc8c
+Naive ESC (Hex+)	#fbcc8c
+Naive ESC (Hex-)	#fbcc8c
+Naive ESCs (2iL)	#fbcc8c
+Naive ESCs (2iLGO)	#fbcc8c
+Oocytes	#fbcc8c
+PGC (female)	#fbcc8c
+PGC (male)	#fbcc8c
+Placenta	#fbcc8c
+Polyploid trophoblast giant cells (E9.5)	#fbcc8c
+Pronuclei	#fbcc8c
+Trophoblast stem cells	#fbcc8c
+XEN cells	#fbcc8c
+Zygote	#fbcc8c
+Caecum (E13.5)	#843487
+Colon	#843487
+Colon epithelial cells	#843487
+Ileum	#843487
+Intestinal stem cell	#843487
+Intestine	#843487
+Large intestine	#843487
+Liver	#843487
+Lung	#843487
+Medullary thymic epithelial	#843487
+Medullary thymic epithelial cell (immature)	#843487
+Medullary thymic epithelial cell (mature)	#843487
+Pancreatic cell (alpha)	#843487
+Pancreatic cell (beta)	#843487
+Prostate basal cells	#843487
+Prostate luminal cells	#843487
+Small intestine cells	#843487
+Mature sperm	#f0f0a6
+Spermatids	#f0f0a6
+Spermatids (elongated)	#f0f0a6
+Spermatids (round)	#f0f0a6
+Spermatocytes	#f0f0a6
+Spermatogonia	#f0f0a6
+Testicular cells	#f0f0a6
+Adipocytes (brown)	#64bb79
+Adipocytes (cultured, brown)	#64bb79
+Adipocytes (cultured, white)	#64bb79
+Adipocytes (white)	#64bb79
+Adipose	#64bb79
+Adrenal medulla	#64bb79
+Atrioventricular canal (E12.5)	#64bb79
+Carotid body	#64bb79
+Chondrocyte (Rib)	#64bb79
+Cortical thymic epithelial	#64bb79
+Dermal fibroblast	#64bb79
+Embryonic kidney fibroblast	#64bb79
+Epididymis	#64bb79
+Fatpad	#64bb79
+Heart	#64bb79
+Intestinal subepithelial myofibroblasts (adult)	#64bb79
+Intestinal subepithelial myofibroblasts (neonatal)	#64bb79
+Kidney	#64bb79
+Lung fibroblasts	#64bb79
+MEF	#64bb79
+MSC (bone)	#64bb79
+MSC (skin)	#64bb79
+MSC (thymus)	#64bb79
+Mammary tissue	#64bb79
+Myoblast	#64bb79
+Neonatal tail fibroblast	#64bb79
+Oviduct	#64bb79
+Skeletal muscle	#64bb79
+Somatic gonadal cell	#64bb79
+Striated muscle	#64bb79
+Tail fibroblast	#64bb79
+Uterus	#64bb79
+Vas deferens	#64bb79
+pre-Adipocytes (brown)	#64bb79
+pre-Adipocytes (white)	#64bb79
+Caudal brain neural epithelium (E8.5)	#c8b1ce
+Central neural epithelium (E10.5)	#c8b1ce
+Cranial mesenchyme (E9.5)	#c8b1ce
+Dorsal control neural epithelium (E10.5)	#c8b1ce
+Epidermal ectoderm (E9.5)	#c8b1ce
+Floor plate (E8.5)	#c8b1ce
+Lateral nasal prominence (E10.5)	#c8b1ce
+Lateral prominence neural epithelium (E10.5)	#c8b1ce
+Lower molar	#c8b1ce
+Mandibular arch (E10.5)	#c8b1ce
+Mandibular arch (E9.5)	#c8b1ce
+Maxillary arch (E10.5)	#c8b1ce
+Maxillary arch (E9.5)	#c8b1ce
+Mesoderm (E8.5)	#c8b1ce
+Non-floor plate neural epithelium (E8.5)	#c8b1ce
+Olfactory pit (E10.5)	#c8b1ce
+Upper molar	#c8b1ce
+Astrocyte	#5888c2
+Brain	#5888c2
+Cerebellar granular neurons	#5888c2
+Cerebellum	#5888c2
+Cortex	#5888c2
+Cortex neuron	#5888c2
+Cortical neurons (E16.5)	#5888c2
+Dentate gyrus	#5888c2
+Dorsal root ganglia	#5888c2
+Eye	#5888c2
+Frontal cortex	#5888c2
+Hippocampus	#5888c2
+Hippocampus neuron	#5888c2
+Hippocampus tissue	#5888c2
+Medial ganglionic eminence neurons	#5888c2
+Motor neurons	#5888c2
+Neocortex cortical plate	#5888c2
+Neocortex subventricular zone	#5888c2
+Neocortex ventricular zone	#5888c2
+Neural progenitor cell	#5888c2
+Neuron	#5888c2
+Nucleus accumbens	#5888c2
+Olfactory bulb	#5888c2
+Oligodendrocyte (myelinating)	#5888c2
+Oligodendrocyte (newly formed)	#5888c2
+Oligodendrocyte (precursor)	#5888c2
+Pineal gland	#5888c2
+Retina	#5888c2
+Spinal cord	#5888c2
+Striatum	#5888c2
+Substantia nigra	#5888c2
+Subventricular zone	#5888c2
+Telencephalon	#5888c2
+Ventral tegmental	#5888c2
+White-matter glia	#5888c2
+Zona limitans intrathalamica	#5888c2
+Basal epidermis (E14.5)	#9edce4
+Dermis (E18.5)	#9edce4
+Epidermis (E18.5)	#9edce4
+Hair follicle	#9edce4
+Hair follicle stem cells	#9edce4
+Hair follicle transit amplifying cells	#9edce4
+Keratinocyte	#9edce4
+Skin (E16.5)	#9edce4
+Skin epithelial	#9edce4
+Suprabasal epidermis (E14.5)	#9edce4

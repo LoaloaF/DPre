@@ -8,6 +8,7 @@
 *.glb
 *.pyc
 
+.gitignore
 hg38
 preset_targets/human/expression.gzip
 preset_targets/mouse/expression.gzip

@@ -9,7 +9,7 @@ DPre is a bioinformatic tool that enables the user to explore cell type conversi
 
 ## Installation and Setup
 
-The Python packages numpy, pandas and matplotlib are required. We recommend the Anaconda distribution of Python which includes many libraries for scientific computing. 
+The Python packages numpy, pandas, scipy and matplotlib are required. We recommend the Anaconda distribution of Python which includes many libraries for scientific computing. 
 
 <b>Command line (recommended)</b>:
 Change into the directory you want DPre to be installed, for example /home/username/Anaconda3/Lib. Then run
@@ -26,10 +26,10 @@ You can update the repository by typing
 > git pull
 ```
 
-<b>Manually:</b> Download the repository at https://github.com/LoaloaF/DPre and place the folder in the directory of your choice, for example at  /home/username/Anaconda3/Lib. 
+<b>Manually:</b> Download the repository at https://github.com/LoaloaF/DPre and place the folder in the directory of your choice, for example /home/username/Anaconda3/Lib. 
 
 
-For using DPre with <b>Python bindings</b>, i.e. running <i>import DPre</i> in a Python script, the PYTHONPATH variable needs to include the directory where DPre was installed. The example folder /home/username/Anaconda3/Lib is already included. If this is not the case, add 
+For using DPre with <b>Python bindings</b>, i.e. running <i>import DPre</i> in a Python script, the PYTHONPATH variable needs to include the directory where DPre was installed. The example folder /home/username/Anaconda3/Lib would already be included. If this is not the case for your installation path, add 
 
 
 ```python
@@ -38,14 +38,8 @@ export PYTHONPATH=/Users/name/tools:$PYTHONPATH
 
 to the <i>&#126;/.bash_profile</i> on Mac or <i>&#126;/.bashrc</i> on Linux. On windows, edit the system variables under <i>Properties > Advanced System Settings > Environment Variables</i>
 
-The <b>command line interface</b> is used by running
 
-
-```python
-> python path/to/DPre/dpre.py <arguments>
-```
-
-DPre comes with thorough documentation. To get started, I recommend to read the docs/DPre user guide.html and have a look through the three documented examples (Python script and commands) featured in the publication. An extensive reference of the command line and Python interface can be found in docs/documentation.
+DPre comes with thorough documentation. To get started, I recommend to read the docs/DPre user guide.html and have a look through the three documented examples (Python script and commands) featured in the publication. An extensive reference of the Python interface and the command line can be found in docs/documentation.
 
 ## Quickstart
 Initiate samples and targets with the input data, then call one of the three similarity visualization functions:
@@ -65,7 +59,14 @@ bp = endoderm.ranked_similarity_barplot(samples=s)
 g_hm = hep.gene_similarity_heatmap(samples=s)
 ```
 
-or
+The <b>command line interface</b> is used by running
+
+
+```python
+> python path/to/DPre/dpre.py <arguments>
+```
+
+So the equivalent would be
 
 
 ```python

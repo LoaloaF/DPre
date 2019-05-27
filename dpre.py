@@ -5,7 +5,7 @@ import argparse
 
 import DPre
 
-# initaite and return the targets and samples for the plots
+# initiate and return the targets and samples for the plots
 def init_trg_smp(args):
                if args['preset_targets'] is not None:
                     t = DPre.preset_targets(args['preset_targets'])

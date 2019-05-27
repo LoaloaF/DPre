@@ -13113,11 +13113,28 @@ div#notebook {
   <div tabindex="-1" id="notebook" class="border-box-sizing">
     <div class="container" id="notebook-container">
 
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[1]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># setting up jupyter</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="kn">import</span> <span class="nn">matplotlib</span> <span class="k">as</span> <span class="nn">mpl</span>
+<span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;figure.dpi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">300</span>
+<span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;savefig.dpi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">300</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Example-1:-successive-differentiation-of-hESCs-to-heptocytes">Example 1: successive differentiation of hESCs to heptocytes<a class="anchor-link" href="#Example-1:-successive-differentiation-of-hESCs-to-heptocytes">&#182;</a></h1><p>In this experiment human embryonic stem cells were treated with a selection of stimuli to differentiate into hepatocytes/ liver tissue. Within the a period of 3 weeks, 10 samples were taken and sequenced on different days. This example goes into samples and targets initiation and basic plotting.</p>
-<h2 id="Initilizing-samples-and-targets">Initilizing samples and targets<a class="anchor-link" href="#Initilizing-samples-and-targets">&#182;</a></h2><p>To <b>initiate the samples instance</b> we pass a TSV expression file and gene list data. Since there are no replicates in this data, we cannot identify significant differential genes with DEseq2 (of which DPre accepts the output). Instead, in this analysis, differential genes were defined as those with an absolute Z-score &gt;2. The genes exceeding this threshold were saved in the two directories <i>DPre/examples/hsliver/up_genelists</i> and <i>DPre/examples/hsliver/down_geneslists</i>.
+<h1 id="Example-1:-successive-differentiation-of-hESCs-to-hepatocytes">Example 1: successive differentiation of hESCs to hepatocytes<a class="anchor-link" href="#Example-1:-successive-differentiation-of-hESCs-to-hepatocytes">&#182;</a></h1><p>In this experiment human embryonic stem cells were treated with a selection of stimuli to differentiate into hepatocytes/ liver tissue. Within the a period of 3 weeks, 10 samples were taken and sequenced on different days. This example goes into samples and targets initiation and basic plotting.</p>
+<h2 id="Initializing-samples-and-targets">Initializing samples and targets<a class="anchor-link" href="#Initializing-samples-and-targets">&#182;</a></h2><p>To <b>initiate the samples instance</b>, we pass a TSV expression file and gene list data. Since there are no replicates in this data, we cannot identify significant differential genes with DEseq2 (of which DPre accepts the output). Instead, in this analysis, differential genes were defined as those with an absolute Z-score &gt;2. The genes exceeding this threshold were saved in the two directories <i>DPre/examples/hsliver/up_genelists</i> and <i>DPre/examples/hsliver/down_geneslists</i>.
 Additionally, we pass the name of the control to the <i>ctrl</i> argument to later plot differential effects. We also set a <i>name</i> that will appear in logs and plot annotations.</p>
 
 </div>
@@ -13245,12 +13262,12 @@ New samples-instance created: `in vitro hepatic differentiated hESCs`
 
 
 INFO-DPre preset_targets:
-Default target `human` created, name: `human FANTOM5 library`, elements: 301
+Default targets `human` created, name: `human FANTOM5 library`, elements: 301
 
 
 
 INFO-DPre plot_color_legend:
-Color legend generated and saved at C:\Users\LOaLoA\Anaconda3\Lib\DPre\examples\example1_hsliver/color_legend.png
+Color legend generated and saved at C:\Users\LOaLoA\Anaconda3\Lib\DPre\examples\example1_hsliver/human_color_legend.png
 </pre>
 </div>
 </div>
@@ -13328,7 +13345,7 @@ Note: in the following plot calls we pass the argument <i>plt_show = True</i>. T
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[6]:</div>
+<div class="prompt input_prompt">In&nbsp;[4]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">rev_order</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">names</span><span class="p">))</span>
@@ -13365,7 +13382,7 @@ INFO-DPre reorder:
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[7]:</div>
+<div class="prompt input_prompt">In&nbsp;[5]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">hm</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">target_similarity_heatmap</span><span class="p">(</span><span class="n">samples</span> <span class="o">=</span> <span class="n">s</span><span class="p">,</span>     <span class="c1"># the samples to check similarity for</span>
@@ -13399,27 +13416,27 @@ Arguments passed. Getting data now ...
 
 INFO-DPre plot_detec_mgs_prop:
 Detection of targets (human FANTOM5 library) marker genes in samples data (in vitro hepatic differentiated hESCs): 
-                                              n markergenes  detected in samples  proportion
-up Blood adult                                          862                  415    0.481439
-   Peripheral blood mononuclear cells                   971                  474    0.488157
-   Cd8+ t cells                                         895                  437    0.488268
-   Eosinophils                                          937                  471    0.502668
-   Cd4+cd25+cd45ra+ naive regulatory t cells            785                  403    0.513376
-   Cd4+ t cells                                         808                  417    0.516089
-   Natural killer cells                                 832                  430    0.516827
-   Memory conventional t cells                          869                  450    0.517837
-   Neutrophils                                          837                  434    0.518519
-   Basophils                                            868                  451    0.519585
-   Mesothelial cells                                    243                  206    0.847737
-   Melanocyte light                                     169                  144    0.852071
-   Meningeal cells                                      359                  306    0.852368
-   Iris pigment epithelial cells                        291                  249    0.855670
-   Melanocyte                                           236                  202    0.855932
-   Smooth muscle cells intestinal                       354                  305    0.861582
-   Astrocyte cerebral cortex                            421                  363    0.862233
-   Hips +ccl2                                           429                  370    0.862471
-   H9 embryonic stem cells                              444                  383    0.862613
-   Retinal pigment epithelial cells                     280                  249    0.889286
+                                              n marker genes  detected in samples  proportion
+up Blood adult                                           862                  415    0.481439
+   Peripheral blood mononuclear cells                    971                  474    0.488157
+   Cd8+ t cells                                          895                  437    0.488268
+   Eosinophils                                           937                  471    0.502668
+   Cd4+cd25+cd45ra+ naive regulatory t cells             785                  403    0.513376
+   Cd4+ t cells                                          808                  417    0.516089
+   Natural killer cells                                  832                  430    0.516827
+   Memory conventional t cells                           869                  450    0.517837
+   Neutrophils                                           837                  434    0.518519
+   Basophils                                             868                  451    0.519585
+   Mesothelial cells                                     243                  206    0.847737
+   Melanocyte light                                      169                  144    0.852071
+   Meningeal cells                                       359                  306    0.852368
+   Iris pigment epithelial cells                         291                  249    0.855670
+   Melanocyte                                            236                  202    0.855932
+   Smooth muscle cells intestinal                        354                  305    0.861582
+   Astrocyte cerebral cortex                             421                  363    0.862233
+   Hips +ccl2                                            429                  370    0.862471
+   H9 embryonic stem cells                               444                  383    0.862613
+   Retinal pigment epithelial cells                      280                  249    0.889286
 Shown are the 20 edge proportion values.
 
 INFO-DPre _overlap_samples:
@@ -13456,14 +13473,14 @@ Drawing...
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>The log shows normal proportions of detected marker genes in the samples. No targets are dropped for the analysis.
-As we can see, the default paramters of the target similarity heatmap are set to show the target labels. The plot is created with the space necessary to cleanly display all target labels. Therefore, when comparing against a large reference the plot widely extends in x-direction. Although this can be useful for reading out the similarities of all targets, we cannot present it in this size. To solve this, we pass <i><b>heatmap_width</b></i>, <b><i>hide_targetlabels</i></b>, and <b><i>targetlabels_space</i></b></p>
+As we can see, the default parameters of the target similarity heatmap are set to show the target labels. The plot is created with the space necessary to cleanly display all target labels. Therefore, when comparing against a large reference the plot widely extends in x-direction. Although this can be useful for reading out the similarities of all targets, we cannot present it in this size. To solve this, we pass <i><b>heatmap_width</b></i>, <b><i>hide_targetlabels</i></b>, and <b><i>targetlabels_space</i></b></p>
 
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[8]:</div>
+<div class="prompt input_prompt">In&nbsp;[6]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">hm</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">target_similarity_heatmap</span><span class="p">(</span><span class="n">samples</span> <span class="o">=</span> <span class="n">s</span><span class="p">,</span>
@@ -13535,7 +13552,7 @@ Drawing...
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[9]:</div>
+<div class="prompt input_prompt">In&nbsp;[7]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">hm</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">target_similarity_heatmap</span><span class="p">(</span><span class="n">samples</span> <span class="o">=</span> <span class="n">s</span><span class="p">,</span> 
@@ -13647,7 +13664,7 @@ Plot saved at C:\Users\LOaLoA\Anaconda3\Lib\DPre\examples\example1_hsliver/targe
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[11]:</div>
+<div class="prompt input_prompt">In&nbsp;[8]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">hm</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">target_similarity_heatmap</span><span class="p">(</span><span class="n">samples</span> <span class="o">=</span> <span class="n">s</span><span class="p">,</span> 
@@ -13689,27 +13706,27 @@ Arguments passed. Getting data now ...
 
 INFO-DPre plot_detec_mgs_prop:
 Detection of targets (human FANTOM5 library) marker genes in samples data (in vitro hepatic differentiated hESCs): 
-                                              n markergenes  detected in samples  proportion
-up Blood adult                                          862                  415    0.481439
-   Peripheral blood mononuclear cells                   971                  474    0.488157
-   Cd8+ t cells                                         895                  437    0.488268
-   Eosinophils                                          937                  471    0.502668
-   Cd4+cd25+cd45ra+ naive regulatory t cells            785                  403    0.513376
-   Cd4+ t cells                                         808                  417    0.516089
-   Natural killer cells                                 832                  430    0.516827
-   Memory conventional t cells                          869                  450    0.517837
-   Neutrophils                                          837                  434    0.518519
-   Basophils                                            868                  451    0.519585
-   Mesothelial cells                                    243                  206    0.847737
-   Melanocyte light                                     169                  144    0.852071
-   Meningeal cells                                      359                  306    0.852368
-   Iris pigment epithelial cells                        291                  249    0.855670
-   Melanocyte                                           236                  202    0.855932
-   Smooth muscle cells intestinal                       354                  305    0.861582
-   Astrocyte cerebral cortex                            421                  363    0.862233
-   Hips +ccl2                                           429                  370    0.862471
-   H9 embryonic stem cells                              444                  383    0.862613
-   Retinal pigment epithelial cells                     280                  249    0.889286
+                                              n marker genes  detected in samples  proportion
+up Blood adult                                           862                  415    0.481439
+   Peripheral blood mononuclear cells                    971                  474    0.488157
+   Cd8+ t cells                                          895                  437    0.488268
+   Eosinophils                                           937                  471    0.502668
+   Cd4+cd25+cd45ra+ naive regulatory t cells             785                  403    0.513376
+   Cd4+ t cells                                          808                  417    0.516089
+   Natural killer cells                                  832                  430    0.516827
+   Memory conventional t cells                           869                  450    0.517837
+   Neutrophils                                           837                  434    0.518519
+   Basophils                                             868                  451    0.519585
+   Mesothelial cells                                     243                  206    0.847737
+   Melanocyte light                                      169                  144    0.852071
+   Meningeal cells                                       359                  306    0.852368
+   Iris pigment epithelial cells                         291                  249    0.855670
+   Melanocyte                                            236                  202    0.855932
+   Smooth muscle cells intestinal                        354                  305    0.861582
+   Astrocyte cerebral cortex                             421                  363    0.862233
+   Hips +ccl2                                            429                  370    0.862471
+   H9 embryonic stem cells                               444                  383    0.862613
+   Retinal pigment epithelial cells                      280                  249    0.889286
 Shown are the 20 edge proportion values.
 
 INFO-DPre _overlap_samples:
@@ -13745,14 +13762,14 @@ Drawing...
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>A first comparison between the two metrics seems to indicate notable differences. However, this is only due to a common problem in weighting the similarity scores. When <i><b>proportional</b></i> is <i>False</i>, the raw number of matches with the target marker genes is shown. This has the obvious effect that targets with high number of marker genes will score higher. We can deal with this problem by setting <i>proportional = True</i> to devide the score by the number of marker genes:</p>
+<p>A first comparison between the two metrics seems to indicate notable differences. However, this is only due to a common problem in weighting the similarity scores. When <i><b>proportional</b></i> is <i>False</i>, the raw number of matches with the target marker genes is shown. This has the obvious effect that targets with high number of marker genes will score higher. We can deal with this problem by setting <i>proportional = True</i> to divide the score by the number of marker genes:</p>
 
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[12]:</div>
+<div class="prompt input_prompt">In&nbsp;[9]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">hm</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">target_similarity_heatmap</span><span class="p">(</span><span class="n">samples</span> <span class="o">=</span> <span class="n">s</span><span class="p">,</span> 
@@ -13845,14 +13862,14 @@ Plot saved at C:\Users\LOaLoA\Anaconda3\Lib\DPre\examples\example1_hsliver/targe
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Plotting-single-gene-transcriptional-similarity">Plotting single gene transcriptional similarity<a class="anchor-link" href="#Plotting-single-gene-transcriptional-similarity">&#182;</a></h2><p>Next we want to investigate the transcriptional similarity with the hepatocyte target for two groups of <b>genes</b>. First, known hepatocyte marker genes and next the genes driving the similarity increase most dominently. This functionality is provided by the <i>gene_similarity_heatmap()</i> function. The function will create a single gene similarity plot for every element in the targets instance. Since we are only interested in Hepatocyte similarity, we can <b>slice the elements</b> in targets like so:</p>
+<h2 id="Plotting-single-gene-transcriptional-similarity">Plotting single gene transcriptional similarity<a class="anchor-link" href="#Plotting-single-gene-transcriptional-similarity">&#182;</a></h2><p>Next we want to investigate the transcriptional similarity with the hepatocyte target for two groups of <b>genes</b>. First, known hepatocyte marker genes and next the genes driving the similarity increase most dominantly. This functionality is provided by the <i>gene_similarity_heatmap()</i> function. The function will create a single gene similarity plot for every element in the targets instance. Since we are only interested in Hepatocyte similarity, we can <b>slice the elements</b> in targets like so:</p>
 
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[13]:</div>
+<div class="prompt input_prompt">In&nbsp;[10]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">hep</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">slice_elements</span><span class="p">([</span><span class="s1">&#39;Hepatocyte&#39;</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Hepatocyte&#39;</span><span class="p">)</span>
@@ -13898,7 +13915,7 @@ New targets-instance created: `Hepatocyte`
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[14]:</div>
+<div class="prompt input_prompt">In&nbsp;[11]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">hm</span> <span class="o">=</span> <span class="n">hep</span><span class="o">.</span><span class="n">gene_similarity_heatmap</span><span class="p">(</span><span class="n">samples</span> <span class="o">=</span> <span class="n">s</span><span class="p">,</span>
@@ -13930,8 +13947,8 @@ Arguments passed. Getting data now ...
 
 INFO-DPre plot_detec_mgs_prop:
 Detection of targets (Hepatocyte) marker genes in samples data (in vitro hepatic differentiated hESCs): 
-               n markergenes  detected in samples  proportion
-up Hepatocyte            472                  290    0.614407
+               n marker genes  detected in samples  proportion
+up Hepatocyte             472                  290    0.614407
 Shown are the 1 edge proportion values.
 
 INFO-DPre _overlap_samples:
@@ -13968,14 +13985,14 @@ Drawing...
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>By default, this function will plot the 45 most variant genes, we are however intersted in the <b>similarity of a specifc gene list</b>: a collection of hepatoblast- and hepatocyte markers. We define these genelists and generate a color legend for the two groups. Then we make a dictionary that maps the genes to the respective color. DPre's predefined <b>colors</b> can be accessed from <i>config.colors</i>:</p>
+<p>By default, this function will plot the 45 most variant genes, we are however interested in the <b>similarity of a specifc gene list</b>: a collection of hepatoblast- and hepatocyte markers. We define these gene lists and generate a color legend for the two groups. Then we make a dictionary that maps the genes to the respective color. DPre's predefined <b>colors</b> can be accessed from <i>config.colors</i>:</p>
 
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[15]:</div>
+<div class="prompt input_prompt">In&nbsp;[12]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">DPre</span> <span class="k">import</span> <span class="n">plot_color_legend</span>
@@ -14017,7 +14034,7 @@ Color legend generated and saved at C:\Users\LOaLoA\Anaconda3\Lib\DPre\examples\
 
 <div class="output_area">
 
-    <div class="prompt output_prompt">Out[15]:</div>
+    <div class="prompt output_prompt">Out[12]:</div>
 
 
 
@@ -14053,7 +14070,7 @@ Color legend generated and saved at C:\Users\LOaLoA\Anaconda3\Lib\DPre\examples\
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[16]:</div>
+<div class="prompt input_prompt">In&nbsp;[13]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">hm</span> <span class="o">=</span> <span class="n">hep</span><span class="o">.</span><span class="n">gene_similarity_heatmap</span><span class="p">(</span><span class="n">samples</span> <span class="o">=</span> <span class="n">s</span><span class="p">,</span>    <span class="c1"># the sampels to explore similarity for</span>
@@ -14101,8 +14118,8 @@ Arguments passed. Getting data now ...
 
 INFO-DPre plot_detec_mgs_prop:
 Detection of targets (custom genelist) marker genes in samples data (in vitro hepatic differentiated hESCs): 
-               n markergenes  detected in samples  proportion
-up Hepatocyte             11                   11         1.0
+               n marker genes  detected in samples  proportion
+up Hepatocyte              11                   11         1.0
 Shown are the 1 edge proportion values.
 
 INFO-DPre _overlap_samples:
@@ -14174,14 +14191,14 @@ Plots saved at C:\Users\LOaLoA\Anaconda3\Lib\DPre\examples\example1_hsliver/hsli
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Second, we want to find the 10 most similarity-increasing genes for the haptocyte fate. Instead of passing <i>custom_target_genelist</i>, we change <b><i>display_genes</i></b> and <b><i>gene_number</i></b>. Here, we do want to show the summary plot but the size should be reduced slightly. Advanced size adjustments like this are realized by passing the size constants defined in <i>config</i> (see documentation for details), in this case <i>G_HM_SUMPLOT_SIZE</i>. This functionality is not available through the command line.</p>
+<p>Second, we want to find the 10 most similarity-increasing genes for the hepatocyte fate. Instead of passing <i>custom_target_genelist</i>, we change <b><i>display_genes</i></b> and <b><i>gene_number</i></b>. Here, we do want to show the summary plot but the size should be reduced slightly. Advanced size adjustments like this are realized by passing the size constants defined in <i>config</i> (see documentation for details), in this case <i>G_HM_SUMPLOT_SIZE</i>. This functionality is not available through the command line.</p>
 
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[18]:</div>
+<div class="prompt input_prompt">In&nbsp;[14]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span>                             

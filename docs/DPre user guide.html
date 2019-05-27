@@ -2,7 +2,7 @@
 <html>
 <head><meta charset="utf-8" />
 
-<title>dpre user guide</title>
+<title>DPre user guide</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
@@ -13118,11 +13118,11 @@ div#notebook {
 <div class="text_cell_render border-box-sizing rendered_html">
 <h1 id="User-Guide">User Guide<a class="anchor-link" href="#User-Guide">&#182;</a></h1><p>DPre is structured in three layers: initiate - overlap - visualize, but only initiation and visualization are controlled by the user. Once these two components are understood, DPre offers great utility for exploring differentiation experiments.<br> This guide covers the fundamentals behind DPre. After going through it, I suggest to run the examples.py scripts. The examples also have an interactive jupyter notebook which can be opened with <i>> jupyter notebook example_file.ipynb</i>.</p>
 <p><img src="images/DPre_schematic.png" alt="caption"></p>
-<h2 id="The-Python--versus-command-line-interface">The Python- versus command line interface<a class="anchor-link" href="#The-Python--versus-command-line-interface">&#182;</a></h2><p>This user guide and also the documented examples largely focus on the Python interface of DPre. This is mainly due to the fact that the Python interface offers a few more features. Since the command line interface is built on top of the Python  implementation, the guide and examples are well suited for understanding the useage of the command line interface.
+<h2 id="The-Python--versus-command-line-interface">The Python- versus command line interface<a class="anchor-link" href="#The-Python--versus-command-line-interface">&#182;</a></h2><p>This user guide and also the documented examples largely focus on the Python interface of DPre. This is mainly due to the fact that the Python interface offers a few more features. Since the command line interface is built on top of the Python  implementation, the guide and examples are well suited for understanding the usage of the command line interface.
 In short, the Python implementation splits initiation and visualization while the command line interface combines everything in one expression: <i>python dpre.py &lt;samples input> &lt;targets input> plot &lt;plot arguments></i>.</p>
-<h2 id="Initiate-samples-and-targets">Initiate samples and targets<a class="anchor-link" href="#Initiate-samples-and-targets">&#182;</a></h2><p>As the schematic shows, the input for samples and targets initiation depends on which of the two similarity metrics 'euclid' and 'intersect' is used. 'euclid' relies on expression data, 'intersect' on lists of genes. Targets and samples overlap in regards to these two data inputs, but targets gene list input is referred to as <i>markergenes</i>, samples as <i>diff_genes</i>.</p>
+<h2 id="Initiate-samples-and-targets">Initiate samples and targets<a class="anchor-link" href="#Initiate-samples-and-targets">&#182;</a></h2><p>As the schematic shows, the input for samples and targets initiation depends on which of the two similarity metrics 'euclid' and 'intersect' is used. 'euclid' relies on expression data, 'intersect' on lists of genes. Targets and samples overlap in regard to these two data inputs, but targets gene list input is referred to as <i>markergenes</i>, samples as <i>diff_genes</i>.</p>
 <p><b>Valid expression input</b> can be a <b>TSV file</b> or a <b>pandas.DataFrame</b>. <br>
-DPre requires a TSV expression file to have a column labeled <i>ensg</i> or a first column listing ensg keys. Also, the data must be purely numerical and not include NAN values. If the TSV file includes the metadata columns <i>loc</i>, <i>name</i>, <i>tss_loc</i> and <i>strand</i>, these are automatically deleted. A pandas.DataFrame must have an ensg index and can contain precalcualted log2- and z-transformed data if the columns are represented as a pandas.MultiIndex with the element names at level 0 and <i>'log2'</i> &amp; <i>'z'</i> at level 1 (compare pre-packaged targets input). <br>
+DPre requires a TSV expression file to have a column labelled <i>ensg</i> or a first column listing ensg keys. Also, the data must be purely numerical and not include NAN values. If the TSV file includes the metadata columns <i>loc</i>, <i>name</i>, <i>tss_loc</i> and <i>strand</i>, these are automatically deleted. A pandas.DataFrame must have an ensg index and can contain precalculated log2- and z-transformed data if the columns are represented as a pandas.MultiIndex with the element names at level 0 and <i>'log2'</i> &amp; <i>'z'</i> at level 1 (compare pre-packaged targets input). <br>
 The normalized expression TSV file in example 1 is composited like this:</p>
 
 </div>
@@ -13292,8 +13292,8 @@ The normalized expression TSV file in example 1 is composited like this:</p>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p><b>Valid gene list data</b> can be a directory with <b>DEseq2 output</b>, directories with <b>up- and down genelists</b> or a <b>pandas.DataFrame</b>. <br>
-Again, for all types of inputs, ensg keys are expected. The p value for filtering the DEseq2 putput is 0.05 and can be adjusted by changing <i>config.DESEQ2_P</i>. For assembling the gene list data from <i>up</i>- and <i>down</i> regulated lists of genes, the two directories must contain the same filenames. A pandas.DataFrame should store boolean values where <i>True</i> presents a <i>markergene</i> or <i>diff_gene</i>, respectively. The columns must be organized in a pandas.MultiIndex with <i>'up'</i> and <i>'down'</i> at level 0, and the element names at level 1. While samples are required to be initiated with both <i>up</i>- and <i>down</i> gene lists, <i>down</i> input is optional for targets (compare pre-packaged targets input). <br>
+<p><b>Valid gene list data</b> can be a directory with <b>DEseq2 output</b>, directories with <b>up- and down gene lists</b> or a <b>pandas.DataFrame</b>. <br>
+Again, for all types of inputs, ensg keys are expected. The p value for filtering the DEseq2 output is 0.05 and can be adjusted by changing <i>config.DESEQ2_P</i>. For assembling the gene list data from <i>up</i>- and <i>down</i> regulated lists of genes, the two directories must contain the same filenames. A pandas.DataFrame should store Boolean values where <i>True</i> presents a <i>markergene</i> or <i>diff_gene</i>, respectively. The columns must be organized in a pandas.MultiIndex with <i>'up'</i> and <i>'down'</i> at level 0, and the element names at level 1. While samples are required to be initiated with both <i>up</i>- and <i>down</i> gene lists, <i>down</i> input is optional for targets (compare pre-packaged targets input). <br>
 In example 1, the samples diff_genes are initiated from an <i>up</i>- and <i>down</i> directory:</p>
 
 </div>
@@ -13336,7 +13336,7 @@ In example 1, the samples diff_genes are initiated from an <i>up</i>- and <i>dow
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>When creating an instance with <b>both gene list- and expression data</b>, care must be taken that the order of elements in the two inputs is the same. Gene list input from a list of files will always be alphabetically sorted, thus the expression data should adapt to this. DPre will raise an error if the element names don't perfectly match. If the element names align but only the naming differs, <i><b>override_namematcher</b></i> can be passed to override the gene list names. Check the logs carefully to avaid mislabelling the data. If the gene list data has an element less then expression and a control was passed, DPre will append an empty control element to the gene list data to align the inputs. Again, the logs should be checked in this case.</p>
+<p>When creating an instance with <b>both gene list- and expression data</b>, care must be taken that the order of elements in the two inputs is the same. Gene list input from a list of files will always be alphabetically sorted, thus the expression data should adapt to this. DPre will raise an error if the element names don't perfectly match. If the element names align but only the naming differs, <i><b>override_namematcher</b></i> can be passed to override the gene list names. Check the logs carefully to avoid mislabelling the data. If the gene list data has an element less then expression and a control was passed, DPre will append an empty control element to the gene list data to align the inputs. Again, the logs should be checked in this case.</p>
 
 </div>
 </div>
@@ -13413,7 +13413,7 @@ In example 1, the samples are initiated like this:</p>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Rather then creating custom targets with the pattern above, it is more common to compare against of of the <b>prepackaged references</b> using <i>preset_targets()</i>. DPre offers <b>'mouse'</b> and <b>'human'</b> with the additional specific domains 'm embryonic', 'm germ cells', 'm neural crest', 'm surface ectoderm', 'm neuroectoderm', 'm mesoderm', 'm endoderm', 'm blood mesoderm', 'h surface ectoderm', 'h neuroectoderm', 'h mesoderm', 'h endoderm' and 'h blood mesoderm'.</p>
+<p>Rather than creating custom targets with the pattern above, it is more common to compare against the <b>prepackaged references</b> using <i>preset_targets()</i>. DPre offers <b>'mouse'</b> and <b>'human'</b> with the additional specific domains 'm embryonic', 'm germ cells', 'm neural crest', 'm surface ectoderm', 'm neuroectoderm', 'm mesoderm', 'm endoderm', 'm blood mesoderm', 'h surface ectoderm', 'h neuroectoderm', 'h mesoderm', 'h endoderm' and 'h blood mesoderm'.</p>
 
 </div>
 </div>
@@ -13562,8 +13562,8 @@ Get the current element names. Supports assignment of new names in a list or dic
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Visualizing-similarities">Visualizing similarities<a class="anchor-link" href="#Visualizing-similarities">&#182;</a></h2><p>When calling a plot with DPre, the similarity of the samples with the targets is computed. Since DPre measures similarity only based on the marker genes detetected in the samples, the <b>detection proportions</b> are checked for validity. <i>config.DROP_TARGET_DETEC_THR</i> defines the minimum required proportion of detected marker genes, by default 15%. Targets under this threshold are excluded from the analysis. The peak proportion values for the targets are shown in the logs when similarity is computed. To get a visual presentation of detection proportions, <i>plot_detec_mgs_prop()</i> can be be called from the targets (compare example 3). This is not implemented in the command line interface.</p>
-<p>There are three similarity visualizing plots to be called from the targets instance: the <b>target similarity heatmap</b> which gives a similarity overview, the <b>ranked similarity bar plot</b> for identifying peak values and finally the <b>gene similarity heatmap</b> which extracts genes with specifc effects.</p>
+<h2 id="Visualizing-similarities">Visualizing similarities<a class="anchor-link" href="#Visualizing-similarities">&#182;</a></h2><p>When calling a plot with DPre, the similarity of the samples with the targets is computed. Since DPre measures similarity only based on the marker genes detected in the samples, the <b>detection proportions</b> are checked for validity. <i>config.DROP_TARGET_DETEC_THR</i> defines the minimum required proportion of detected marker genes, by default 15%. Targets under this threshold are excluded from the analysis. The peak proportion values for the targets are shown in the logs when similarity is computed. To get a visual presentation of detection proportions, <i>plot_detec_mgs_prop()</i> can be called from the targets (compare example 3). This is not implemented in the command line interface.</p>
+<p>There are three similarity visualizing plots to be called from the targets instance: the <b>target similarity heatmap</b> which gives a similarity overview, the <b>ranked similarity bar plot</b> for identifying peak values and finally the <b>gene similarity heatmap</b> which extracts genes with specific effects.</p>
 
 </div>
 </div>
@@ -13615,9 +13615,9 @@ Get the current element names. Supports assignment of new names in a list or dic
 <b>which</b><br>The similarity metric to use, either 'euclid' or 'intersect'. 'euclid' requires expression input for targets and samples, 'intersect' requires gene list data. If this is <i>None</i>, DPre will choose a metric based on the data in, defaulting to 'euclid'. <br>
 <b>differential</b><br>Display the changes in similarity, defaults to <i>True</i>. For the 'euclid' metric, the samples must include a control to display differential similarity. When differential = False, the absolute similarity, i.e. cell type classification, is shown. This is only available for the 'euclid' metric. On the command line, the equivalent argument is <i>absolute</i> which defaults to False. <br>
 <b>proportional</b><br>
-Display the proportional differential similarity. <i>differential</i> is required to be <i>True</i>. While for 'euclid', the differential similarity is devided by the absolute similarity of the control, 'intersect' simliarities are devided by the number of target <i>markergenes</i>. In both cases, the value can be understood as the proportion of adapted cell type identity. In the single gene heatmap, <i>proportional</i> is only valid for the 'euclid' metric.</p>
-<p>All plots return <i>figure, axes, data</i> to further process the data or modify the plot.</p>
-<p>For details on how to use the plots, please have a look at the real world examples or the documentation for an extensive reference.</p>
+Display the proportional differential similarity. <i>differential</i> is required to be <i>True</i>. While for 'euclid', the differential similarity is divided by the absolute similarity of the control, 'intersect' similarities are divided by the number of target <i>markergenes</i>. In both cases, the value can be understood as the proportion of adapted cell type identity. In the single gene heatmap, <i>proportional</i> is only valid for the 'euclid' metric.</p>
+<p>All <b>plots return <i>figure, axes, data</i></b> to further process the data or modify the plot.</p>
+<p>For details on how to use the plots to visualize the results, have a look at the 3 examples. For an extensive reference, check the DPre/docs/documentation folder.</p>
 
 </div>
 </div>

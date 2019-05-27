@@ -216,6 +216,8 @@ def _make_title(differential, proportional, which, el1, el2, pref='', postf=''):
     elif which == 'euclid' and not differential:
         dtype = 'Absolute '
         which_title = ''
+    if pref:
+        dtype = dtype.lower()
     title = '{}{}{}transcriptional similarity {}\nof {} & {}'
     return title.format(pref, dtype, postf, which_title, el1, el2)
 

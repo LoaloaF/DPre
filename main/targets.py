@@ -1689,7 +1689,7 @@ class targets(_differential):
             if title:
                 if title and type(title) is not str:
                     this_t = util._make_title(differential, proportional, which,
-                                              s_name, self.name, pref='ranked ')
+                                              s_name, self.name, pref='Ranked ')
                 else:
                     this_t = title
                 if not pivot:

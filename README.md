@@ -59,7 +59,7 @@ bp = endoderm.ranked_similarity_barplot(samples=s)
 g_hm = hep.gene_similarity_heatmap(samples=s)
 ```
 
-The <b>command line interface</b> is used by running
+The command line interface is used by running
 
 
 ```python

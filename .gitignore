@@ -9,20 +9,12 @@
 *.pyc
 
 .gitignore
-hg38
 preset_targets/human/expression.gzip
 preset_targets/mouse/expression.gzip
-feature list.txt
-main/data_preproc.py
-docs/DPre user guide.ipynb
-docs/README.ipynb
-docs/documentation/DPre command line documentation.ipynb
 tempCodeRunnerFile.py
-ws.code-workspace
 __pycache__
 main/__pycache__/*.pyc
 main/.vimrc
-/.vscode
 
 
 # Byte-compiled / optimized / DLL files

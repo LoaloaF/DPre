@@ -177,10 +177,10 @@ def _init_figure(fig_widths, fig_heights, nplts, spacers):
     return fig, axes
 
 def _open_file(filename):
-    """Open a .pdf or .png file based on the filename ending or if not present
+    """Open a file based on the filename ending or if not present
        on config.SAVE_FORMAT"""
-    if not (filename.endswith('.png') or filename.endswith('.pdf')):
-        filename += '.'+config.SAVE_FORMAT
+    if not '.' in filename:
+        filename += '.' + config.SAVE_FORMAT
     if filename.endswith('.pdf'):
         return filename, PdfPages(filename)
     else:
@@ -193,7 +193,7 @@ def _save_file(fig, filename=None, pp=None):
         replace = ['$\\mathit{', '}$']
         for repl in replace:
             filename = filename.replace(repl, '')
-        fig.savefig(filename, format='png')
+        fig.savefig(filename)
         plt.close(fig)
 
 def _clean_axes(axes):

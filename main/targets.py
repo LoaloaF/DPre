@@ -700,6 +700,7 @@ class targets(_differential):
         logger.info('Drawing...')
         if filename:
             filename, pp = util._open_file(filename)
+        print(filename)
         fig, axes, data = do_plot()
         if plt_show:
                 plt.show()

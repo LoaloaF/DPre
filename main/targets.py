@@ -20,16 +20,16 @@ class targets(_differential):
     collection of comparative transcriptional identities, the targets. 
 
     Arguments:
-        markergenes (optional): Directory with deseq2 output, directories 
+        marker genes (optional): Directory with deseq2 output, directories 
             with up- and (optional) down gene lists or pandas.DataFrame. 
             Defaults to None. Gene list data has an ensg key in the first column 
-            or contains an 'ensg' column label. 'Up-markergenes' should list 
-            genes highly expressed in targets, 'down-markergenes' are those 
+            or contains an 'ensg' column label. 'Up-marker genes' should list 
+            genes highly expressed in targets, 'down-marker genes' are those 
             expected to be low. When passing a DataFrame, the index should 
             consist of ensg keys, the columns of a pandas.MultiIndex with 'up' 
             or 'up' & 'down' at level 0 and the element names at level 1. 
             The dtype is bool, marker genes are stored as 'True'. If None, all 
-            expression values are considered as 'markergenes'.
+            expression values are considered as 'marker genes'.
         expression (optional): TSV expression file or pandas.DataFrame. 
             Defaults to None.
             The TSV input should have an ensg key in the first column or an ensg 
@@ -39,12 +39,12 @@ class targets(_differential):
             and z-transformed with an ensg key index and pandas.MultiIndex 
             columns with the element names at level 0, and `log2` & `z` at 
             level 1. 
-        ignore_down_mgs (bool, optional): Even if found in 'markergene' input, 
+        ignore_down_mgs (bool, optional): Even if found in 'marker gene' input, 
             do not use the down marker genes for the analysis. Defaults to False.
-        override_namematcher (bool, optional): When both 'markergenes' and 
+        override_namematcher (bool, optional): When both 'marker genes' and 
             'expression' passed, this overrides the element names in 
-            'markergenes'. Defaults to False. When False, element names in 
-            'markergenes' and 'expression' are expected to match perfectly.
+            'marker genes'. Defaults to False. When False, element names in 
+            'marker genes' and 'expression' are expected to match perfectly.
         name (str, optional): Name label of the targets. Defaults to 'Targets'. 
             Used in logging and plot annotations.
         log: (bool, optional): Log the targets initiation. Defaults to True.
@@ -77,16 +77,16 @@ class targets(_differential):
                 spacer.info('')
                 n = self._diff.sum().unstack(0).reindex(self.names).to_string()
                 logger.info('Number of marker genes: \n{}'.format(n))
-        # inform that not passing markergenes is not recommended
+        # inform that not passing marker genes is not recommended
         elif log:
             self._down_mgs = False
             spacer.warning('')
             logger.warning('The targets `{}` are initiated without '
-                           '`markergenes`. Note that comparing against all '
+                           '`marker genes`. Note that comparing against all '
                            'genes can lead to low accuracy for defining '
                            'transcriptional similarity.'.format(self.name))
         
-        # _expr_mgs stores a mask of _expr that holds only the markergenes
+        # _expr_mgs stores a mask of _expr that holds only the marker genes
         if self._has_expr:
             expr_mgs = util._add_mg_types(self._expr.copy(), self._down_mgs)
             if self._has_diff: 
@@ -102,7 +102,7 @@ class targets(_differential):
     def __repr__(self):
         """Get a readable summary of the samples instance"""
         return ('\n=|=|= targets-instance =|=|=\nname = {};\nelements = {};\n'
-                'n = {};\nmarkergenes data = {};\nexpression data = {}\n'
+                'n = {};\nmarker genes data = {};\nexpression data = {}\n'
                 .format(self.name, self.names, len(self), self._has_diff, 
                         self._has_expr))
     @property
@@ -144,8 +144,8 @@ class targets(_differential):
                     .format(which, samples.name, self.name))
         # to overlap samples and targets, the data-shapes need to be adjusted
         if which == 'euclid':
-            # get the z-data of targets markergenes and samples
-            # if the targets have down markergenes, duplicate samples data to 
+            # get the z-data of targets marker genes and samples
+            # if the targets have down marker genes, duplicate samples data to 
             # match targets shape
             trg_data = self._expr_mgs.xs('z', 1, 2)
             smp_data = samples._expr.xs('z', 1, 1)
@@ -157,7 +157,7 @@ class targets(_differential):
             smp_data = smp_data[self._mg_types]
             diff_mgs = self._diff.reindex(self._mgs)
             trg_data = util._diff_to_int_updown_notation(diff_mgs, False)
-            # non markergenes are set to NaN for the targets 
+            # non marker genes are set to NaN for the targets 
             trg_data.mask(trg_data == 0, inplace=True)
 
         # repeat the samples data n targets times for groupby operation
@@ -173,7 +173,7 @@ class targets(_differential):
         trg_data = trg_data.reindex(smp_ext.index)
 
         # core
-        # calculate the differnece between the z target markergene expression 
+        # calculate the differnece between the z target marker gene expression 
         # in the targets and samples. Positive value = samples higher expressed
         eucl_dist = lambda smp_d: smp_d -trg_data[smp_d.columns.unique(0)].values 
         # calculate matches between targets and samples. A match results in 
@@ -205,7 +205,7 @@ class targets(_differential):
                 det: A DataFrame with detection values used for logging and 
                     plotting
         """
-        # get proportion of detected markergenes
+        # get proportion of detected marker genes
         if self._has_diff:
             trg_d = self._diff
         elif self._has_expr:
@@ -217,7 +217,7 @@ class targets(_differential):
         n_mgs = trg_d.sum()
         order = (det/n_mgs).sort_values().index
 
-        # log proportion of detected markergenes
+        # log proportion of detected marker genes
         det = pd.DataFrame({'n marker genes': n_mgs.reindex(order), 
                             'detected in samples': det.reindex(order).values, 
                             'proportion': (det/n_mgs).reindex(order).values})
@@ -413,14 +413,14 @@ class targets(_differential):
                 Example: the samples control has an absolute similarity of 3.2 
                 with target A. A change in similarity of Sample A with Target A 
                 by 0.32 results in a proportional differential value of 0.1. For 
-                the 'intersect' metric, the intersect value of markergenes and 
-                diff. genes is divided by the number of target markergenes.
+                the 'intersect' metric, the intersect value of marker genes and 
+                diff. genes is divided by the number of target marker genes.
             display_similarity (str, optional): specify the group of 
-                markergenes to display similarity for. . Defaults to 'mgs mean'. 
+                marker genes to display similarity for. . Defaults to 'mgs mean'. 
                 Valid options are 
                 'mgs mean', 'mgs up', 'mgs down'. Relevent when targets are 
                 initiated with 
-                down-markergenes.
+                down-marker genes.
 
             =================== data ordering options ===================
             cluster_targets (bool, optional): cluster targets using the 
@@ -482,7 +482,7 @@ class targets(_differential):
                 bar on top of the heatmap. Defaults to False. For the 
                 'euclid' metric, this bar visualizes the absolute similarity 
                 with the targets. For the 'intersect' metric, the number of 
-                target markergenes is shown. Defaults to False.
+                target marker genes is shown. Defaults to False.
             hide_targetlabels (bool, optional): Do not plot the target 
                 labels at the bottom. Defaults to False.
             hide_targets_dendrogram (bool, optional): Do not plot the 
@@ -630,8 +630,8 @@ class targets(_differential):
                 if which == 'euclid' and not hide_samplelabels:
                         ctrl_lbl = samples._ctrl
                 bar_args = {'cmap': 'afmhot', 'vmin': 0, 'vmax': db_cap}
-                cb_lbl = 'Number of markergenes\n' if which == 'intersect' else \
-                         'Base expr. similarity\n[mean abs. eucl. distance]'
+                cb_lbl = config.INTE_DIST_BAR if which == 'intersect' else \
+                         config.EUCL_DIST_BAR
                 if distance_bar_range is not None:
                     bar_args.update({'vmin': distance_bar_range[0], 
                                      'vmax': distance_bar_range[1]})
@@ -655,16 +655,16 @@ class targets(_differential):
             ax.set_xticks(np.arange(0, sim.shape[1]))
             hm_args = {'cmap': 'RdBu_r', 'vmin': -cap, 'vmax': cap}
             if which == 'euclid' and differential and not proportional:
-                cb_lbl = config.AGG_EUCL_DIFF_NOPROP
+                cb_lbl = config.EUCL_DIFF_NOPROP
             if which == 'euclid' and differential and proportional:
-                cb_lbl = config.AGG_EUCL_DIFF_PROP
+                cb_lbl = config.EUCL_DIFF_PROP
             elif which == 'euclid' and not differential:
                 hm_args = {'cmap': 'afmhot', 'vmin': 0, 'vmax': cap}
-                cb_lbl = config.AGG_EUCL_NODIFF
+                cb_lbl = config.EUCL_NODIFF
             elif which == 'intersect' and not proportional:
-                cb_lbl = config.AGG_INTE_DIFF_NOPROP
+                cb_lbl = config.INTE_DIFF_NOPROP
             elif which == 'intersect' and proportional:
-                cb_lbl = config.AGG_INTE_DIFF_PROP
+                cb_lbl = config.INTE_DIFF_PROP
             if heatmap_range is not None:
                 hm_args.update({'vmin': heatmap_range[0], 
                                 'vmax': heatmap_range[1]})
@@ -763,10 +763,10 @@ class targets(_differential):
         heatmap, a bar plot visualizes a summery of the gene values.
         Two different metrics can be picked to assess similarity: 
         'euclid' for expression inputs or 'intersect' for comparison based 
-        on diff. genes/ markergenes. Differential and proportional gene
+        on diff. genes/ marker genes. Differential and proportional gene
         similarity values are available options for investagting the change 
-        in similarity. When targets were initiated with down-markergenes,
-        a seperate heatmap for each markergene type is drawn.
+        in similarity. When targets were initiated with down-marker genes,
+        a seperate heatmap for each marker gene type is drawn.
 
         Args:
             =================== Plot data options ===================
@@ -791,14 +791,14 @@ class targets(_differential):
                 similarity of the control. Negative values are capped to -3 to 
                 deal with very low absolute gene similarities. Example: the 
                 samples control has an absolute gene similarity of 0.01 with 
-                markergene x of target A. A change in similarity of Sample A 
-                with markergene x by -0.1 results in a proportional 
+                marker gene x of target A. A change in similarity of Sample A 
+                with marker gene x by -0.1 results in a proportional 
                 differential value of -3 (rather then -10). 
                 For the 'intersect' metric, no proportional gene value 
                 exists but the summary plot will devide the intersection 
                 value by the number of displayed genes.
             display_genes (str, optional): Extract a specific set of 
-                markergenes to display for each target. Defaults to 
+                marker genes to display for each target. Defaults to 
                 'variant'. Valid options are 'variant', 'greatest', 
                 'increasing', 'decreasing' when differential True, and 
                 'variant', 'distant', 'similar' for differential False. 
@@ -810,9 +810,9 @@ class targets(_differential):
                 'display_genes' option. Defaults to 45. This option is 
                 ignored for the two other gene selection options 
                 'specific_genes' and 'custom_target_genelist'. 
-            specific_genes (list, optional): Specify the markergenes to 
+            specific_genes (list, optional): Specify the marker genes to 
                 display in a list of gene names. Defaults to None. A gene 
-                from this list is only displayed if it is a markergene of 
+                from this list is only displayed if it is a marker gene of 
                 the specifc target and detected in the samples. This option can 
                 be used idependently or in combination with 'display_genes' for 
                 adding specific genes of interest to the extracted ones. Genes 
@@ -823,7 +823,7 @@ class targets(_differential):
                 similarity metric. The passed genelist will be used for all 
                 targets. In contrast to 'specific_genes', the genes only need to 
                 be detected in the targets instead of qualifying as specific 
-                target markergenes. Still, genes need to be detected in the 
+                target marker genes. Still, genes need to be detected in the 
                 samples. Genes are annotated referencing enseble v.96.
             
             =================== data ordering options ===================
@@ -892,12 +892,12 @@ class targets(_differential):
             hide_distance_bar (bool, optional): Do not plot the distance 
                 bar on top of the heatmap. Defaults to False. For the 
                 'euclid' metric, this bar visualizes the absolute similarity 
-                with the gene. For the 'intersect' metric, all up-markergenes
+                with the gene. For the 'intersect' metric, all up-marker genes
                 are labelled red, down ones are blue.
             hide_sum_plot (bool, optional): Do not generate the summary plot on
                 the left visualizing the aggregated samples. Defualts to False.
                 This plot relies on the sample methad as the target similarity 
-                measurement, but instead of using all target markergenes, only 
+                measurement, but instead of using all target marker genes, only 
                 the displayed genes are used.  
             show_samplelabels_sum_plot (bool, optional): Plot additional sample
                 labels on the right of the plot, next to the summary plot. 
@@ -1008,7 +1008,7 @@ class targets(_differential):
                 if specific_genes is not None:
                     inp_gl = pd.Index(specific_genes).drop_duplicates()
                     val_gl = pd.Index(genes.name.values)
-                    isin = 'markergenes'
+                    isin = 'marker genes'
                 elif custom_target_genelist is not None:
                     inp_gl = pd.Index(custom_target_genelist).drop_duplicates()
                     val_gl_ensg = self._detec_genes.intersection(samples._detec_genes)
@@ -1048,7 +1048,7 @@ class targets(_differential):
         # get the specific overlap data and pick out the genes to display
         def get_data():
             
-            # init a new target where all genes are markergenes of all targets
+            # init a new target where all genes are marker genes of all targets
             if custom_target_genelist:
                 nonlocal self
                 if which == 'euclid':
@@ -1111,13 +1111,13 @@ class targets(_differential):
                     get_genes = idx[:gene_number]
                     
                 if specific_genes is not None:
-                    # check if passed genelist in target markergenes add them 
+                    # check if passed genelist in target marker genes add them 
                     # if not already in 
                     inp_ensg = util.get_ensgs(specific_genes, self._species).ensg
                     not_mg = filter(lambda ie: ie not in trg_sim.index, inp_ensg)
                     inv = genes.set_index('ensg').reindex(not_mg).name
                     if not inv.empty:
-                        logger.info('{} not included: not markergenes of `'
+                        logger.info('{} not included: not marker genes of `'
                                     '{}-{}`'.format(inv.tolist(), mgt, trg))
                     add = lambda ie: not (ie in get_genes or ie in inv)
                     add_genes = pd.Index(filter(add, inp_ensg))
@@ -1153,11 +1153,11 @@ class targets(_differential):
                 # store plot data in nested dict
                 data[trg][mgt] = (ts.T, cs.to_frame().T, agg_sim)
             
-            # iterate target+markergene type
+            # iterate target+marker gene type
             sim.groupby(axis=1, level=(0,1), sort=False).apply(sel_genes, genes)
             return data
 
-        # get data limits across all targets and markergene types to plot with 
+        # get data limits across all targets and marker gene types to plot with 
         # one consistent heatmap range 
         def get_caps():
              # unpack nested dict into the 3 plot data elements       
@@ -1296,15 +1296,16 @@ class targets(_differential):
                         if not hide_colorbar_legend and (mgt == 'up') and \
                         differential:
                             draw_cb = True
-                        cb_lbl = ('Base expr. similarity\n'
-                                  '[absolute Eucl. distance]')
+                        # cb_lbl = ('Base expression similarity\n'
+                        #           '[absolute Euclidean distance]')
+                        cb_lbl = config.EUCL_NODIFF
                         ctrl_lbl = samples._ctrl if not hide_samplelabels else ''
                         bar_args = {'vmin': 0, 'vmax': db_cap,
                                     'cmap': 'afmhot'}
                     elif which == 'intersect':
                         draw_cb = False
                         cb_lbl = None
-                        ctrl_lbl = 'target markergenes' if not hide_samplelabels \
+                        ctrl_lbl = 'target marker genes' if not hide_samplelabels \
                                    else ''
                         bar_args = {'vmin': -1, 'vmax': 1,
                                     'cmap': config.RdBu_bin}
@@ -1335,7 +1336,7 @@ class targets(_differential):
                 util._setup_heatmap_xy('y', axes[2+r, 0], ylbl, pivot, 
                                       hide_samplelabels, samplelabels_size, cols)
                 if self._down_mgs:
-                    tit = '{} markergenes'.format(mgt)
+                    tit = '{} marker genes'.format(mgt)
                     axes[2+r, 0].set_title(tit, loc='right', fontweight='bold', 
                                            fontsize=config.FONTS)
                 
@@ -1374,15 +1375,15 @@ class targets(_differential):
                         xlim = xlim[1], xlim[0]
                     ax.set_xlim(xlim)
                     if which == 'euclid' and differential and not proportional:
-                        lbl = config.AGG_EUCL_DIFF_NOPROP
+                        lbl = config.EUCL_DIFF_NOPROP
                     if which == 'euclid' and differential and proportional:
-                        lbl = config.AGG_EUCL_DIFF_PROP
+                        lbl = config.EUCL_DIFF_PROP
                     elif which == 'euclid' and not differential:
-                        lbl = config.AGG_EUCL_NODIFF
+                        lbl = config.EUCL_NODIFF
                     elif which == 'intersect' and not proportional:
-                        lbl = config.AGG_INTE_DIFF_NOPROP
+                        lbl = config.INTE_DIFF_NOPROP
                     elif which == 'intersect' and proportional:
-                        lbl = config.AGG_INTE_DIFF_PROP
+                        lbl = config.INTE_DIFF_PROP
                     if (which == 'euclid') and not differential and samples._ctrl:
                         base = ctrl_sim.mean(1)
                         ax.vlines(base, 0, nsmps)
@@ -1404,20 +1405,22 @@ class targets(_differential):
                 if which == 'euclid':
                     if differential and not proportional:
                         hm_args = {'cmap': 'RdBu_r', 'vmin': -cap, 'vmax': cap}
-                        cb_lbl = ('Change in expr. similarity\n'
-                                  '[differential Eucl. distance]')
-                    if differential and proportional:
+                        # cb_lbl = ('Change in expression similarity\n'
+                        #           '[differential Euclidean distance]')
+                        cb_lbl = config.EUCL_G_DIFF_NOPROP
+                    elif differential and proportional:
                         hm_args = {'cmap': 'RdBu_r', 'vmin': -cap, 'vmax': cap}
-                        cb_lbl = ('Prop. of changed expr. similarity\n'
-                                  '[prop. differential Eucl. dist.]')
-                    if not differential:
+                        # cb_lbl = ('Proportion of changed expression similarity\n'
+                        #           '[proportional differential Euclidean distance]')
+                        cb_lbl = config.EUCL_G_DIFF_PROP
+                    elif not differential:
                         hm_args = {'cmap': 'afmhot', 'vmin': -0, 'vmax': cap}
-                        cb_lbl = ('Absolute expr. similarity\n'
-                                  '[absolute Eucl. distance]')
+                        # cb_lbl = ('Absolute expression similarity\n'
+                        #           '[absolute Eucl. distance]')
+                        cb_lbl = config.EUCL_G_NODIFF
                 elif which == 'intersect':
                     hm_args = {'cmap': config.RdBu_bin, 'vmin': -1, 'vmax': 1}
-                    cb_lbl = ('Differential genes similarity\n'
-                              '[target markergene intersect]')
+                    cb_lbl = config.INTE_G_DIFF_NOPROP
                 
                 if heatmap_range is not None:
                     hm_args.update({'vmin': heatmap_range[0], 
@@ -1506,7 +1509,7 @@ class targets(_differential):
             Sort the similarity values of the samples and targets to identify
             the dominating effects in the samples. Two different metrics can be 
             picked to assess similarity: 'euclid' for expression inputs or 
-            'intersect' for comparison based on diff. genes/ markergenes.
+            'intersect' for comparison based on diff. genes/ marker genes.
             Differential and proportional similarity values are available 
             options for investagting the change in similarity.
 
@@ -1535,14 +1538,14 @@ class targets(_differential):
                 Sample A with Target A by 0.32 results in a proportional 
                 differential value of 0.1. 
                 For the 'intersect' metric, the intersect value of 
-                markergenes and diff. genes is devided by the number of 
-                target markergenes.
+                marker genes and diff. genes is devided by the number of 
+                target marker genes.
             display_similarity (str, optional): specify the group of 
-                markergenes to display similarity for. . Defaults to 'mgs mean'. 
+                marker genes to display similarity for. . Defaults to 'mgs mean'. 
                 Valid options are 
                 'mgs mean', 'mgs up', 'mgs down'. Relevent when targets are 
                 initiated with 
-                down-markergenes.
+                down-marker genes.
             n_targets (int, optional): the number of targets to display in each
                 plot. Defaults to 16. 
             display_negative (bool, optional): display the most negative values 
@@ -1747,22 +1750,22 @@ class targets(_differential):
             ax.set_axisbelow(True)
             ax.xaxis.grid(alpha=0.8, linestyle='dashed')  
             if which == 'euclid' and differential and not proportional:
-                xlbl = config.AGG_EUCL_DIFF_NOPROP
+                xlbl = config.EUCL_DIFF_NOPROP
             if which == 'euclid' and differential and proportional:
-                xlbl = config.AGG_EUCL_DIFF_PROP
+                xlbl = config.EUCL_DIFF_PROP
             elif which == 'euclid' and not differential:
-                xlbl = config.AGG_EUCL_NODIFF
+                xlbl = config.EUCL_NODIFF
             elif which == 'intersect' and not proportional:
-                xlbl = config.AGG_INTE_DIFF_NOPROP
+                xlbl = config.INTE_DIFF_NOPROP
             elif which == 'intersect' and proportional:
-                xlbl = config.AGG_INTE_DIFF_PROP
+                xlbl = config.INTE_DIFF_PROP
             # for absolute euclid sim., mark the untreated base if available
             if which == 'euclid' and not differential and samples._ctrl:
                 xs = ctrl_sim.loc[samples._ctrl, display_similarity]
                 xs = xs.reindex(ylbls, axis=1)
                 ax.vlines(xs, yts-.4, yts+.4, linewidth=.5)
                 xlbl = xlbl[:26] + ' (line = base)' +xlbl[26:]
-            ax.set_xlabel(xlbl)
+            ax.set_xlabel(xlbl, labelpad=10)
 
             if not colored_bars:
                 cols = config.colors[19]

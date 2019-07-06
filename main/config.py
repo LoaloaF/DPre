@@ -79,15 +79,15 @@ preset_targets_colors = {
 # predefined legend parameters for annotating preset_targets with various color-
 # labeled groups. For presets below, colors are defined in colors.tsv.
 preset_col_legend = {
-    'mouse': (['embryonic', 'germ cells', 'neural crest', 'surface ectoderm', 
-               'neuroectoderm', 'mesoderm', 'endoderm', 'blood mesoderm'], 
+    'mouse': (['Embryonic', 'Germ cells', 'Neural crest', 'Surface ectoderm', 
+               'Neuroectoderm', 'Mesoderm', 'Endoderm', 'Blood mesoderm'], 
               ['#fbcc8c', '#f0f0a6', '#c8b1ce', '#9edce4', '#5888c2',  
                '#64bb79',  '#843487',  '#fe7e81']),
-    'human': (['embryonic', 'surface ectoderm', 'neuroectoderm', 'mesoderm',  
-               'endoderm', 'blood mesoderm'],
+    'human': (['Embryonic', 'Surface ectoderm', 'Neuroectoderm', 'Mesoderm',  
+               'Endoderm', 'Blood mesoderm'],
               ['#fbcc8c', '#9edce4', '#5888c2', '#64bb79', '#843487', '#fe7e81']),
-    'm embryonic': (['pre-2C', '2C', '4C 8C', 'post-8C', 'Blastocyst', 
-                     'Naive ESCs', 'Epiblast', 'ESCs', 'late embryonic'], 
+    'm embryonic': (['Pre-2C', '2C', '4C 8C', 'post-8C', 'Blastocyst', 
+                     'Naive ESCs', 'Epiblast', 'ESCs', 'Late embryonic'], 
                     colors[3:12]),
 }
 
@@ -123,7 +123,7 @@ G_HM_UPDOWN_SPACE_SIZE = .4   # space between the up and down heatmaps
 
 # CB_* args correspond to the colorbar dimensions in inches
 CB_LEFT = .3                  # space left from the colorbar
-CB_LEFT_SEC = 1.3             # space left from the second colorbar
+CB_LEFT_SEC = 1.5             # space left from the second colorbar
 CB_TOP = .25                  # space on top of the colorbar
 CB_WIDTH = .85                # width of the colorbar
 CB_HEIGHT = .06               # height of the colorbar
@@ -137,18 +137,33 @@ BP_Y_COLORBAR = .04           # width of the colorbar on the left
 BP_BARSPACE = .8              # size of the bar plot
 BP_BARWIDTH_SIZE = .07        # width of the single bars
 
-# Aggregated plot labels; used for all plots except single-gene- and distance 
-# bar annotation
-AGG_EUCL_DIFF_NOPROP = ('Mean change in expr. similarity\n'
-                        '[differential mean Eucl. dist.]')
-AGG_EUCL_DIFF_PROP = ('Prop. of changed expr. similarity\n'
-                      '[prop. differential mean Eucl. dist.]')
-AGG_EUCL_NODIFF = ('Mean abs. expr. similarity\n'
-                   '[mean abs. Eucl. dist.]')
-AGG_INTE_DIFF_NOPROP = ('Diff.- & marker genes similarity\n'
-                        '[sum of matches(1) & mism.(-1)]')
-AGG_INTE_DIFF_PROP = ('Prop. of target markergene intersect\n'
-                      '[sum of matches(1) & mism.(-1)]')
+# plot labels for aggrevated information, per gene and specific distance bars 
+EUCL_DIFF_NOPROP = ('Mean change in expression similarity\n'
+                        '[differential mean Euclidean distance]')
+EUCL_DIFF_PROP = ('Proportion of changed expression similarity\n'
+                      '[proportional differential mean Euclidean distance]')
+EUCL_NODIFF = ('Mean absolute expression similarity\n'
+                   '[mean absolute Euclidean distance]')
+INTE_DIFF_NOPROP = ('Differential- & marker genes similarity\n'
+                        '[sum of matches(1) & mismatches(-1)]')
+INTE_DIFF_PROP = ('Proportion of target markergene intersect\n'
+                      '[sum of matches(1) & mismatches(-1) /n]')
+
+EUCL_G_DIFF_NOPROP = ('Change in expression similarity\n'
+                    '[differential Euclidean distance]')
+EUCL_G_DIFF_PROP = ('Proportion of changed expression similarity\n'
+                      '[proportional differential Euclidean distance]')
+EUCL_G_NODIFF = ('Absolute expression similarity\n'
+               '[absolute Euclidean distance]')
+INTE_G_DIFF_NOPROP = ('Differential genes similarity\n'
+                    '[target marker gene intersect]')
+
+EUCL_DIST_BAR = ('Base expression similarity\n'
+                 '[mean absolute Euclidean distance]')
+INTE_DIST_BAR = ('Number of marker genes\n')
+EUCL_G_DIST_BAR = ('Base expression similarity\n'
+                   '[absolute Euclidean distance]')
+
 
 def _update_consts(constants):
     """take in the kwargs passed to the plot and override the config constans"""

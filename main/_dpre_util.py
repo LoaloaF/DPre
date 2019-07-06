@@ -384,7 +384,7 @@ def _check_args(trg, smp, which, differential, proportional,
     return which, differential, proportional, hide_distance_bar, \
            reorder_to_distance_bar, cluster_hmx, display_similarity
 
-def plot_color_legend(labels, colors, ncolumns=1, filename='color_legend.png'):
+def plot_color_legend(labels, colors, ncolumns=4, filename='color_legend.png'):
     """Plot a custom color legend.
     
        Takes a list of labels and colors and links them to produce a color 
@@ -407,7 +407,7 @@ def plot_color_legend(labels, colors, ncolumns=1, filename='color_legend.png'):
         logger.error('The following colors are not recognized as colors by '
                      'matplotlib: {}'.format(inv_cols))
         sys.exit(1)
-    fig, ax = plt.subplots(1, 1, figsize=(2, 2))
+    fig, ax = plt.subplots(1, 1, figsize=(4, 4))
     _clean_axes(np.array([ax]))
     ax.legend(handles=[Patch(color=colors[i], label=labels[i]) 
                 for i in range(len(colors))], loc='center', ncol=ncolumns)

@@ -363,6 +363,7 @@ class targets(_differential):
                                   heatmap_height = None,
                                   heatmap_range = None,
                                   distance_bar_range = None,
+                                  specific_target_labels = None,
                                   targetlabels_space = None,
                                   samplelabels_space = None,
                                   targetlabels_size = None,
@@ -448,6 +449,8 @@ class targets(_differential):
                 None. The list is interpreted as, [lower_limit, upper_limit]. 
                 When None, the edges are defined to cover all occuring values. 
                 
+            specific_target_labels (list, optional): define a specific set of
+                target labels to display. Defaults to None
             targetlabels_space (float, optional): define the size in inches
                 to reserve for target labels, here, the white space on the
                 bottom. Defaults to None. When None, refer to the values set in 
@@ -642,7 +645,10 @@ class targets(_differential):
             # setup heatmap x,y axis, including the colorbars
             cols = self.get_colors(sim.columns) if not hide_targets_colorbar \
                    else None
-            util._setup_heatmap_xy('x', axes[3, 1], sim.columns, pivot,
+            xlbl = sim.columns
+            if specific_target_labels:
+                xlbl = [lbl if lbl in specific_target_labels else '' for lbl in xlbl]
+            util._setup_heatmap_xy('x', axes[3, 1], xlbl, pivot,
                                   hide_targetlabels, targetlabels_size, cols)
                    
             cols = samples.get_colors(sim.index[::-1]) if show_samples_colorbar \
@@ -700,7 +706,6 @@ class targets(_differential):
         logger.info('Drawing...')
         if filename:
             filename, pp = util._open_file(filename)
-        print(filename)
         fig, axes, data = do_plot()
         if plt_show:
                 plt.show()

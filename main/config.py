@@ -129,7 +129,7 @@ CB_WIDTH = .85                # width of the colorbar
 CB_HEIGHT = .06               # height of the colorbar
 
 # BP_* args correspond to plot elements in the barplot function
-BP_LEFT = 1.2                 # space left from the bar plot 
+BP_LEFT = 1.4                 # space left from the bar plot 
 BP_TOP = .7                   # space on top of the bar plot
 BP_RIGHT = .5                 # space right from the bar plot
 BP_BOTTOM = .4                # space on the bootom of the bar plot  

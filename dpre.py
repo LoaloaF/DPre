@@ -50,6 +50,7 @@ def _do_target_sim(args):
                     heatmap_height = args['heatmap_height'],
                     heatmap_range = args['heatmap_range'],
                     distance_bar_range = args['distance_bar_range'],
+                    specific_target_labels = args['specific_target_labels'],
                     targetlabels_space = args['targetlabels_space'],
                     samplelabels_space = args['samplelabels_space'],
                     targetlabels_size = args['targetlabels_size'],
@@ -248,6 +249,8 @@ genhm_grp.add_argument('--heatmap_range', '-hr', action='append', type=float,
                        help='range of heatmap values, (lower, upper)')
 genhm_grp.add_argument('--distance_bar_range', '-dr', action='append', type=float,
                        help='range of distance bar values, (lower, upper)')
+genhm_grp.add_argument('--specific_target_labels', '-st', action='append', 
+                       type=str,  help='plot specific set of target labels')
 genhm_grp.add_argument('--targetlabels_space', '-ta', type=float, 
                        help='space reserved for targetlabels in inches')
 genhm_grp.add_argument('--samplelabels_space', '-sa', type=float, 

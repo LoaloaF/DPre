@@ -1,0 +1,603 @@
+name	domain
+	
+Neural stem cells	#5888c2
+	
+Neurons	#5888c2
+	
+Brain fetal	#5888c2
+	
+Occipital lobe fetal	#5888c2
+	
+Parietal lobe fetal	#5888c2
+	
+Temporal lobe fetal	#5888c2
+	
+Amygdala adult	#5888c2
+	
+Amygdala newborn	#5888c2
+	
+Brain adult	#5888c2
+	
+Caudate nucleus adult	#5888c2
+	
+Caudate nucleus newborn	#5888c2
+	
+Cerebellum adult	#5888c2
+	
+Cerebellum newborn	#5888c2
+	
+Cerebral meninges adult	#5888c2
+	
+Frontal lobe adult	#5888c2
+	
+Globus pallidus newborn	#5888c2
+	
+Hippocampus adult	#5888c2
+	
+Hippocampus newborn	#5888c2
+	
+Insula adult	#5888c2
+	
+Medial frontal gyrus adult	#5888c2
+	
+Medial frontal gyrus newborn	#5888c2
+	
+Medial temporal gyrus adult	#5888c2
+	
+Medial temporal gyrus newborn	#5888c2
+	
+Nucleus accumbens adult	#5888c2
+	
+Occipital cortex adult	#5888c2
+	
+Occipital cortex newborn	#5888c2
+	
+Occipital lobe adult	#5888c2
+	
+Occipital pole adult	#5888c2
+	
+Olfactory region adult	#5888c2
+	
+Paracentral gyrus adult	#5888c2
+	
+Parietal cortex adult	#5888c2
+	
+Parietal lobe adult	#5888c2
+	
+Parietal lobe newborn	#5888c2
+	
+Postcentral gyrus adult	#5888c2
+	
+Putamen adult	#5888c2
+	
+Putamen newborn	#5888c2
+	
+Temporal lobe adult	#5888c2
+	
+Thalamus newborn	#5888c2
+	
+Corpus callosum adult	#5888c2
+	
+Diencephalon adult	#5888c2
+	
+Globus pallidus adult	#5888c2
+	
+Locus coeruleus adult	#5888c2
+	
+Locus coeruleus newborn	#5888c2
+	
+Medulla oblongata adult	#5888c2
+	
+Medulla oblongata newborn	#5888c2
+	
+Optic nerve	#5888c2
+	
+Pons adult	#5888c2
+	
+Spinal cord adult	#5888c2
+	
+Spinal cord fetal	#5888c2
+	
+Spinal cord newborn	#5888c2
+	
+Substantia nigra adult	#5888c2
+	
+Substantia nigra newborn	#5888c2
+	
+Thalamus adult	#5888c2
+	
+Cerebrospinal fluid	#5888c2
+	
+Eye vitreous humor	#5888c2
+	
+Eye fetal	#5888c2
+	
+Retina adult	#5888c2
+	
+Pineal adult	#5888c2
+	
+Pituitary adult	#5888c2
+	
+Appendix adult	#fe7e81
+	
+Lymph node adult	#fe7e81
+	
+Spleen adult	#fe7e81
+	
+Spleen fetal	#fe7e81
+	
+Thymus adult	#fe7e81
+	
+Thymus fetal	#fe7e81
+	
+Tonsil adult	#fe7e81
+	
+Vein adult	#fe7e81
+	
+Eosinophils	#fe7e81
+	
+Neutrophils	#fe7e81
+	
+Blood adult	#fe7e81
+	
+Neutrophil pmn	#fe7e81
+	
+Basophils	#fe7e81
+	
+Cd14+ monocytes	#fe7e81
+	
+Cd14+ monocyte derived endothelial progenitor cells	#fe7e81
+	
+Cd14+cd16+ monocytes	#fe7e81
+	
+Monocytes	#fe7e81
+	
+Cd19+ b cells	#fe7e81
+	
+Cd34+ progenitors	#fe7e81
+	
+Dendritic cells monocyte immature derived	#fe7e81
+	
+Dendritic cells plasmacytoid	#fe7e81
+	
+Macrophage monocyte derived	#fe7e81
+	
+Mast cell stimulated	#fe7e81
+	
+Mast cell	#fe7e81
+	
+Peripheral blood mononuclear cells	#fe7e81
+	
+Immature langerhans cells	#fe7e81
+	
+Migratory langerhans cells	#fe7e81
+	
+Cd4+ t cells	#fe7e81
+	
+Cd4+cd25+cd45ra+ naive regulatory t cells	#fe7e81
+	
+Memory regulatory t cells	#fe7e81
+	
+Naive conventional t cells	#fe7e81
+	
+Memory conventional t cells	#fe7e81
+	
+Cd8+ t cells	#fe7e81
+	
+Natural killer cells	#fe7e81
+	
+Gamma delta positive t cells	#fe7e81
+	
+Cd133+ stem cells adult bone marrow derived	#fe7e81
+	
+Cd133+ stem cells cord blood derived	#fe7e81
+	
+Cd34+ stem cells adult bone marrow derived	#fe7e81
+	
+Common myeloid progenitor cmp	#fe7e81
+	
+Granulocyte macrophage progenitor	#fe7e81
+	
+Pmc	#fe7e81
+	
+Lung adult	#5888c2
+	
+Lung fetal	#5888c2
+	
+Lung right lower lobe adult	#5888c2
+	
+Colon adult	#64bb79
+	
+Colon fetal	#64bb79
+	
+Duodenum fetal	#64bb79
+	
+Small intestine adult	#64bb79
+	
+Small intestine fetal	#64bb79
+	
+Rectum fetal	Embryonic
+	
+H9 embryonic stem cells	#843487
+	
+Adipose	#843487
+	
+Hips +ccl2	#843487
+	
+Hips	#843487
+	
+Adipocyte breast	#843487
+	
+Adipocyte omental	#843487
+	
+Adipocyte perirenal	#843487
+	
+Adipocyte subcutaneous	#843487
+	
+Alveolar epithelial cells	#843487
+	
+Amniotic epithelial cells	#843487
+	
+Anulus pulposus cell	#843487
+	
+Astrocyte cerebellum	#843487
+	
+Astrocyte cerebral cortex	#843487
+	
+Bronchial epithelial cell	#843487
+	
+Cardiac myocyte	#843487
+	
+Chondrocyte de diff	#843487
+	
+Chondrocyte re diff	#843487
+	
+Ciliary epithelial cells	#843487
+	
+Corneal epithelial cells	#843487
+	
+Endothelial cells aortic	#843487
+	
+Endothelial cells artery	#843487
+	
+Endothelial cells lymphatic	#843487
+	
+Endothelial cells microvascular	#843487
+	
+Endothelial cells thoracic	#843487
+	
+Endothelial cells umbilical vein	#843487
+	
+Endothelial cells vein	#843487
+	
+Esophageal epithelial cells	#843487
+	
+Fibroblast aortic adventitial	#843487
+	
+Fibroblast cardiac	#843487
+	
+Fibroblast choroid plexus	#843487
+	
+Fibroblast conjunctival	#843487
+	
+Fibroblast dermal	#843487
+	
+Fibroblast gingival	#843487
+	
+Fibroblast lung	#843487
+	
+Fibroblast lymphatic	#843487
+	
+Fibroblast mammary	#843487
+	
+Fibroblast periodontal ligament	#843487
+	
+Fibroblast pulmonary artery	#843487
+	
+Fibroblast villous mesenchymal	#843487
+	
+Fibroblast skin normal	#843487
+	
+Gingival epithelial cells	#843487
+	
+Hair follicle dermal papilla cells	#843487
+	
+Hair follicle outer root sheath cells	#843487
+	
+Hepatic sinusoidal endothelial cells	#843487
+	
+Hepatic stellate cells	#843487
+	
+Iris pigment epithelial cells	#843487
+	
+Keratinocyte epidermal	#843487
+	
+Keratinocyte oral	#843487
+	
+Keratocytes	#843487
+	
+Lens epithelial cells	#843487
+	
+Cells	#843487
+	
+Mammary epithelial cell	#843487
+	
+Melanocyte dark	#843487
+	
+Melanocyte light	#843487
+	
+Melanocyte	#843487
+	
+Meningeal cells	#843487
+	
+Mesenchymal stem cells vertebral	#843487
+	
+Mesenchymal stem cells whartons jelly	#843487
+	
+Mesenchymal stem cells adipose	#843487
+	
+Mesenchymal stem cells amniotic membrane	#843487
+	
+Mesenchymal stem cells bone marrow	#843487
+	
+Mesenchymal stem cells hepatic	#843487
+	
+Mesenchymal stem cells umbilical	#843487
+	
+Mesothelial cells	#843487
+	
+Multipotent cord blood unrestricted somatic stem cells	#843487
+	
+Myoblast	#843487
+	
+Nucleus pulposus cell	#843487
+	
+Olfactory epithelial cells	#843487
+	
+Oligodendrocyte precursors	#843487
+	
+Osteoblast	#843487
+	
+Pancreatic stromal cells	#843487
+	
+Pericytes	#843487
+	
+Perineurial cells	#843487
+	
+Placental epithelial cells	#843487
+	
+Preadipocyte breast	#843487
+	
+Preadipocyte omental	#843487
+	
+Preadipocyte perirenal	#843487
+	
+Preadipocyte subcutaneous	#843487
+	
+Preadipocyte visceral	#843487
+	
+Prostate epithelial cells	#843487
+	
+Prostate stromal cells	#843487
+	
+Renal cortical epithelial cells	#843487
+	
+Renal epithelial cells	#843487
+	
+Renal glomerular endothelial cells	#843487
+	
+Renal mesangial cells	#843487
+	
+Renal proximal tubular epithelial cell	#843487
+	
+Retinal pigment epithelial cells	#843487
+	
+Schwann cells	#843487
+	
+Sebocyte	#843487
+	
+Sertoli cells	#843487
+	
+Skeletal muscle cells	#843487
+	
+Skeletal muscle satellite cells	#843487
+	
+Small airway epithelial cells	#843487
+	
+Smooth muscle cells aortic	#843487
+	
+Smooth muscle cells bladder	#843487
+	
+Smooth muscle cells brachiocephalic	#843487
+	
+Smooth muscle cells brain vascular	#843487
+	
+Smooth muscle cells bronchial	#843487
+	
+Smooth muscle cells carotid	#843487
+	
+Smooth muscle cells colonic	#843487
+	
+Smooth muscle cells coronary artery	#843487
+	
+Smooth muscle cells esophageal	#843487
+	
+Smooth muscle cells internal thoracic artery	#843487
+	
+Smooth muscle cells intestinal	#843487
+	
+Smooth muscle cells prostate	#843487
+	
+Smooth muscle cells pulmonary artery	#843487
+	
+Smooth muscle cells subclavian artery	#843487
+	
+Smooth muscle cells tracheal	#843487
+	
+Smooth muscle cells umbilical artery	#843487
+	
+Smooth muscle cells umbilical vein	#843487
+	
+Smooth muscle cells uterine	#843487
+	
+Smooth muscle cells airway control	#843487
+	
+Synoviocyte	#843487
+	
+Trabecular meshwork cells	#843487
+	
+Tracheal epithelial cells	#843487
+	
+Urothelial cells	#843487
+	
+Amniotic membrane cells	#843487
+	
+Chorionic membrane cells	#843487
+	
+Mesenchymal precursor cell adipose	#843487
+	
+Mesenchymal precursor cell bone marrow	#843487
+	
+Mesenchymal precursor cell cardiac	#843487
+	
+Nasal epithelial cells	#843487
+	
+Salivary acinar cells	#843487
+	
+Tenocyte	#843487
+	
+Hepatocyte	#843487
+	
+Intestinal epithelial cells	#843487
+	
+Liver adult	#843487
+	
+Liver fetal	#843487
+	
+Cervix adult	#843487
+	
+Penis adult	#843487
+	
+Skin fetal	#843487
+	
+Throat fetal	#843487
+	
+Tongue epidermis	#843487
+	
+Tongue adult	#843487
+	
+Tongue fetal	#843487
+	
+Trachea fetal	#843487
+	
+Uterus adult	#843487
+	
+Uterus fetal	#843487
+	
+Fingernail nail plate eponychium	#843487
+	
+Skin palm	#843487
+	
+Skin adult	#843487
+	
+Esophagus adult	#9edce4
+	
+Parotid adult	#9edce4
+	
+Salivary adult	#9edce4
+	
+Submaxillary adult	#9edce4
+	
+Throat adult	#9edce4
+	
+Trachea adult	#9edce4
+	
+Artery adult	#843487
+	
+Diaphragm fetal	#843487
+	
+Eye muscle inferior rectus	#843487
+	
+Eye muscle lateral	#843487
+	
+Eye muscle medial	#843487
+	
+Eye muscle superior	#843487
+	
+Heart mitral valve adult	#843487
+	
+Heart pulmonic valve adult	#843487
+	
+Heart tricuspid valve adult	#843487
+	
+Heart adult diseased	#843487
+	
+Heart adult	#843487
+	
+Heart fetal	#843487
+	
+Left atrium adult	#843487
+	
+Left ventricle adult	#843487
+	
+Skeletal muscle soleus muscle	#843487
+	
+Skeletal muscle adult	#843487
+	
+Skeletal muscle fetal	#843487
+	
+Umbilical cord fetal	#843487
+	
+Achilles tendon	#64bb79
+	
+Adipose tissue adult	#64bb79
+	
+Bone marrow adult	#64bb79
+	
+Breast adult	#64bb79
+	
+Cruciate ligament	#64bb79
+	
+Dura mater adult	#64bb79
+	
+Mature adipocyte	#64bb79
+	
+Placenta adult	#64bb79
+	
+Urethra	#64bb79
+	
+Adrenal adult	#64bb79
+	
+Aorta adult	#64bb79
+	
+Bladder adult	#64bb79
+	
+Ductus deferens adult	#64bb79
+	
+Epididymis adult	#64bb79
+	
+Gall bladder adult	#64bb79
+	
+Kidney adult	#64bb79
+	
+Kidney fetal	#64bb79
+	
+Ovary adult	#64bb79
+	
+Pancreas adult	#64bb79
+	
+Prostate adult	#64bb79
+	
+Seminal vesicle adult	#64bb79
+	
+Smooth muscle adult	#64bb79
+	
+Stomach fetal	#64bb79
+	
+Thyroid adult	#64bb79
+	
+Thyroid fetal	#64bb79
+	
+Vagina adult	#64bb79
+	
+Testis adult	#64bb79

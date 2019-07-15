@@ -1,5 +1,7 @@
-""" Initiation of DPre and import checking. Runs when `import DPre` is called. 
-Defines which modules and functions are accessable through DPre.*
+""" DPre is a bioinformatic tool that enables the user to explore cell type 
+conversion/ differentiation experiments. DPre may take the expression or the 
+differentially regulated genes of the samples to rate transcriptional similarity 
+with a reference dataset, the targets. 
 """
 import os, sys
 sys.path.insert(0, os.path.dirname(__file__))

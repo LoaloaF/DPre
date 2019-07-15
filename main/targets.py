@@ -177,7 +177,7 @@ class targets(_differential):
         # in the targets and samples. Positive value = samples higher expressed
         eucl_dist = lambda smp_d: smp_d -trg_data[smp_d.columns.unique(0)].values 
         # calculate matches between targets and samples. A match results in 
-        # -1+-1= -2 or 1+1=2, mismatches in 0, no diff-gene/ no marker gene in 1 
+        # -1+-1= -2 or 1+1=2, mismatches in 0, nor up- or down sample gene in 1 
         # Matches are set to 1, mismatches to -1, no overlap to 0
         def mg_inters(smp_d):
             m = abs(smp_d + trg_data[smp_d.columns[0][0]].values)
@@ -188,7 +188,8 @@ class targets(_differential):
         return ovp
 
     def plot_detec_mgs_prop(self, samples, plt_show=False, 
-                            filename='detec_mgs_prop.png'):
+                            filename='detec_mgs_prop.png', 
+                            specific_target_labels=None):
         """Show the proportion of detected marker genes in logs and a histogram.
 
             Useful for adjusting the DROP_TARGET_DETEC_THR value.
@@ -201,6 +202,8 @@ class targets(_differential):
                 filename (str, optional): Filename to save the generated 
                     histogram. Defaults to None in which case no plot is 
                     saved.
+                specific_target_labels (list, optional): define a specific set 
+                    of target labels to display. Defaults to None
             Returns:
                 det: A DataFrame with detection values used for logging and 
                     plotting
@@ -237,6 +240,12 @@ class targets(_differential):
             ax.hlines(config.DROP_TARGET_DETEC_THR, 0, len(self))
             ax.yaxis.grid(alpha=0.8, linestyle='dashed')
             ax.set_xlabel(self.name, fontsize=4)
+            if specific_target_labels:
+                xlbl = [lbl if lbl in specific_target_labels else '' 
+                        for lbl in order]
+                ax.set_xticks(np.arange(len(xlbl)))
+                ax.set_xticklabels(xlbl, rotation=45, ha='right', 
+                                rotation_mode='anchor')
             ax.set_ylabel('Proportion of detected marker genes', fontsize=4)
             tit = ('Proportion of detected {} marker genes in {}\nline = drop '
                    'threshold').format(self.name, samples.name)

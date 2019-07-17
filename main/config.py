@@ -7,7 +7,7 @@ from scipy.cluster.hierarchy import set_link_color_palette
 # change DPI from 100 to 300, adjust everything accordingly
 mpl.rcParams['figure.dpi'] = 300.0
 mpl.rcParams['savefig.dpi'] = 300.0
-mpl.rcParams['font.size'] = FONTS = 3.5
+mpl.rcParams['font.size'] = FONTS = 5
 mpl.rcParams['lines.linewidth'] = 0.3
 mpl.rcParams['hatch.linewidth'] = 0.3333
 mpl.rcParams['patch.linewidth'] = 0.3333
@@ -107,62 +107,68 @@ set_link_color_palette(dendrogram_colors[1:])
 HM_LEFT = 1.1                 # space left from the plot
 HM_TOP = 1                    # space on top of the plot
 HM_RIGHT = .2                 # space right from the plot
-HM_BOTTOM = 1.35              # space at the bottom of the plot
+HM_BOTTOM = 1.6              # space at the bottom of the plot
 HM_WSPACE = .04               # space between plot elements left and right
 HM_HSPACE = .02               # space between plot elements top and bottom
 HM_Y_COLORBAR = .04           # width of the colorbar on the left
 HM_X_COLORBAR = .04           # width of the colorbar on the right
-HM_DISTANCE_BAR = .06         # width of the distance bar on top of the heatmap
+HM_DISTANCE_BAR = .08         # width of the distance bar on top of the heatmap
 HM_Y_DENDROGRAM = .3          # size of the dendrogram on the y-axis
 HM_X_DENDROGRAM = .3          # size of the dendrogram on the x-axis 
-HM_SQUARE_SIZE = .07          # the size of one heatmap square
+HM_SQUARE_SIZE = .1          # the size of one heatmap square
 
 # G_HM_* args correspond to plot elements in the single-gene heatmap function
-G_HM_SUMPLOT_SIZE = .9        # size of the summary plot
+G_HM_SUMPLOT_SIZE = 1        # size of the summary plot
 G_HM_UPDOWN_SPACE_SIZE = .4   # space between the up and down heatmaps
 
 # CB_* args correspond to the colorbar dimensions in inches
 CB_LEFT = .3                  # space left from the colorbar
 CB_LEFT_SEC = 1.5             # space left from the second colorbar
-CB_TOP = .25                  # space on top of the colorbar
-CB_WIDTH = .85                # width of the colorbar
-CB_HEIGHT = .06               # height of the colorbar
+CB_TOP = .35                  # space on top of the colorbar
+CB_WIDTH = 1                  # width of the colorbar
+CB_HEIGHT = .07               # height of the colorbar
 
 # BP_* args correspond to plot elements in the barplot function
-BP_LEFT = 1.4                 # space left from the bar plot 
+BP_LEFT = 1.6                 # space left from the bar plot 
 BP_TOP = .7                   # space on top of the bar plot
 BP_RIGHT = .5                 # space right from the bar plot
-BP_BOTTOM = .4                # space on the bootom of the bar plot  
+BP_BOTTOM = .5                # space on the bootom of the bar plot  
 BP_Y_COLORBAR = .04           # width of the colorbar on the left
-BP_BARSPACE = .8              # size of the bar plot
-BP_BARWIDTH_SIZE = .07        # width of the single bars
+BP_BARSPACE = .8              # size of the bar plot (width)
+BP_BARWIDTH_SIZE = .1         # width of the single bars
 
+delta = r'$\Delta$ '
 # plot labels for aggrevated information, per gene and specific distance bars 
-EUCL_DIFF_NOPROP = ('Mean change in expression similarity\n'
-                        '[differential mean Euclidean distance]')
-EUCL_DIFF_PROP = ('Proportion of changed expression similarity\n'
-                      '[proportional differential mean Euclidean distance]')
-EUCL_NODIFF = ('Mean absolute expression similarity\n'
-                   '[mean absolute Euclidean distance]')
-INTE_DIFF_NOPROP = ('Differential- & marker genes similarity\n'
-                        '[sum of matches(1) & mismatches(-1)]')
-INTE_DIFF_PROP = ('Proportion of target markergene intersect\n'
-                      '[sum of matches(1) & mismatches(-1) /n]')
+EUCL_DIFF = ('{0}Expression similarity\n'
+                    '[{0}Euclidean distance]'.format(delta))
+# EUCL_DIFF_PROP = ('Proportion of changed expression similarity\n'
+#                       '[proportional differential mean Euclidean distance]')
+EUCL_NODIFF = ('Absolute expression similarity\n'
+               '[Euclidean distance]')
+# INTE_DIFF_NOPROP = ('Differential- & marker genes similarity\n'
+#                         '[sum of matches(1) & mismatches(-1)]')
+INTE_DIFF = ('Marker gene similarity\n'
+             '[proportion of intersect]')
 
-EUCL_G_DIFF_NOPROP = ('Change in expression similarity\n'
-                    '[differential Euclidean distance]')
-EUCL_G_DIFF_PROP = ('Proportion of changed expression similarity\n'
-                      '[proportional differential Euclidean distance]')
-EUCL_G_NODIFF = ('Absolute expression similarity\n'
-               '[absolute Euclidean distance]')
-INTE_G_DIFF_NOPROP = ('Differential genes similarity\n'
-                    '[target marker gene intersect]')
+INTE_DIFF_SINGLE = ('Marker gene intersect\n'
+                    '[matches and mismatches]')
+INTE_DIFF_SINGLE_SUM = ('Proportion of intersect\n'
+                      '[sum of matches(1) &\nmismatches(-1) /n]')
 
-EUCL_DIST_BAR = ('Base expression similarity\n'
-                 '[mean absolute Euclidean distance]')
+# EUCL_G_DIFF_NOPROP = ('Absolute expression similarity\n'
+#                     '[differential Euclidean distance]')
+# EUCL_G_DIFF_PROP = ('Proportion of changed expression similarity\n'
+#                       '[proportional differential Euclidean distance]')
+# EUCL_G_NODIFF = ('Absolute expression similarity\n'
+#                '[absolute Euclidean distance]')
+# INTE_G_DIFF_NOPROP = ('Differential genes similarity\n'
+#                     '[target marker gene intersect]')
+
+EUCL_DIST_BAR = ('Base Expression similarity\n'
+                 '[Euclidean distance]')
 INTE_DIST_BAR = ('Number of marker genes\n')
 EUCL_G_DIST_BAR = ('Base expression similarity\n'
-                   '[absolute Euclidean distance]')
+                   '[Euclidean distance]')
 
 
 def _update_consts(constants):

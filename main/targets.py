@@ -6,6 +6,7 @@ import copy
 import matplotlib.pyplot as plt
 from matplotlib.colors import is_color_like
 from matplotlib.lines import Line2D
+from scipy.spatial import distance
 
 from DPre.main._differential import _differential
 from DPre.main.samples import samples
@@ -57,15 +58,18 @@ class targets(_differential):
     """
     def __init__(self, markergenes=None, expression=None, name=None, 
                  ignore_down_mgs=False, override_namematcher=False, 
-                 species='mouse', log=True):
+                 species=None, log=True):
         # call _differential __init__ method
         super().__init__(diff_genes=markergenes, expression=expression, 
                          name=name, override_namematcher=override_namematcher, 
                          log=log)
-        # define if down marker genes are used, which species and the overlap
+        # define if down marker genes are used, metric species and the overlap
         self._down_mgs = not ignore_down_mgs
         self._species = species
         self._overlaps = {}
+
+        self._trg_sims = {}
+        self._gene_sims = {}
         
         # remove down mgs from _diff if in there but not desired by the user
         if self._has_diff:
@@ -86,7 +90,8 @@ class targets(_differential):
                            'genes can lead to low accuracy for defining '
                            'transcriptional similarity.'.format(self.name))
         
-        # _expr_mgs stores a mask of _expr that holds only the marker genes
+        # _expr_mgs store
+        # s a mask of _expr that holds only the marker genes
         if self._has_expr:
             expr_mgs = util._add_mg_types(self._expr.copy(), self._down_mgs)
             if self._has_diff: 
@@ -118,11 +123,11 @@ class targets(_differential):
         """Get the marker gene types present in the targets instance"""
         return ['up', 'down'] if self._down_mgs else ['up']
 
-    def _overlap_samples(self, samples, which):
+    def _compute_similarity(self, samples, metric):
         """Core function computing the similarity between samples and targets
         
             This function outputs either the euclidean distance similarity for 
-            which = 'euclid' or the marker gene & diff. gene intersect for which 
+            metric = 'euclid' or the marker gene & diff. gene intersect for metric 
             = 'intersect'. Returns a similarity matrix that is also stored in
             the targets dictionary '_overlaps' with the id(samples) as the key.
         """
@@ -140,53 +145,132 @@ class targets(_differential):
             self = self.slice_elements(keep, log=False)
 
         spacer.info('')
-        logger.info('Overlappping samples ({}): `{}` on targets: `{}` ... '
-                    .format(which, samples.name, self.name))
-        # to overlap samples and targets, the data-shapes need to be adjusted
-        if which == 'euclid':
-            # get the z-data of targets marker genes and samples
-            # if the targets have down marker genes, duplicate samples data to 
-            # match targets shape
+        logger.info('Computing similarity `{}` of samples `{}` and targets: '
+                    '`{}` ... '.format(metric, samples.name, self.name))
+        # get expression data or gene list data of samples and targets
+        if metric != 'intersect':
+            # get the z-data of targets marker genes and all samples genes
             trg_data = self._expr_mgs.xs('z', 1, 2)
             smp_data = samples._expr.xs('z', 1, 1)
-            smp_data = util._add_mg_types(smp_data, self._down_mgs)
-        elif which == 'intersect':
-            # substitute diff data with +1 for up genes, -1 for down
-            # slice the sample data to the targets mg types to match the shape 
-            smp_data = util._diff_to_int_updown_notation(samples._diff, True)
-            smp_data = smp_data[self._mg_types]
+        else:
+            # get gene list data (bool) and substitute diff data with +1 for 
+            # up genes, -1 for down. Samples up and down lists are merged
+            smp_data = util._bool_to_int_genes(samples._diff, return_merged=True)
             diff_mgs = self._diff.reindex(self._mgs)
-            trg_data = util._diff_to_int_updown_notation(diff_mgs, False)
-            # non marker genes are set to NaN for the targets 
+            trg_data = util._bool_to_int_genes(diff_mgs, trans_updown=False)
             trg_data.mask(trg_data == 0, inplace=True)
+        
+        def compute_trg_sim(trg_d):
+            det = trg_d.index[trg_d.notna()].intersection(smp_data.index)
+            trg = trg_d.reindex(det)
+            smp_d = smp_data.reindex(det)
+            if metric == 'pearson':
+                return smp_d.apply(lambda smp: (distance.correlation(smp, trg)-1)*-1)
+            elif metric == 'cosine':
+                return smp_d.apply(lambda smp: (distance.cosine(smp, trg)-1)*-1)
+            else:
+                # additionally save single gene similarity matrix here
+                if metric == 'euclid':
+                    gene_sims.append(smp_d.apply(lambda smp: smp-trg))
+                    return gene_sims[-1].abs().mean()
+                elif metric == 'intersect':
+                    def mg_inters(smp_d):
+                        m = abs(smp_d + trg)
+                        return m.mask(m == 2, 1).mask(m == 1, 0).mask(m == 0, -1)
+                    gene_sims.append(smp_d.apply(mg_inters))
+                    return gene_sims[-1].mean()
+        if metric in ['euclid', 'intersect']:
+            gene_sims = []
+            trg_sim = trg_data.apply(compute_trg_sim)
+            
+            # single gene data saving
+            gene_sim = pd.concat(gene_sims, axis=1, sort=False)
+            idx = [*[trg_data.columns.unique(i) for i in (0,1)], smp_data.columns]
+            gene_sim.columns = pd.MultiIndex.from_product(idx)
+            self._gene_sims['{}-{}'.format(id(samples), metric)] = gene_sim
+        else:
+            trg_sim = trg_data.apply(compute_trg_sim)
 
-        # repeat the samples data n targets times for groupby operation
-        # smp_ext will be transformed to the final output
-        smp_data = smp_data.reindex(self._mgs)
-        smp_exts = [d for _, dd in smp_data.iteritems() 
-                    for d in [dd]*len(self.names)]
-        smp_ext = pd.concat(smp_exts, axis=1)
-        lvls = (self._mg_types, smp_ext.columns.unique(1), self.names)
-        smp_ext.columns = pd.MultiIndex.from_product(lvls).swaplevel()
-        # ignore not detected marker genes 
-        smp_ext.dropna(inplace=True)
-        trg_data = trg_data.reindex(smp_ext.index)
+        trg_sim = util._add_mgtmean(trg_sim)
+        self._trg_sims['{}-{}'.format(id(samples), metric)] = trg_sim
 
-        # core
-        # calculate the differnece between the z target marker gene expression 
-        # in the targets and samples. Positive value = samples higher expressed
-        eucl_dist = lambda smp_d: smp_d -trg_data[smp_d.columns.unique(0)].values 
-        # calculate matches between targets and samples. A match results in 
-        # -1+-1= -2 or 1+1=2, mismatches in 0, nor up- or down sample gene in 1 
-        # Matches are set to 1, mismatches to -1, no overlap to 0
-        def mg_inters(smp_d):
-            m = abs(smp_d + trg_data[smp_d.columns[0][0]].values)
-            return m.mask(m == 2, 1).mask(m == 1, 0).mask(m == 0, -1)
-        do_ovp = eucl_dist if which == 'euclid' else mg_inters
-        ovp = smp_ext.groupby(axis=1, level=(0,2), sort=False).apply(do_ovp)
-        self._overlaps['{}-{}'.format(id(samples), which)] = ovp
-        return ovp
 
+
+    def _get_similarity(self, samples, metric, which_sim='target_sim', 
+                          differential=False, drop_ctrl=True, 
+                          inters_to_updown_not=True, log=True):
+        """Access and specifically process similarity data in overlap. Returns 
+            4 elements, single-gene similarity, aggregated similarity (mean for 
+            'euclid' metric, sum for 'intersect'), single-gene distance and 
+            aggregated distance. Option for differential and proportional 
+            similarities.
+        """
+        # check if overlap has already been computed, if not do overlap
+        try:
+            key = '{}-{}'.format(id(samples), metric)
+            trg_sim = self._trg_sims[key].copy()
+        except KeyError:
+            self._compute_similarity(samples, metric)
+            trg_sim = self._trg_sims[key].copy()
+        if log:
+            logger.info('Selecting and processing overlap data...')
+
+        # ensure the overlap DataFrame has the correct ordering 
+        t_ord = trg_sim.columns.unique(1)
+        val_t_ord = pd.Index(self.names)
+        val_t_ord = val_t_ord.drop(val_t_ord.difference(t_ord))
+        if t_ord.tolist() != val_t_ord.tolist():
+            trg_sim = trg_sim.reindex(val_t_ord, level=1, axis=1)
+        s_ord = trg_sim.index
+        val_s_ord = samples.names
+        if s_ord.tolist() != val_s_ord:
+            trg_sim = trg_sim.reindex(val_s_ord)
+
+        # return target similarity, i.e. the aggregated single gene similarities
+        if which_sim == 'target_sim':
+            sim = trg_sim
+            # expression based metrics
+            if metric != 'intersect':
+                if samples._ctrl:
+                    ctrl_sim = sim.xs(samples._ctrl, drop_level=False)
+                    if drop_ctrl:
+                        sim.drop(samples._ctrl, inplace=True)
+                    if differential:
+                        sim = sim.apply(lambda smp: smp - ctrl_sim, axis=1)
+                    return sim, ctrl_sim.to_frame().T
+                else:
+                    return sim, None
+            # gene list based metrics (intersect is differential by itself)
+            else:
+                # instead of a control, the number of marker genes are returned
+                n_mgs = self._diff.sum()
+                n_mgs = n_mgs.append(n_mgs.groupby(level=1, axis=0).mean())
+                return sim, pd.DataFrame([n_mgs.values], ['n_mgs'], sim.columns)
+        
+        # return gene similarity, only available for euclid and intersect metric
+        elif which_sim == 'gene_sim':
+            sim = self._gene_sims[key].copy()
+            if metric == 'euclid':
+                if samples._ctrl:
+                    ctrl_sim = sim.xs(samples._ctrl, 1, 2, drop_level=False)
+                    if drop_ctrl:
+                        sim.drop(samples._ctrl, axis=1, level=2, inplace=True)
+                    if differential:
+                        c_mask = np.repeat(ctrl_sim.values, axis=1, 
+                                           repeats=len(sim.columns.unique(2)))
+                        sim = sim.abs() - np.abs(c_mask)
+                    return sim, ctrl_sim
+                else:
+                    return sim, None
+            elif metric == 'intersect':
+                if samples._ctrl and drop_ctrl:
+                    sim.drop(samples._ctrl, axis=1, level=2, inplace=True)
+                # by default sim holds matches (1) and mismatches (-1) 
+                # this option makes -1 the positve value for down-marker genes
+                if inters_to_updown_not and self._down_mgs:
+                    sim['down'] *= -1
+                return sim, None
+            
     def plot_detec_mgs_prop(self, samples, plt_show=False, 
                             filename='detec_mgs_prop.png', 
                             specific_target_labels=None):
@@ -200,7 +284,7 @@ class targets(_differential):
                 plt_show (bool, optional): Directly the histogram in a new
                     window. Defaults to False.
                 filename (str, optional): Filename to save the generated 
-                    histogram. Defaults to None in which case no plot is 
+                    histogram. Defaults to None in metric case no plot is 
                     saved.
                 specific_target_labels (list, optional): define a specific set 
                     of target labels to display. Defaults to None
@@ -259,7 +343,7 @@ class targets(_differential):
             plt.close()
         return det
 
-    def _get_from_overlap(self, samples, which, genes_diff=False, 
+    def _get_from_overlap(self, samples, metric, genes_diff=False, 
                           genes_prop=False, genes_agg_diff=False, 
                           genes_agg_prop=False, drop_ctrl=True, 
                           inters_to_updown_not=True, log=True):
@@ -271,9 +355,10 @@ class targets(_differential):
         """
         # check if overlap has already been computed, if not do overlap
         try:
-            ovp = self._overlaps['{}-{}'.format(id(samples), which)].copy()
+            ovp = self._overlaps['{}-{}'.format(id(samples), metric)].copy()
         except KeyError:
-            ovp = self._overlap_samples(samples, which).copy()
+            ovp = self._compute_similarity(samples, metric)
+            ovp = self._gene_sims['{}-{}'.format(id(samples), metric)].copy()
 
         # make sure the overlap DataFrame has the correct ordering 
         t_ord = ovp.columns.unique(1)
@@ -285,10 +370,9 @@ class targets(_differential):
         val_s_ord = samples.names
         if s_ord.tolist() != val_s_ord:
             ovp = ovp.reindex(val_s_ord, level=2, axis=1)
-
         if log:
             logger.info('Selecting and processing overlap data...')
-        if which == 'euclid':
+        if metric == 'euclid':
             # get single gene control ovp values and aggregate (absolute mean)
             if samples._ctrl:
                 ctrl_genes = ovp.xs(samples._ctrl, 1, 2, False)
@@ -336,7 +420,7 @@ class targets(_differential):
                 agg.drop(samples._ctrl, inplace=True)
             return genes, agg, ctrl_genes, ctrl_agg
         
-        elif which == 'intersect':
+        elif metric == 'intersect':
             # ovp stores matches (1) and mismatches (-1). This option is for 
             # reverting that notation for down mgs, matches -1, mismatches 1
             n_mgs = ovp.notna().sum().xs(s_ord[0], level=2)
@@ -358,9 +442,8 @@ class targets(_differential):
     def target_similarity_heatmap(self, 
                                   # plot data
                                   samples, 
-                                  which = None, 
+                                  metric = None, 
                                   differential = True,
-                                  proportional = False, 
                                   display_similarity = 'mgs mean',
                                   # data ordering
                                   cluster_targets = False,
@@ -396,14 +479,14 @@ class targets(_differential):
         This gives a compact insight on transcriptional similarity with the 
         targets. Two different metrics can be picked to assess similarity: 
         'euclid' for expression inputs or 'intersect' for comparison based 
-        on diff. genes/ marker genes. Differential and proportional 
+        on diff. genes/ marker genes. Differential and absolute 
         similarity values are available options for investigating the change 
         in similarity.
 
         Args:
             =================== Plot data options ===================
             samples (samples): the data to rate similarity for.
-            which (str, optional): the similarity metric to use. Valid 
+            metric (str, optional): the similarity metric to use. Valid 
                 options are 'euclid' and 'intersect'. Defaults to None.
                 'euclid' shows the mean euclidean distance towards the 
                 target marker genes expression levels and requires `expression` 
@@ -416,15 +499,6 @@ class targets(_differential):
                 similarity between samples and targets. Defaults to True. 
                 Requires a control to be passed for the 'euclid' metric. Cannot 
                 be False for 'intersect'-metric.
-            proportional (bool, optional): plot the proportional differential 
-                similarity between samples and targets. Defaults to False. For 
-                the 'euclid'-metric, a proportional value of 1 reflects a change 
-                in similarity equal to the absolute similarity of the control. 
-                Example: the samples control has an absolute similarity of 3.2 
-                with target A. A change in similarity of Sample A with Target A 
-                by 0.32 results in a proportional differential value of 0.1. For 
-                the 'intersect' metric, the intersect value of marker genes and 
-                diff. genes is divided by the number of target marker genes.
             display_similarity (str, optional): specify the group of 
                 marker genes to display similarity for. . Defaults to 'mgs mean'. 
                 Valid options are 
@@ -525,9 +599,8 @@ class targets(_differential):
         """
         # check user input for errors and incompatibilities
         def _check_args():
-            nonlocal which
+            nonlocal metric
             nonlocal differential
-            nonlocal proportional
 
             nonlocal cluster_targets
             nonlocal reorder_to_distance_bar
@@ -535,19 +608,21 @@ class targets(_differential):
             nonlocal display_similarity
 
             # check general basic input requirements
-            a = util._check_args(self, samples, which, differential, proportional, 
+            a = util._check_args(self, samples, metric, differential, 
                                 hide_distance_bar, reorder_to_distance_bar,
                                 cluster_targets, display_similarity)
-            which, differential, proportional, hide_distance_bar, \
-            reorder_to_distance_bar, cluster_targets, display_similarity = a
+            metric, differential, hide_distance_bar, reorder_to_distance_bar, \
+            cluster_targets, display_similarity = a
             config._update_consts(kwargs)
             logger.info('Arguments passed. Getting data now ...')
 
         # get the specific overlap data, plot the mean of up and down mgs
         def get_data():
-            _, sim, _, ctrl_sim = self._get_from_overlap(samples, which, 
-                                                    genes_agg_diff=differential, 
-                                                    genes_agg_prop=proportional)
+            sim, ctrl_sim = self._get_similarity(samples, metric, 
+                                                 differential=differential)
+            # _, sim, _, ctrl_sim = self._get_from_overlap(samples, metric, 
+            #                                         genes_agg_diff=differential, 
+            #                                         genes_agg_prop=proportional)
             if ctrl_sim is None:
                 ctrl_sim =  pd.DataFrame(0, [0], sim.columns)
             return [sim.xs(display_similarity, 1, 0), 
@@ -559,7 +634,7 @@ class targets(_differential):
             maxi = abs(data[0].max().max())
             cap = round(max((mini, maxi)), 1)
             db_cap = round(data[1].iloc[0].max(), 1)
-            if which == 'euclid' and not differential:
+            if metric != 'intersect' and not differential:
                 cap = db_cap = max((cap, db_cap))
             return cap, db_cap
         
@@ -609,13 +684,13 @@ class targets(_differential):
                 this_t = False
             if title:
                 if title and type(title) is not str:
-                    this_t = util._make_title(differential, proportional, which, 
+                    this_t = util._make_title(differential, metric, 
                                               samples.name, self.name)
                 else:
                     this_t = title
                 if not pivot:
                     fig.suptitle(this_t, y=1- (config.HM_TOP/height)*.7, 
-                                               fontsize=config.FONTS)
+                                 fontsize=config.FONTS)
                 else:
                     axes[2, 0].set_ylabel(this_t, labelpad=10)
 
@@ -636,13 +711,13 @@ class targets(_differential):
                     order = ctrl_sim.iloc[0].sort_values().index
                     sim, ctrl_sim = util._align_indices([sim, ctrl_sim], order)
                 draw_cb = True if not hide_colorbar_legend else False
-                if which == 'euclid' and not differential:
-                        draw_cb = False
+                if metric != 'intersect' and not differential:
+                    draw_cb = False
                 ctrl_lbl = ''
-                if which == 'euclid' and not hide_samplelabels:
-                        ctrl_lbl = samples._ctrl
+                if metric != 'intersect' and not hide_samplelabels:
+                    ctrl_lbl = samples._ctrl
                 bar_args = {'cmap': 'afmhot', 'vmin': 0, 'vmax': db_cap}
-                cb_lbl = config.INTE_DIST_BAR if which == 'intersect' else \
+                cb_lbl = config.INTE_DIST_BAR if metric == 'intersect' else \
                          config.EUCL_DIST_BAR
                 if distance_bar_range is not None:
                     bar_args.update({'vmin': distance_bar_range[0], 
@@ -669,17 +744,19 @@ class targets(_differential):
             ax.set_yticks(np.arange(0, sim.shape[0]))
             ax.set_xticks(np.arange(0, sim.shape[1]))
             hm_args = {'cmap': 'RdBu_r', 'vmin': -cap, 'vmax': cap}
-            if which == 'euclid' and differential and not proportional:
-                cb_lbl = config.EUCL_DIFF_NOPROP
-            if which == 'euclid' and differential and proportional:
-                cb_lbl = config.EUCL_DIFF_PROP
-            elif which == 'euclid' and not differential:
+            cb_lbl = 'Not implemented'
+            if metric == 'euclid' and differential:
+                cb_lbl = config.EUCL_DIFF
+                hm_args.update({'cmap': 'RdBu'})
+            # if metric == 'euclid' and differential and proportional:
+            #     cb_lbl = config.EUCL_DIFF_PROP
+            elif metric == 'euclid' and not differential:
                 hm_args = {'cmap': 'afmhot', 'vmin': 0, 'vmax': cap}
                 cb_lbl = config.EUCL_NODIFF
-            elif which == 'intersect' and not proportional:
-                cb_lbl = config.INTE_DIFF_NOPROP
-            elif which == 'intersect' and proportional:
-                cb_lbl = config.INTE_DIFF_PROP
+            # elif metric == 'intersect' and not proportional:
+            #     cb_lbl = config.INTE_DIFF_NOPROP
+            elif metric == 'intersect':
+                cb_lbl = config.INTE_DIFF
             if heatmap_range is not None:
                 hm_args.update({'vmin': heatmap_range[0], 
                                 'vmax': heatmap_range[1]})
@@ -693,8 +770,8 @@ class targets(_differential):
                 cb = ax.figure.colorbar(im, cax=cax, orientation='horizontal') 
                 
                 bar_ticks = [hm_args['vmin'], hm_args['vmax']]
-                if which == 'intersect' and not proportional:
-                    bar_ticks = [int(bar_ticks[0]), int(bar_ticks[1])]
+                # if metric == 'intersect' and not proportional:
+                #     bar_ticks = [int(bar_ticks[0]), int(bar_ticks[1])]
                 cb.set_ticks(bar_ticks)
                 cb.ax.set_xticklabels(bar_ticks)
                 if pivot:
@@ -730,7 +807,7 @@ class targets(_differential):
     def gene_similarity_heatmap(self,
                                 # plot data
                                 samples,  
-                                which = None,
+                                metric = None,
                                 differential = True,
                                 proportional = False, 
                                 display_genes = 'variant',
@@ -786,7 +863,7 @@ class targets(_differential):
         Args:
             =================== Plot data options ===================
             samples (samples): the data to rate similariity for.
-            which (str, optional): the similarity metric to use. Valid 
+            metric (str, optional): the similarity metric to use. Valid 
                 options are 'euclid' and 'intersect'. Defaults to None.
                 'euclid' shows the mean euclidean distance towards the 
                 target marker genes expression levels and requires `expression` 
@@ -799,19 +876,6 @@ class targets(_differential):
                 gene similarity with the targets. Defaults to True. 
                 Requires a control to be passed for the 'euclid' metric. 
                 Cannot be False for 'intersect'-metric. 
-            proportional (bool, optional): plot the proportional 
-                differential gene similarity with the targets. Defaults to 
-                False. For the 'euclid'-metric, a proportional value of 1 
-                reflects a change in gene similarity equal to the absolute gene 
-                similarity of the control. Negative values are capped to -3 to 
-                deal with very low absolute gene similarities. Example: the 
-                samples control has an absolute gene similarity of 0.01 with 
-                marker gene x of target A. A change in similarity of Sample A 
-                with marker gene x by -0.1 results in a proportional 
-                differential value of -3 (rather then -10). 
-                For the 'intersect' metric, no proportional gene value 
-                exists but the summary plot will devide the intersection 
-                value by the number of displayed genes.
             display_genes (str, optional): Extract a specific set of 
                 marker genes to display for each target. Defaults to 
                 'variant'. Valid options are 'variant', 'greatest', 
@@ -950,9 +1014,8 @@ class targets(_differential):
         """
         # check user input for errors and incompatibilities
         def _check_args():
-            nonlocal which
+            nonlocal metric
             nonlocal differential
-            nonlocal proportional
             nonlocal display_genes
             nonlocal specific_genes
             nonlocal custom_target_genelist
@@ -963,14 +1026,21 @@ class targets(_differential):
             nonlocal show_genes_colorbar
 
             # check general basic input requirements
-            a = util._check_args(self, samples, which, differential, proportional, 
+            a = util._check_args(self, samples, metric, differential, 
                                 hide_distance_bar, reorder_to_distance_bar,
                                 cluster_genes)
-            which, differential, proportional, hide_distance_bar, \
+            metric, differential, hide_distance_bar, \
             reorder_to_distance_bar, cluster_genes, _ = a
 
             # check main data input
-            if custom_target_genelist is not None and which == 'intersect':
+            if self._species not in ['human', 'mouse']:
+                logger.info('')
+                logger.error('Invalid input for species: `{}`. Valid are `mouse` '
+                             'and `human`. Initate targets with these species ' 
+                             'to use this function.'.format(self._species))
+                sys.exit(1)
+
+            if custom_target_genelist is not None and metric == 'intersect':
                 logger.error('The `custom_target_genelist` option is '
                              'currentily not implemented for the similarity '
                              'metric `intersect`. Please choose an alternative '
@@ -1003,15 +1073,10 @@ class targets(_differential):
             config._update_consts(kwargs)
             
             # modify arguments for convneience 
-            if which == 'euclid' and not differential:
-                if display_genes == 'distant':
-                    display_genes = 'increasing'
-                elif display_genes == 'similar':
-                    display_genes = 'decreasing'
             if show_genes_colorbar == True:
                 if specific_genes:
                     show_genes_colorbar = dict.fromkeys(specific_genes, 
-                                                   config.colors[1])
+                                                        config.colors[1])
                 else:
                     show_genes_colorbar = None
 
@@ -1066,31 +1131,34 @@ class targets(_differential):
             # init a new target where all genes are marker genes of all targets
             if custom_target_genelist:
                 nonlocal self
-                if which == 'euclid':
+                if metric == 'euclid':
                     expr = self._expr.reindex(genes.ensg).copy()
                     args = {'expression': expr}
                 self = targets(name='custom genelist', ignore_down_mgs=True, 
                                log=False, **args)
-            sim, _, ctrl_sim, _ = self._get_from_overlap(samples, which, 
-                                                      genes_diff=differential, 
-                                                      genes_prop=proportional)
+            # sim, _, ctrl_sim, _ = self._get_from_overlap(samples, metric, 
+            #                                           genes_diff=differential, 
+            #                                           genes_prop=proportional)
+            sim, ctrl_sim = self._get_similarity(samples, metric, 'gene_sim',
+                                                 differential=differential, drop_ctrl=False)
             if samples._ctrl:
                 ctrl_name = samples._ctrl
             else:
                 # dummy, won't be used
                 ctrl_name = sim.columns[0][2]
                 ctrl_sim = sim.xs(ctrl_name, 1, 2, False)
-            if which == 'euclid':
+            if metric == 'euclid':
                 if samples._ctrl:
                     ctrl_sim = ctrl_sim.abs()
                 if not differential:
                     sim = sim.abs()
-                if proportional:
+                # if proportional:
                     # for the summary plot, i.e aggregated data
                     # get the non proportional single genes values to limit the
                     # calculation of the abs.().mean() to the specific genelist
-                    s_noprop, _ , cs_noprop, _ = self._get_from_overlap(samples,
-                                                               which, log=False) 
+                    # s_noprop, cs_noprop = self._get_similarity(samples, metric,
+                    #                                         which_sim='gene_sim',
+                    #                                         log=False) 
 
             # init mutable dict with target and markegene type keys
             data = dict((trg, dict((mgt, None) for mgt in self._mg_types))
@@ -1107,15 +1175,18 @@ class targets(_differential):
                     # sort overlap based on passed metric, slice to gene number
                     if display_genes == 'variant':
                         idx = trg_sim.var(1).sort_values().index[::-1]
-                    elif display_genes == 'greatest' and which == 'euclid':
+                    elif display_genes == 'greatest' and metric == 'euclid':
                         idx = trg_sim.abs().max(1).sort_values().index[::-1]
-                    elif display_genes == 'greatest' and which == 'intersect':
+                    elif display_genes == 'greatest' and metric == 'intersect':
                         idx = trg_sim.abs().sum(1).sort_values().index[::-1]
-                    elif display_genes == 'increasing' and (which == 'euclid'):
-                        idx = trg_sim.max(1).sort_values().index[::-1]
-                    elif display_genes == 'decreasing' and (which == 'euclid'):
+                    elif display_genes in ['increasing', 'similar'] and \
+                        (metric == 'euclid'):
                         idx = trg_sim.min(1).sort_values().index
-                    elif which == 'intersect':
+                    elif display_genes in ['decreasing', 'distant'] and \
+                        (metric == 'euclid'):
+                        idx = trg_sim.max(1).sort_values().index[::-1]
+                        
+                    elif metric == 'intersect':
                         if display_genes.startswith('in') and mgt == 'down' or \
                         display_genes.startswith('de') and mgt == 'up':
                             asc = True
@@ -1149,22 +1220,13 @@ class targets(_differential):
                 ts = trg_sim.reindex(get_genes)
                 ctrl_n = mgt, trg, ctrl_name
 
-                if which == 'euclid':
+                if metric == 'euclid':
                     cs = ctrl_sim.loc[get_genes, ctrl_n]
-                    if not proportional:
-                        agg_sim = ts.mean()
-                    else:
-                        s_np = s_noprop.loc[get_genes, (mgt, trg, slice(None))]
-                        cs_np = cs_noprop.loc[get_genes, (mgt, trg, samples._ctrl)]
-                        s_np = s_np.abs().mean()
-                        cs_np = cs_np.abs().mean()
-                        agg_sim = (cs_np - s_np) /cs_np
-                elif which == 'intersect':
+                    agg_sim = ts.mean()
+                elif metric == 'intersect':
                     mgt_int = 1 if mgt == 'up' else -1
                     cs = pd.Series(mgt_int, get_genes, name=ctrl_n)
-                    agg_sim = ts.sum() *mgt_int
-                    if proportional:
-                        agg_sim /= cs.shape
+                    agg_sim = (ts.sum() *mgt_int) /cs.shape
                 # store plot data in nested dict
                 data[trg][mgt] = (ts.T, cs.to_frame().T, agg_sim)
             
@@ -1191,12 +1253,12 @@ class targets(_differential):
             agg_max = max([ags.max() for ags in agss])
             agg_lim = [agg_min -abs(agg_min*.15), agg_max +abs(agg_max*.15)]
             # make sure 0 is included
-            if differential:
+            if differential or True:
                 if agg_lim[0]>=0 and agg_lim[1]>=0:
                     agg_lim[agg_lim.index(min(agg_lim))] = 0
                 elif agg_lim[0]<=0 and agg_lim[1]<=0:
                     agg_lim[agg_lim.index(max(agg_lim))] = 0
-            if which == 'euclid':
+            if metric != 'intersect':
                 # get sum heatmap range
                 mini = [ts.min().sort_values()[int(ts.shape[1]*.05)] for ts in tss]
                 maxi = [ts.max().sort_values()[int(ts.shape[1]*.95)] for ts in tss]
@@ -1206,11 +1268,7 @@ class targets(_differential):
                                    for cs in css]), 1)
                 if not differential:
                     cap = db_cap = max((cap, db_cap))
-                cap = 1 if proportional and (cap >1) else cap
                 return cap, db_cap, agg_lim, n_genes
-                
-            if which == 'intersect' and not proportional:
-                agg_lim = int(agg_lim[0]), int(agg_lim[1])
             return None, None, agg_lim, n_genes
         
         # built 2 lists with widths and heights in inches of every axes
@@ -1274,15 +1332,15 @@ class targets(_differential):
                 this_t = False
             if title:
                 if title and type(title) is not str:
-                    this_t = util._make_title(differential, proportional, which,
+                    this_t = util._make_title(differential, metric,
                                               samples.name, t_name, 
                                               postf='single gene ')
-                    if display_genes:
-                        this_t += ':\nmost {} genes'.format(display_genes) 
+                    this_t += ' - most {} genes'.format(display_genes) 
                 else:
                     this_t = title
                 if not pivot:
-                    fig.suptitle(this_t, y=1- (config.HM_TOP/height)*.7)
+                    fig.suptitle(this_t, y=1- (config.HM_TOP/height)*.7,
+                                 fontsize=config.FONTS)
                 else:
                     axes[2, 0].set_ylabel(this_t, labelpad=10)
                 
@@ -1307,17 +1365,15 @@ class targets(_differential):
                         order = ctrl_sim.iloc[0].sort_values().index
                         sim, ctrl_sim = util._align_indices([sim, ctrl_sim], order)
                     draw_cb = False
-                    if which == 'euclid':
+                    if metric != 'intersect':
                         if not hide_colorbar_legend and (mgt == 'up') and \
                         differential:
                             draw_cb = True
-                        # cb_lbl = ('Base expression similarity\n'
-                        #           '[absolute Euclidean distance]')
                         cb_lbl = config.EUCL_NODIFF
                         ctrl_lbl = samples._ctrl if not hide_samplelabels else ''
                         bar_args = {'vmin': 0, 'vmax': db_cap,
                                     'cmap': 'afmhot'}
-                    elif which == 'intersect':
+                    elif metric == 'intersect':
                         draw_cb = False
                         cb_lbl = None
                         ctrl_lbl = 'target marker genes' if not hide_samplelabels \
@@ -1389,53 +1445,44 @@ class targets(_differential):
                     if pivot:
                         xlim = xlim[1], xlim[0]
                     ax.set_xlim(xlim)
-                    if which == 'euclid' and differential and not proportional:
-                        lbl = config.EUCL_DIFF_NOPROP
-                    if which == 'euclid' and differential and proportional:
-                        lbl = config.EUCL_DIFF_PROP
-                    elif which == 'euclid' and not differential:
+                    lbl = 'not implemented'
+                    if metric == 'euclid' and differential:
+                        lbl = config.EUCL_DIFF
+                    elif metric == 'euclid' and not differential:
                         lbl = config.EUCL_NODIFF
-                    elif which == 'intersect' and not proportional:
-                        lbl = config.INTE_DIFF_NOPROP
-                    elif which == 'intersect' and proportional:
-                        lbl = config.INTE_DIFF_PROP
-                    if (which == 'euclid') and not differential and samples._ctrl:
+                    elif metric == 'intersect':
+                        lbl = config.INTE_DIFF_SINGLE_SUM
+                    if (metric == 'euclid') and not differential and samples._ctrl:
                         base = ctrl_sim.mean(1)
                         ax.vlines(base, 0, nsmps)
-                        lbl = lbl[:26] + ' (line = base)' +lbl[26:]
+                        lbl = lbl[:30] + '\n(line = base)' +lbl[30:]
                     ax.set_xlabel(lbl)
                         
-                    if (which == 'euclid') and differential:
+                    if (metric != 'intersect') and differential:
                         blue = config.colors[18] 
                         red = config.colors[14]
-                        cols = [blue if v <0 else red for v in sim_agg.values]
+                        cols = [blue if v >0 else red for v in sim_agg.values]
                     else:
                         cols = config.colors[19]
                     ax.barh(y=yts, width=sim_agg, color=cols)
-                
+
                 # draw heatmap
                 ax = axes[2+r, 1]
                 ax.set_yticks(np.arange(0, sim.shape[0]))
                 ax.set_xticks(np.arange(0, sim.shape[1]))
-                if which == 'euclid':
-                    if differential and not proportional:
-                        hm_args = {'cmap': 'RdBu_r', 'vmin': -cap, 'vmax': cap}
-                        # cb_lbl = ('Change in expression similarity\n'
-                        #           '[differential Euclidean distance]')
-                        cb_lbl = config.EUCL_G_DIFF_NOPROP
-                    elif differential and proportional:
-                        hm_args = {'cmap': 'RdBu_r', 'vmin': -cap, 'vmax': cap}
-                        # cb_lbl = ('Proportion of changed expression similarity\n'
-                        #           '[proportional differential Euclidean distance]')
-                        cb_lbl = config.EUCL_G_DIFF_PROP
+                if metric != 'intersect':
+                    if differential:
+                        hm_args = {'cmap': 'RdBu', 'vmin': cap, 'vmax': -cap}
+                        cb_lbl = config.EUCL_DIFF
                     elif not differential:
-                        hm_args = {'cmap': 'afmhot', 'vmin': -0, 'vmax': cap}
-                        # cb_lbl = ('Absolute expression similarity\n'
-                        #           '[absolute Eucl. distance]')
-                        cb_lbl = config.EUCL_G_NODIFF
-                elif which == 'intersect':
+                        hm_args = {'cmap': 'afmhot', 'vmin': 0, 'vmax': cap}
+                        cb_lbl = config.EUCL_NODIFF
+                    # elif differential:
+                    #     hm_args = {'cmap': 'RdBu_r', 'vmin': -cap, 'vmax': cap}
+                    #     cb_lbl = config.EUCL_G_DIFF_PROP
+                elif metric == 'intersect':
                     hm_args = {'cmap': config.RdBu_bin, 'vmin': -1, 'vmax': 1}
-                    cb_lbl = config.INTE_G_DIFF_NOPROP
+                    cb_lbl = config.INTE_DIFF_SINGLE
                 
                 if heatmap_range is not None:
                     hm_args.update({'vmin': heatmap_range[0], 
@@ -1453,10 +1500,10 @@ class targets(_differential):
                     cb.ax.get_xaxis().set_label_position('top')
                     bar_ticks = [hm_args['vmin'], hm_args['vmax']]
                     cb.set_ticks(bar_ticks)                
-                    if which == 'intersect':
+                    if metric == 'intersect':
                         bar_ticks = ('down-regul.', 'up-regul.')
-                    elif which == 'euclid' and proportional:
-                        bar_ticks[0] = '< ' + str(bar_ticks[0])
+                    # elif metric == 'euclid' and proportional:
+                    #     bar_ticks[0] = '< ' + str(bar_ticks[0])
                     cb.ax.set_xticklabels(bar_ticks)
                     if pivot:
                         cb.ax.tick_params(labelrotation=90)
@@ -1495,7 +1542,7 @@ class targets(_differential):
     def ranked_similarity_barplot(self,
                                   # plot data
                                   samples,
-                                  which = None, 
+                                  metric = None, 
                                   differential = True,
                                   proportional = False,
                                   display_similarity = 'mgs mean',
@@ -1514,6 +1561,7 @@ class targets(_differential):
                                   # show/ hide elements
                                   hide_targetlabels = False,
                                   hide_colorbar = False,
+                                  hide_base_lines = False,
                                   # others
                                   filename = 'ranked_similarity_bp.pdf',
                                   plt_show = False,
@@ -1525,13 +1573,13 @@ class targets(_differential):
             the dominating effects in the samples. Two different metrics can be 
             picked to assess similarity: 'euclid' for expression inputs or 
             'intersect' for comparison based on diff. genes/ marker genes.
-            Differential and proportional similarity values are available 
+            Differential and absolute similarity values are available 
             options for investagting the change in similarity.
 
         Args:
             =================== Plot data options ===================
             samples (samples): the data to rank similariity for.
-            which (str, optional): the similarity metric to use. Valid 
+            metric (str, optional): the similarity metric to use. Valid 
                 options are 'euclid' and 'intersect'. Defaults to None.
                 'euclid' shows the mean euclidean distance towards the 
                 target marker genes expression levels and requires `expression` 
@@ -1544,17 +1592,6 @@ class targets(_differential):
                 similarity between samples and targets. Defaults to True. 
                 Requires a control to be passed for the 'euclid' metric. Cannot 
                 be False for'intersect'-metric.
-            proportional (bool, optional): plot the proportional differential 
-                similarity between samples and targets. Defaults to False. 
-                For the 'euclid'-metric, a proportional value of 1 reflects a 
-                change in similarity equal to the absolute similarity of the 
-                control. Example: the samples control has an absolute 
-                similarity of 3.2 with target A. A change in similarity of 
-                Sample A with Target A by 0.32 results in a proportional 
-                differential value of 0.1. 
-                For the 'intersect' metric, the intersect value of 
-                marker genes and diff. genes is devided by the number of 
-                target marker genes.
             display_similarity (str, optional): specify the group of 
                 marker genes to display similarity for. . Defaults to 'mgs mean'. 
                 Valid options are 
@@ -1606,6 +1643,8 @@ class targets(_differential):
                 at the left. Defaults to False.
             hide_colorbar (bool, optional): Do not plot the targets colorbar on 
                 the left of the barplot. Defaults to False. 
+            hide_base_lines (bool, optional): Do not show the lines marking 
+                the absolute simialrity of the control, i.e. the base line. 
             
             =================== others ===================
             filename (str, optional): the filename for saving the figure.
@@ -1617,19 +1656,18 @@ class targets(_differential):
                 window. Defaults to False.
             
         """
-        # check user input for errors and incompatibilities around `which` arg
+        # check user input for errors and incompatibilities around `metric` arg
         def _check_args():
-            nonlocal which
+            nonlocal metric
             nonlocal differential
-            nonlocal proportional
             nonlocal n_targets
             nonlocal display_similarity
 
             # check general basic input requirements
-            a = util._check_args(self, samples, which, differential, proportional, 
-                                display_similarity=display_similarity)
-            which, differential, proportional, _, _, _, display_similarity = a
-            if not n_targets:
+            a = util._check_args(self, samples, metric, differential,  
+                                 display_similarity=display_similarity)
+            metric, differential, _, _, _, display_similarity = a
+            if not n_targets or n_targets > len(self):
                 n_targets = len(self)
                 logger.warning('The number of targets `n_targets` was not '
                                'passed. Set to all target elements ({}).'
@@ -1640,10 +1678,8 @@ class targets(_differential):
         # get the aggregated overlap data for plotting, pick the targets
         def get_data():
             # dr_ctrl = True if differential else False
-            _, sim, _, ctrl_sim = self._get_from_overlap(samples, which, 
-                                                    genes_agg_diff=differential, 
-                                                    genes_agg_prop=proportional,
-                                                    )
+            sim, ctrl_sim = self._get_similarity(samples, metric, 
+                                                 differential=differential)
             sim = sim.xs(display_similarity, 1, 0)
             if rank_samples:
                 if differential:
@@ -1654,9 +1690,10 @@ class targets(_differential):
             
             drop = slice(int(n_targets/2), -int(n_targets/2)) if display_negative \
                    else slice(-1, n_targets-1, -1)
-            ascend = False if differential else True
+            
+            ascend = True if metric == 'euclid' and differential else False
             data = dict.fromkeys(sim.index, None)
-            def sel_trgs(smp_row):
+            def sel_trgs(smp_row):                
                 trgs = smp_row.iloc[0].sort_values(ascending=ascend)
                 data[trgs.name] = trgs.drop(trgs.index[drop])
             sim.groupby(level=0).apply(sel_trgs)
@@ -1666,11 +1703,16 @@ class targets(_differential):
         def get_caps():
             maxi = max([trg_vals.max() for trg_vals in list(data.values())])
             mini = min([trg_vals.min() for trg_vals in list(data.values())])
-            lims = [mini -abs(mini*.15), maxi +abs(maxi*.15)]
+            ext = max([abs(maxi), abs(mini)]) *.15
+            lims = [mini -ext, maxi +ext]
+            print(lims)
             if lims[0]>=0 and lims[1]>=0:
                 lims[lims.index(min(lims))] = 0
             elif lims[0]<=0 and lims[1]<=0:
                 lims[lims.index(max(lims))] = 0
+            if metric == 'euclid' and differential:
+                return [lims[1], lims[0]]
+            print(lims)
             return lims
 
         # built 2 lists with widths and heights in inches of every axes
@@ -1683,7 +1725,7 @@ class targets(_differential):
             fig_widths[2] = config.BP_BARSPACE
             fig_widths[3] = .04
             fig_widths[4] = config.BP_RIGHT
-
+            
             fig_heights = [.0001] *4
             fig_heights[0] = config.BP_TOP
             fig_heights[1] = config.BP_BARWIDTH_SIZE *n_targets
@@ -1706,12 +1748,13 @@ class targets(_differential):
                 this_t = False
             if title:
                 if title and type(title) is not str:
-                    this_t = util._make_title(differential, proportional, which,
-                                              s_name, self.name, pref='ranked ')
+                    this_t = util._make_title(differential, metric, s_name, 
+                                              self.name, pref='ranked ')
                 else:
                     this_t = title
                 if not pivot:
-                    fig.suptitle(this_t, y=1- (config.BP_TOP/height)*.7)
+                    fig.suptitle(this_t, y=1- (config.BP_TOP/height)*.6,
+                                 fontsize=config.FONTS)
                 else:
                     ax.get_yaxis().set_label_position('right')
                     ax.set_ylabel(this_t, rotation=-90, labelpad=25)
@@ -1752,6 +1795,8 @@ class targets(_differential):
             
             # setup x axis
             xlim = lims
+            print(xlim)
+
             if xlim_range:
                  xlim = xlim_range
             if not pivot:
@@ -1764,30 +1809,32 @@ class targets(_differential):
             ax.set_xlim(xlim)
             ax.set_axisbelow(True)
             ax.xaxis.grid(alpha=0.8, linestyle='dashed')  
-            if which == 'euclid' and differential and not proportional:
-                xlbl = config.EUCL_DIFF_NOPROP
-            if which == 'euclid' and differential and proportional:
-                xlbl = config.EUCL_DIFF_PROP
-            elif which == 'euclid' and not differential:
+            xlbl = 'not implemented'
+            if metric == 'euclid' and differential:
+                xlbl = config.EUCL_DIFF
+            elif metric == 'euclid' and not differential:
                 xlbl = config.EUCL_NODIFF
-            elif which == 'intersect' and not proportional:
-                xlbl = config.INTE_DIFF_NOPROP
-            elif which == 'intersect' and proportional:
-                xlbl = config.INTE_DIFF_PROP
+            elif metric == 'intersect':
+                xlbl = config.INTE_DIFF
             # for absolute euclid sim., mark the untreated base if available
-            if which == 'euclid' and not differential and samples._ctrl:
+            if metric == 'euclid' and not differential and samples._ctrl \
+            and not hide_base_lines:
                 xs = ctrl_sim.loc[samples._ctrl, display_similarity]
                 xs = xs.reindex(ylbls, axis=1)
                 ax.vlines(xs, yts-.4, yts+.4, linewidth=.5)
-                xlbl = xlbl[:26] + ' (line = base)' +xlbl[26:]
-            ax.set_xlabel(xlbl, labelpad=10)
+                xlbl = xlbl[:30] + '\n(line = base)' +xlbl[30:]
+            ax.set_xlabel(xlbl, labelpad=8)
 
             if not colored_bars:
                 cols = config.colors[19]
             else:
                 blue = config.colors[18] 
                 red = config.colors[14]
-                cols = [blue if v <0 else red for v in dat.values]
+                if metric == 'euclid' and differential:
+                    cols = [blue if v >0 else red for v in dat.values]
+                else:
+                    cols = [blue if v <0 else red for v in dat.values]
+                
             ax.barh(yts, dat, color=cols)
             return fig, axes
 

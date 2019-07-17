@@ -28,7 +28,7 @@ def _add_mg_types(data, down):
     data.columns = _add_level(data.columns, updown_idx)
     return data.reindex(orig_order, axis=1, level=1)
 
-def _diff_to_int_updown_notation(_diff, trans_updown):
+def _bool_to_int_genes(_diff, trans_updown=True, return_merged=False):
     """Take _diff input and convert up-genes to +1, down-genes to -1, optionally 
        transfer up- and down values to each other makeing up- and down subframes
        equal"""
@@ -38,7 +38,10 @@ def _diff_to_int_updown_notation(_diff, trans_updown):
     if trans_updown and 'down' in _diff.columns.unique(0):
         int_diff['up'] = int_diff['up'].mask(_diff['down'], -1)
         int_diff['down'] = int_diff['down'].mask(_diff['up'], 1)
-    return int_diff
+    if not return_merged:
+        return int_diff
+    else:
+        return int_diff.xs('up', 1, 0)
 
 def _add_mgtmean(agg):
     """Prodcue the mean between aggregated up- and down mg similarity values"""
@@ -205,26 +208,34 @@ def _clean_axes(axes):
                        labelleft=False)
     return axes
 
-def _make_title(differential, proportional, which, el1, el2, pref='', postf=''):
+def _make_title(differential, metric, el1, el2, pref='', postf=''):
     """Produce the plot title based on plot parmaters, pref and posf are used
        for plot specific adjustments; return the title string"""
-    which_title = '(Euclidean)' if which == 'euclid' else '(intersection)'
+
+    metric_title = 'metric: '
+    if metric == 'euclid':
+        metric_title += 'L1 Euclidean distance'
+    elif metric == 'pearson':
+        metric_title += 'Perason correlation' 
+    elif metric == 'cosine':
+        metric_title += 'cosine distance' 
+    elif metric == 'intersect':
+         metric_title += 'marker gene intersect'
+
     if differential:
         dtype = 'Change in '
-        if proportional:
-            dtype = 'Proportional ' + dtype.lower()
-    elif which == 'euclid' and not differential:
+    else:
         dtype = 'Absolute '
-        which_title = ''
     if pref:
         dtype = dtype.lower()
-    title = '{}{}{}transcriptional similarity {}\nof {} & {}'
-    return title.format(pref, dtype, postf, which_title, el1, el2)
+    title = ('{}{}{}transcriptional similarity \nof {} & {}\n{}'
+              .format(pref, dtype, postf, el1, el2, metric_title))
+    return title[0].upper() + title[1:]
 
-def _heatmap_cluster(dat, where, ax, which):
+def _heatmap_cluster(dat, where, ax, metric):
     """Cluster the columns or index with scipy; return the new order"""
     ax.set_visible(True)
-    d = dat.T if which == 'columns' else dat 
+    d = dat.T if metric == 'columns' else dat 
     Y = pdist(d, metric='euclidean')
     Z = linkage(Y, method='complete', metric='euclidean')
     order = dendrogram(Z,
@@ -234,7 +245,7 @@ def _heatmap_cluster(dat, where, ax, which):
                         labels = d.index, 
                         above_threshold_color = config.dendrogram_colors[0],
                         ax = ax)['ivl']
-    if which == 'rows':
+    if metric == 'rows':
         # for some reason reversed?
         order = order[::-1]
     return order
@@ -300,59 +311,59 @@ def _setup_heatmap_xy(x_y, ax, lbls, pivot, hide_lbls, lbl_size, colors):
         if colors:
             ax.bar(0, 1, color=colors, bottom=np.arange(len(lbls)))
 
-def _check_args(trg, smp, which, differential, proportional, 
+def _check_args(trg, smp, metric, differential, 
                 hide_distance_bar=None, reorder_to_distance_bar=None,
                 cluster_hmx=None, display_similarity=False):
     """General purpose plot argument checker; returns (modified) input values"""
-    def check_which(which, trg, smp, diff):
+    def check_metric(metric, trg, smp, diff):
         # check if the samples and targets have equivalent data to compare
-        if which is None:
+        if metric is None:
             if trg._has_expr and smp._has_expr:
-                which = 'euclid'
+                metric = 'euclid'
             elif trg._has_diff and smp._has_diff:
-                which = 'intersect'
+                metric = 'intersect'
             else:
                 logger.error('Either initiate targets and samples with '
                              'expression or with markergenes and diff genes.')
                 sys.exit(1)
         msg = 'The {} were initiated without {} data. Cannot use `{}` similarity.'
-        if which not in ('euclid', 'intersect'):
-            logger.error('Invalid `which` input: `{}`. Valid are `euclid` and '
-                        '`intersect`'.format(which))
-        elif (which == 'euclid') and not trg._has_expr:
+        if metric not in ('euclid', 'intersect', 'cosine', 'pearson'):
+            logger.error('Invalid `metric` input: `{}`. Valid are `euclid` and '
+                        '`intersect`'.format(metric))
+        elif (metric == 'euclid') and not trg._has_expr:
             logger.error(msg.format('targets', 'expression', 'euclid'))
-        elif (which == 'euclid') and not smp._has_expr:
+        elif (metric == 'euclid') and not smp._has_expr:
             logger.error(msg.format('samples', 'expression', 'euclid'))
-        elif (which == 'intersect') and not trg._has_diff:
+        elif (metric == 'intersect') and not trg._has_diff:
             logger.error(msg.format('targets', 'merker gene', 'intersect'))
-        elif (which == 'intersect') and not smp._has_diff:
+        elif (metric == 'intersect') and not smp._has_diff:
             logger.error(msg.format('samples', 'diff genes', 'intersect'))
-        elif which == 'euclid' and diff and not smp._ctrl:
+        elif metric == 'euclid' and diff and not smp._ctrl:
             logger.error('To plot the changes in transcriptional similarity '
-                         'with which = `euclid`, the samples must be initiated '
+                         'with metric = `euclid`, the samples must be initiated '
                          'with a control.')
         else:
-            # valid which
-            return which
-        # invalid which
+            # valid metric
+            return metric
+        # invalid metric
         sys.exit(1)
 
     # checks for all plots
-    which = check_which(which, trg, smp, differential)
-    if which == 'intersect' and not differential:
+    metric = check_metric(metric, trg, smp, differential)
+    if metric == 'intersect' and not differential:
         differential = True
         logger.warning('For the `intersect` similarity metric, '
                        'differential cannot be False. Was set to True.')
-    if proportional and not differential:
-                    proportional = False
-                    logger.warning('`proportional` can only be used if '
-                                   '`differential` is True aswell. Set to False.')
+    # if proportional and not differential:
+    #                 proportional = False
+    #                 logger.warning('`proportional` can only be used if '
+    #                                '`differential` is True aswell. Set to False.')
 
     # checks for 2 heatmaps
-    if which == 'euclid' and not hide_distance_bar and not smp._ctrl:
+    if metric == 'euclid' and not hide_distance_bar and not smp._ctrl:
         hide_distance_bar = True
         logger.warning('`hide_distance_bar` cannot be False '
-                    'for which = `euclid` if the samples data is '
+                    'for metric = `euclid` if the samples data is '
                     'initialized without a control. Set to True.')
     if reorder_to_distance_bar and hide_distance_bar:
         reorder_to_distance_bar = False
@@ -381,8 +392,8 @@ def _check_args(trg, smp, which, differential, proportional,
             sys.exit(1)
         display_similarity = display_similarity[4:]
 
-    return which, differential, proportional, hide_distance_bar, \
-           reorder_to_distance_bar, cluster_hmx, display_similarity
+    return metric, differential, hide_distance_bar, reorder_to_distance_bar, \
+           cluster_hmx, display_similarity
 
 def plot_color_legend(labels, colors, ncolumns=4, filename='color_legend.png'):
     """Plot a custom color legend.

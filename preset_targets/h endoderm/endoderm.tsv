@@ -1,23 +1,26 @@
-ensg
-H9 embryonic stem cells
-Adipose
-Hips +ccl2
-Hips
+name
 Adipocyte breast
 Adipocyte omental
 Adipocyte perirenal
 Adipocyte subcutaneous
+Adipose
 Alveolar epithelial cells
 Amniotic epithelial cells
+Amniotic membrane cells
 Anulus pulposus cell
+Artery adult
 Astrocyte cerebellum
 Astrocyte cerebral cortex
 Bronchial epithelial cell
 Cardiac myocyte
+Cells
+Cervix adult
 Chondrocyte de diff
 Chondrocyte re diff
+Chorionic membrane cells
 Ciliary epithelial cells
 Corneal epithelial cells
+Diaphragm fetal
 Endothelial cells aortic
 Endothelial cells artery
 Endothelial cells lymphatic
@@ -26,6 +29,10 @@ Endothelial cells thoracic
 Endothelial cells umbilical vein
 Endothelial cells vein
 Esophageal epithelial cells
+Eye muscle inferior rectus
+Eye muscle lateral
+Eye muscle medial
+Eye muscle superior
 Fibroblast aortic adventitial
 Fibroblast cardiac
 Fibroblast choroid plexus
@@ -37,39 +44,59 @@ Fibroblast lymphatic
 Fibroblast mammary
 Fibroblast periodontal ligament
 Fibroblast pulmonary artery
-Fibroblast villous mesenchymal
 Fibroblast skin normal
+Fibroblast villous mesenchymal
+Fingernail nail plate eponychium
 Gingival epithelial cells
+H9 embryonic stem cells
 Hair follicle dermal papilla cells
 Hair follicle outer root sheath cells
+Heart adult
+Heart adult diseased
+Heart fetal
+Heart mitral valve adult
+Heart pulmonic valve adult
+Heart tricuspid valve adult
 Hepatic sinusoidal endothelial cells
 Hepatic stellate cells
+Hepatocyte
+Hips
+Hips +ccl2
+Intestinal epithelial cells
 Iris pigment epithelial cells
 Keratinocyte epidermal
 Keratinocyte oral
 Keratocytes
+Left atrium adult
+Left ventricle adult
 Lens epithelial cells
-Cells
+Liver adult
+Liver fetal
 Mammary epithelial cell
+Melanocyte
 Melanocyte dark
 Melanocyte light
-Melanocyte
 Meningeal cells
-Mesenchymal stem cells vertebral
-Mesenchymal stem cells whartons jelly
+Mesenchymal precursor cell adipose
+Mesenchymal precursor cell bone marrow
+Mesenchymal precursor cell cardiac
 Mesenchymal stem cells adipose
 Mesenchymal stem cells amniotic membrane
 Mesenchymal stem cells bone marrow
 Mesenchymal stem cells hepatic
 Mesenchymal stem cells umbilical
+Mesenchymal stem cells vertebral
+Mesenchymal stem cells whartons jelly
 Mesothelial cells
 Multipotent cord blood unrestricted somatic stem cells
 Myoblast
+Nasal epithelial cells
 Nucleus pulposus cell
 Olfactory epithelial cells
 Oligodendrocyte precursors
 Osteoblast
 Pancreatic stromal cells
+Penis adult
 Pericytes
 Perineurial cells
 Placental epithelial cells
@@ -86,12 +113,20 @@ Renal glomerular endothelial cells
 Renal mesangial cells
 Renal proximal tubular epithelial cell
 Retinal pigment epithelial cells
+Salivary acinar cells
 Schwann cells
 Sebocyte
 Sertoli cells
+Skeletal muscle adult
 Skeletal muscle cells
+Skeletal muscle fetal
 Skeletal muscle satellite cells
+Skeletal muscle soleus muscle
+Skin adult
+Skin fetal
+Skin palm
 Small airway epithelial cells
+Smooth muscle cells airway control
 Smooth muscle cells aortic
 Smooth muscle cells bladder
 Smooth muscle cells brachiocephalic
@@ -110,51 +145,16 @@ Smooth muscle cells tracheal
 Smooth muscle cells umbilical artery
 Smooth muscle cells umbilical vein
 Smooth muscle cells uterine
-Smooth muscle cells airway control
 Synoviocyte
-Trabecular meshwork cells
-Tracheal epithelial cells
-Urothelial cells
-Amniotic membrane cells
-Chorionic membrane cells
-Mesenchymal precursor cell adipose
-Mesenchymal precursor cell bone marrow
-Mesenchymal precursor cell cardiac
-Nasal epithelial cells
-Salivary acinar cells
 Tenocyte
-Hepatocyte
-Intestinal epithelial cells
-Liver adult
-Liver fetal
-Cervix adult
-Penis adult
-Skin fetal
 Throat fetal
-Tongue epidermis
 Tongue adult
+Tongue epidermis
 Tongue fetal
+Trabecular meshwork cells
 Trachea fetal
+Tracheal epithelial cells
+Umbilical cord fetal
+Urothelial cells
 Uterus adult
 Uterus fetal
-Fingernail nail plate eponychium
-Skin palm
-Skin adult
-Artery adult
-Diaphragm fetal
-Eye muscle inferior rectus
-Eye muscle lateral
-Eye muscle medial
-Eye muscle superior
-Heart mitral valve adult
-Heart pulmonic valve adult
-Heart tricuspid valve adult
-Heart adult diseased
-Heart adult
-Heart fetal
-Left atrium adult
-Left ventricle adult
-Skeletal muscle soleus muscle
-Skeletal muscle adult
-Skeletal muscle fetal
-Umbilical cord fetal

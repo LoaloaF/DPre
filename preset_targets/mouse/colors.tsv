@@ -1,4 +1,4 @@
-	color
+name	color
 B cell (active)	#fe7e81
 B cell (germinal center)	#fe7e81
 B cell (naive)	#fe7e81
@@ -104,51 +104,51 @@ splenic DC +IL10 +LPS	#fe7e81
 splenic DC +IL10 -LPS	#fe7e81
 splenic DC -IL10 +LPS	#fe7e81
 splenic DC -IL10 -LPS	#fe7e81
-2C Embryo	#fbcc8c
+Oocytes	#fbcc8c
+Pronuclei	#fbcc8c
+Zygote	#fbcc8c
 2C Embryo (early)	#fbcc8c
-2C Embryo (late)	#fbcc8c
 2C Embryo (middle)	#fbcc8c
-4C Embryo	#fbcc8c
+2C Embryo	#fbcc8c
+2C Embryo (late)	#fbcc8c
 4C Embryo (single-cell)	#fbcc8c
-8C Embryo	#fbcc8c
+4C Embryo	#fbcc8c
 8C Embryo (single-cell)	#fbcc8c
-Blastocyst	#fbcc8c
-Blastocyst (Early) ICM	#fbcc8c
+8C Embryo	#fbcc8c
+Morula (single-cell)	#fbcc8c
+Morula	#fbcc8c
+Inner cell mass (E3.5)	#fbcc8c
+Inner cell mass (E3.75)	#fbcc8c
 Blastocyst (Early) TE	#fbcc8c
-Blastocyst (Late) PrE	#fbcc8c
-Blastocyst (Late) TE	#fbcc8c
-Blastocyst (Mid) ICM	#fbcc8c
+Blastocyst (Early) ICM	#fbcc8c
 Blastocyst (Mid) TE	#fbcc8c
-ESCs (B6J)	#fbcc8c
-ESCs (E14)	#fbcc8c
-ESCs (PDL)	#fbcc8c
-ESCs (V6.5)	#fbcc8c
-ESCs (ZHBTc4)	#fbcc8c
-ESCs (groundstate)	#fbcc8c
-Ectoplacental cone	#fbcc8c
-EpiSC	#fbcc8c
-EpiSC (region-selective)	#fbcc8c
+Blastocyst (Mid) ICM	#fbcc8c
+Blastocyst (Late) TE	#fbcc8c
+Blastocyst (Late) PrE	#fbcc8c
+Blastocyst	#fbcc8c
+Naive ESC (Hex-)	#fbcc8c
+Naive ESC (Hex+)	#fbcc8c
+Naive ESCs (2iL)	#fbcc8c
+Naive ESCs (2iLGO)	#fbcc8c
 Epiblast (E6.5) anterior-dorsal	#fbcc8c
 Epiblast (E6.5) anterior-proximal	#fbcc8c
 Epiblast (E6.5) posterior-dorsal	#fbcc8c
 Epiblast (E6.5) posterior-proximal	#fbcc8c
-Inner cell mass (E3.5)	#fbcc8c
-Inner cell mass (E3.75)	#fbcc8c
-Morula	#fbcc8c
-Morula (single-cell)	#fbcc8c
-Naive ESC (Hex+)	#fbcc8c
-Naive ESC (Hex-)	#fbcc8c
-Naive ESCs (2iL)	#fbcc8c
-Naive ESCs (2iLGO)	#fbcc8c
-Oocytes	#fbcc8c
+ESCs (E14)	#fbcc8c
+ESCs (B6J)	#fbcc8c
+ESCs (ZHBTc4)	#fbcc8c
+ESCs (V6.5)	#fbcc8c
+ESCs (groundstate)	#fbcc8c
+ESCs (PDL)	#fbcc8c
+EpiSC	#fbcc8c
+EpiSC (region-selective)	#fbcc8c
+Ectoplacental cone	#fbcc8c
 PGC (female)	#fbcc8c
 PGC (male)	#fbcc8c
-Placenta	#fbcc8c
-Polyploid trophoblast giant cells (E9.5)	#fbcc8c
-Pronuclei	#fbcc8c
 Trophoblast stem cells	#fbcc8c
+Polyploid trophoblast giant cells (E9.5)	#fbcc8c
 XEN cells	#fbcc8c
-Zygote	#fbcc8c
+Placenta	#fbcc8c
 Caecum (E13.5)	#843487
 Colon	#843487
 Colon epithelial cells	#843487

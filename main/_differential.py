@@ -233,7 +233,7 @@ class _differential:
         logger.info('`{}` reordered. New order of elements:\n{}'
                     .format(self.name, self.names))
 
-    def slice_elements(self, elements, name=None, log=True):
+    def slice_elements(self, elements, name=None, inplace=False, log=True):
         """Slice the targets/samples to a specific list of elements. Return a 
         copy of the original.
 
@@ -260,12 +260,16 @@ class _differential:
                          'in current element names:\n{}'.format(not_ctnd))
             sys.exit(1)
 
-        sliced = copy.copy(self)
+        if not inplace:
+            sliced = copy.copy(self)
+        else:
+            sliced = self
         if sliced._type_name == 'samples': 
             if sliced._ctrl and (sliced._ctrl not in elements):
                 sliced._ctrl = None
         elif self._type_name == 'targets':
-            sliced._overlaps.clear()
+            self._trg_sims.clear()
+            self._gene_sims.clear()
         sliced._update_data_columns(elements)
         [sliced._colors.pop(k, None) for k in sliced.names if k not in elements]
         sliced.name = name if name else sliced.name
@@ -274,7 +278,8 @@ class _differential:
             logger.info('`{}` sliced:'.format(self.name))
             spacer.info('')
             sliced._log_init(log)
-        return sliced
+        if not inplace:
+            return sliced
 
     def _is_expr_diff_compatible(self, override_namematcher=False):
         """Check if expression and differential input share element labels

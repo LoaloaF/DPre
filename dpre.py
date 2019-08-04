@@ -30,7 +30,7 @@ def init_trg_smp(args):
                     s = s.slice_elements(args['samples_slice'])
                return t, s
 
-# run the target_similarity_heatmap plot with the parsed arguments (1/3)
+# run the target_similarity_heatmap plot with the parsed argumen ts (1/3)
 def _do_target_sim(args):
      t, s = init_trg_smp(args)
      t.target_similarity_heatmap(
@@ -92,15 +92,13 @@ def _do_gene_sim(args):
                     distance_bar_range = args['distance_bar_range'],
                     sum_plot_range = args['sum_plot_range'],
                     genelabels_space = args['genelabels_space'],
-                    samplelabels_space_left = args['samplelabels_space_left'],
-                    samplelabels_space_right = args['samplelabels_space_right'],
+                    samplelabels_space = args['samplelabels_space'],
                     genelabels_size = args['genelabels_size'],
                     title = args['title'],
                     # show/ hide elements
                     hide_colorbar_legend = args['hide_colorbar_legend'],
                     hide_distance_bar = args['hide_distance_bar'],
                     hide_sum_plot = args['hide_sum_plot'],
-                    show_samplelabels_sum_plot = args['show_samplelabels_sum_plot'],
                     hide_genelabels = args['hide_genelabels'],
                     hide_genes_dendrogram = args['hide_genes_dendrogram'],
                     show_genes_colorbar = args['show_genes_colorbar'],
@@ -233,8 +231,8 @@ datord_grp.add_argument('--cluster_targets', '-ct', action='store_true',
 datord_grp.add_argument('--cluster_samples', '-cs', action='store_true',
                         help='cluster samples (y axis)')
 datord_grp.add_argument('--reorder_to_distance_bar', '-re', action='store_true',
-                        help=('reorder the targets according to the required '
-                              'effect for specific target identification'))
+                        help=('reorder the targets according to the distance '
+                              'bar for specific target identification'))
 # general heatmap settings
 d = 'parameters to control general visual options'
 genhm_grp = trg_sim_parser.add_argument_group('General heatmap options', 
@@ -267,7 +265,7 @@ elem_grp = trg_sim_parser.add_argument_group('Plot elements', description=d)
 elem_grp.add_argument('--hide_colorbar_legend', '-hco', action='store_true', 
                       help='do not plot the heatmap legend')
 elem_grp.add_argument('--hide_distance_bar', '-hd', action='store_true',
-                      help='do not plot the required effect bar')
+                      help='do not plot the distance bar')
 elem_grp.add_argument('--hide_targetlabels', '-hta', action='store_true', 
                       help='do not show the targetlabels')
 elem_grp.add_argument('--hide_targets_dendrogram', '-htd', action='store_true',
@@ -302,7 +300,7 @@ dat_grp.add_argument('--absolute', '-a', action='store_false', help='plot the '
 dat_grp.add_argument('--proportional', '-p', action='store_true',
                      help='plot the proportional changes in similarity')
 dat_grp.add_argument('--display_genes', '-di', type=str, default='variant', 
-                     choices=['variant', 'greatest', 'increasing', 'decreasing', 
+                     choices=['variant', 'increasing', 'decreasing', 
                      'similar', 'distant'], help='Option 1: specify the group '
                      'of genes to extract, default `variant`')
 dat_grp.add_argument('--gene_number', '-gn', type=int, default=45, 
@@ -320,8 +318,8 @@ datord_grp.add_argument('--cluster_genes', '-cg', action='store_true',
 datord_grp.add_argument('--cluster_samples', '-cs', action='store_true',
                         help='cluster samples (y axis)')
 datord_grp.add_argument('--reorder_to_distance_bar', '-re', action='store_true',
-                        help=('reorder the genes according to the required '
-                        'effect, i.e the base gene similarity'))
+                        help=('reorder the genes according to the distance '
+                        'bar, i.e the base gene similarity'))
 # general heatmap settings
 d = 'parameters to control general visual options'
 genhm_grp = gene_sim_parser.add_argument_group('General heatmap options', 
@@ -340,10 +338,8 @@ genhm_grp.add_argument('--sum_plot_range', '-sr', action='append', type=float,
                        help='range of sum plot values, (lower, upper)')
 genhm_grp.add_argument('--genelabels_space', '-ge', type=float, 
                        help='space reserved for genelabels in inches')
-genhm_grp.add_argument('--samplelabels_space_left', '-sa', type=float, 
+genhm_grp.add_argument('--samplelabels_space', '-sa', type=float, 
                        help='space reserved for samplelabels on left in inches')
-genhm_grp.add_argument('--samplelabels_space_right', '-sar', type=float, 
-                       help='space reserved for samplelabels on right in inches')
 genhm_grp.add_argument('--genelabels_size', '-ges', type=float, 
                        help='multiplier for genelabels fontsize, default = 1')
 genhm_grp.add_argument('--targetlabels_size', '-tas', type=float, 
@@ -356,11 +352,9 @@ elem_grp = gene_sim_parser.add_argument_group('Plot elements', description=d)
 elem_grp.add_argument('--hide_colorbar_legend', '-hco', action='store_true', 
                       help='do not plot the legend for the heatmap')
 elem_grp.add_argument('--hide_distance_bar', '-hd', action='store_true',
-                      help='do not plot the required effect bar')
+                      help='do not plot the distance bar')
 elem_grp.add_argument('--hide_sum_plot', '-hs', action='store_true',
                       help='do not plot the sum plot on the right')
-elem_grp.add_argument('--show_samplelabels_sum_plot', '-ssa', action='store_true', 
-                      help='additionally show samplelabels on the right')
 elem_grp.add_argument('--hide_genelabels', '-hge', action='store_true', 
                       help='do not show the genelabels')
 elem_grp.add_argument('--hide_genes_dendrogram', '-hgd', action='store_true',

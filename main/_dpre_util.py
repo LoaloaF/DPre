@@ -216,9 +216,9 @@ def _make_title(differential, metric, el1, el2, pref='', postf=''):
     if metric == 'euclid':
         metric_title += 'L1 Euclidean distance'
     elif metric == 'pearson':
-        metric_title += 'Perason correlation' 
+        metric_title += 'Pearson correlation' 
     elif metric == 'cosine':
-        metric_title += 'cosine distance' 
+        metric_title += 'cosine similarity' 
     elif metric == 'intersect':
          metric_title += 'marker gene intersect'
 
@@ -293,7 +293,7 @@ def _setup_heatmap_xy(x_y, ax, lbls, pivot, hide_lbls, lbl_size, colors):
                                    rotation_mode='anchor', y=.5)
             else:
                 ax.set_xticklabels(lbls, rotation=90, ha='right', va='center', 
-                                   fontsize=fs, rotation_mode='anchor', y=.5)
+                                   fontsize=fs, rotation_mode='anchor', y=-.5)
         if colors:
             ax.bar(ticks, 1, 1, color=colors)
     
@@ -306,20 +306,24 @@ def _setup_heatmap_xy(x_y, ax, lbls, pivot, hide_lbls, lbl_size, colors):
             if not pivot:
                 ax.set_yticklabels(lbls, x=.5, fontsize=fs)
             else:
-                ax.set_yticklabels(lbls, rotation=45, ha='right', x=.5,
+                ax.set_yticklabels(lbls, rotation=45, ha='right', x=1,
                                    fontsize=fs, rotation_mode='anchor')
         if colors:
-            ax.bar(0, 1, color=colors, bottom=np.arange(len(lbls)))
+            ax.bar(0, 1, width=1, color=colors, bottom=np.arange(len(lbls)))
 
 def _check_args(trg, smp, metric, differential, 
                 hide_distance_bar=None, reorder_to_distance_bar=None,
-                cluster_hmx=None, display_similarity=False):
+                distance_bar_range=None, cluster_hmx=None, 
+                display_similarity=False):
     """General purpose plot argument checker; returns (modified) input values"""
     def check_metric(metric, trg, smp, diff):
         # check if the samples and targets have equivalent data to compare
+        if smp._type_name != 'samples':
+            logger.error('The passed `samples` are not of type DPre.smaples.')
+            sys.exit(1)
         if metric is None:
             if trg._has_expr and smp._has_expr:
-                metric = 'euclid'
+                metric = 'cosine'
             elif trg._has_diff and smp._has_diff:
                 metric = 'intersect'
             else:
@@ -327,26 +331,31 @@ def _check_args(trg, smp, metric, differential,
                              'expression or with markergenes and diff genes.')
                 sys.exit(1)
         msg = 'The {} were initiated without {} data. Cannot use `{}` similarity.'
-        if metric not in ('euclid', 'intersect', 'cosine', 'pearson'):
+        if metric not in ('euclid', 'cosine', 'pearson', 'intersect'):
             logger.error('Invalid `metric` input: `{}`. Valid are `euclid` and '
                         '`intersect`'.format(metric))
-        elif (metric == 'euclid') and not trg._has_expr:
-            logger.error(msg.format('targets', 'expression', 'euclid'))
-        elif (metric == 'euclid') and not smp._has_expr:
-            logger.error(msg.format('samples', 'expression', 'euclid'))
-        elif (metric == 'intersect') and not trg._has_diff:
-            logger.error(msg.format('targets', 'merker gene', 'intersect'))
-        elif (metric == 'intersect') and not smp._has_diff:
-            logger.error(msg.format('samples', 'diff genes', 'intersect'))
-        elif metric == 'euclid' and diff and not smp._ctrl:
-            logger.error('To plot the changes in transcriptional similarity '
-                         'with metric = `euclid`, the samples must be initiated '
-                         'with a control.')
-        else:
-            # valid metric
-            return metric
-        # invalid metric
-        sys.exit(1)
+            sys.exit(1)
+        if metric in ['euclid', 'cosine', 'pearson']:
+            if not trg._has_expr:
+                logger.error(msg.format('targets', 'expression', metric))
+                sys.exit(1)
+            elif not smp._has_expr:
+                logger.error(msg.format('samples', 'expression', metric))
+                sys.exit(1)
+            if diff and not smp._ctrl:
+                logger.error('To plot the changes in transcriptional similarity '
+                            'with metric = `{}`, the samples must be initiated '
+                            'with a control. For absolute, pass differential = ' 
+                            'False.'.format(metric))
+        elif metric == 'intersect':
+            if not trg._has_diff:
+                logger.error(msg.format('targets', 'merker gene', metric))
+                sys.exit(1)
+            elif not smp._has_diff:
+                logger.error(msg.format('samples', 'diff genes', metric))
+                sys.exit(1)
+        
+        return metric
 
     # checks for all plots
     metric = check_metric(metric, trg, smp, differential)
@@ -354,17 +363,13 @@ def _check_args(trg, smp, metric, differential,
         differential = True
         logger.warning('For the `intersect` similarity metric, '
                        'differential cannot be False. Was set to True.')
-    # if proportional and not differential:
-    #                 proportional = False
-    #                 logger.warning('`proportional` can only be used if '
-    #                                '`differential` is True aswell. Set to False.')
 
     # checks for 2 heatmaps
-    if metric == 'euclid' and not hide_distance_bar and not smp._ctrl:
+    if metric != 'intersect' and not hide_distance_bar and not smp._ctrl:
         hide_distance_bar = True
-        logger.warning('`hide_distance_bar` cannot be False '
-                    'for metric = `euclid` if the samples data is '
-                    'initialized without a control. Set to True.')
+        logger.warning('`hide_distance_bar` must be True '
+                    'for metric = `{}` if the samples data is '
+                    'initialized without a control. Set to True.'.format(metric))
     if reorder_to_distance_bar and hide_distance_bar:
         reorder_to_distance_bar = False
         logger.warning('When `reorder_to_distance_bar` is True, '
@@ -375,7 +380,12 @@ def _check_args(trg, smp, metric, differential,
         logger.warning('Both `reorder_to_distance_bar` and '
                         '`cluster_genes` were set as True. '
                         '`cluster_genes` will be ignored.')                    
-
+    if not differential and distance_bar_range is not None:
+        distance_bar_range = None
+        logger.warning('The argument `distance_bar_range` is invalid '
+                       'and ignored when differential = False. To apply'
+                       ' a custom range, please use "heatmap_range".')
+            
     if display_similarity is not False:
         # checks for target_sim and ranked_sim plots
         val = ['mgs mean', 'mgs up', 'mgs down']
@@ -393,9 +403,9 @@ def _check_args(trg, smp, metric, differential,
         display_similarity = display_similarity[4:]
 
     return metric, differential, hide_distance_bar, reorder_to_distance_bar, \
-           cluster_hmx, display_similarity
+           distance_bar_range, cluster_hmx, display_similarity
 
-def plot_color_legend(labels, colors, ncolumns=4, filename='color_legend.png'):
+def plot_color_legend(labels, colors, ncolumns=2, filename='color_legend.png'):
     """Plot a custom color legend.
     
        Takes a list of labels and colors and links them to produce a color 

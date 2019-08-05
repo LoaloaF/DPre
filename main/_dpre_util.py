@@ -181,17 +181,28 @@ def _init_figure(fig_widths, fig_heights, nplts, spacers):
 
 def _open_file(filename):
     """Open a file based on the filename ending or if not present
-       on config.SAVE_FORMAT"""
-    if not '.' in filename:
-        filename += '.' + config.SAVE_FORMAT
+       on config.SAVE_FORMAT. Must be supporte by matplotlib."""
+    valid = plt.figure().canvas.get_supported_filetypes()
+    if not any([filename.endswith(val_format) for val_format in valid]):
+        if config.SAVE_FORMAT in valid:
+            filename += '.' + config.SAVE_FORMAT
+        else:
+            logger.error('The value for config.SAVE_FORMAT `{}` is not '
+                         'supported by matplotlib. Valid formats are:\n{}'
+                         .format(config.SAVE_FORMAT, ', '.join(list(valid.keys()))))
+            sys.exit(1)
+        
     if filename.endswith('.pdf'):
         return filename, PdfPages(filename)
     else:
         return filename, None
-def _save_file(fig, filename=None, pp=None):
-    """Save pdf if pp is passed, otherwise use filename to save a .png"""
+def _save_file(fig, filename=None, pp=None, close_pp=False):
+    """Save pdf if pp is passed, otherwise use filename to save as 
+       config.SAVE_FORMAT"""
     if pp:
         fig.savefig(pp, format='pdf')
+        if close_pp:
+            pp.close()
     elif filename:
         replace = ['$\\mathit{', '}$']
         for repl in replace:
@@ -314,7 +325,7 @@ def _setup_heatmap_xy(x_y, ax, lbls, pivot, hide_lbls, lbl_size, colors):
 def _check_args(trg, smp, metric, differential, 
                 hide_distance_bar=None, reorder_to_distance_bar=None,
                 distance_bar_range=None, cluster_hmx=None, 
-                display_similarity=False):
+                display_markergenes=False):
     """General purpose plot argument checker; returns (modified) input values"""
     def check_metric(metric, trg, smp, diff):
         # check if the samples and targets have equivalent data to compare
@@ -386,26 +397,25 @@ def _check_args(trg, smp, metric, differential,
                        'and ignored when differential = False. To apply'
                        ' a custom range, please use "heatmap_range".')
             
-    if display_similarity is not False:
+    if display_markergenes is not False:
         # checks for target_sim and ranked_sim plots
-        val = ['mgs mean', 'mgs up', 'mgs down']
-        if display_similarity not in val:
-            logger.warning('Invalid input for display_similarity: `{}`. ' 
-                               'Valid are {}. Set to default `{}`'
-                               .format(display_similarity, val, val[0]))
-            display_similarity = val[0] 
+        val = ['mean', 'up', 'down']
+        if display_markergenes not in val:
+            logger.warning('Invalid input for display_markergenes: `{}`. ' 
+                           'Valid are {}. Set to default `{}`'
+                           .format(display_markergenes, val, val[0]))
+            display_markergenes = val[0] 
 
-        if display_similarity == val[2] and not trg._down_mgs: 
+        if display_markergenes == val[2] and not trg._down_mgs: 
             logger.error('Cannot display down markergene similarity because'
                          ' the targets were not initiated with down '
                          'markergenes.')
             sys.exit(1)
-        display_similarity = display_similarity[4:]
 
     return metric, differential, hide_distance_bar, reorder_to_distance_bar, \
-           distance_bar_range, cluster_hmx, display_similarity
+           distance_bar_range, cluster_hmx, display_markergenes
 
-def plot_color_legend(labels, colors, ncolumns=2, filename='color_legend.png'):
+def plot_color_legend(labels, colors, ncolumns=1, filename='color_legend'):
     """Plot a custom color legend.
     
        Takes a list of labels and colors and links them to produce a color 
@@ -417,7 +427,7 @@ def plot_color_legend(labels, colors, ncolumns=2, filename='color_legend.png'):
             must be interpretable by matplotlib: for example, 'w', #ffffff, 
             (1,1,1) all refer to white.
         filename (str, optional): the filename to save the legend. Defaults to
-            './color_legend.png'
+            './color_legend.' + config.SAVE_FORMAT
         ncolumns (int, optional): the number of columns in the legend. Defaults 
             to 1.
     """
@@ -428,11 +438,14 @@ def plot_color_legend(labels, colors, ncolumns=2, filename='color_legend.png'):
         logger.error('The following colors are not recognized as colors by '
                      'matplotlib: {}'.format(inv_cols))
         sys.exit(1)
+    if filename:
+        filename, pp = _open_file(filename)
     fig, ax = plt.subplots(1, 1, figsize=(4, 4))
     _clean_axes(np.array([ax]))
     ax.legend(handles=[Patch(color=colors[i], label=labels[i]) 
                 for i in range(len(colors))], loc='center', ncol=ncolumns)
-    fig.savefig(filename)
-    plt.close()
+    if filename:
+        _save_file(fig, filename=filename, pp=pp, close_pp=True)
+
     logger.info('Color legend generated and saved at {}/{}'
                 .format(os.path.abspath(os.curdir), filename))

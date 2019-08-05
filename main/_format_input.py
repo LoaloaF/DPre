@@ -7,7 +7,8 @@ from DPre.main._logger import logger, spacer
 import DPre.main.config as config
 import DPre.main._dpre_util as util
 
-def preset_targets(get, sort=False, preset_colors=True):
+def preset_targets(get, sort=False, preset_colors=True, 
+                   color_legend_filename=True, color_legend_ncols=1):
     """Generate one of the predefined targets instances and return it. 
     
         Pick a reference dataset for comparison. Mouse (Hutchins et al. 2017, 
@@ -28,6 +29,13 @@ def preset_targets(get, sort=False, preset_colors=True):
         preset_colors (bool, optional): Tries to initiate the targets with preset 
             colors either from colors.tsv in the respective preset directory or 
             when not found from config.preset_targets_colors. Defaults to True.
+        color_legend_filename (bool, str, optional): The filename when a preset
+            color legend is drawn from config.preset_col_legend. When True, a
+            filename is inferred from the targets name and config.SAVE_FORMAT, 
+            a str is set as the filename. Defaults to True. When None, the color
+            legend is not drawn.
+        color_legend_ncols (int, optional): Number of columns in the color 
+            legend. Defaults to 1.
     
     Returns:
         t: the preset targets instance
@@ -95,9 +103,12 @@ def preset_targets(get, sort=False, preset_colors=True):
                 logger.warning('No colors found for preset targets {}'
                                .format(get))
         # draw a colorlegend if defined in config
-        if get in config.preset_col_legend:
+        if get in config.preset_col_legend and color_legend_filename:
+            filename = get+'_color_legend' if color_legend_filename == True \
+                       else color_legend_filename
+            print(filename)
             util.plot_color_legend(*config.preset_col_legend[get], 
-                                   filename=get+'_color_legend.png')
+                                   ncolumns=color_legend_ncols, filename=filename)
     return t
 
 def _format_expr(expr, type_name, ctrl=None):

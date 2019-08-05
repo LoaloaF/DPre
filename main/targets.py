@@ -278,7 +278,7 @@ class targets(_differential):
                 return sim, None
             
     def plot_detec_mgs_prop(self, samples, plt_show=False, 
-                            filename='detec_mgs_prop.png', 
+                            filename='detec_mgs_prop', 
                             specific_target_labels=None, log=True):
         """Show the proportion of detected marker genes in logs and a histogram.
 
@@ -290,13 +290,16 @@ class targets(_differential):
                 plt_show (bool, optional): Directly the histogram in a new
                     window. Defaults to False.
                 filename (str, optional): Filename to save the generated 
-                    histogram. Defaults to None in metric case no plot is 
-                    saved.
+                    histogram. Defaults to detec_mgs_prop. + config.SAVE_FORMAT.
+                    None results in no file being saved.
                 specific_target_labels (list, optional): define a specific set 
                     of target labels to display. Defaults to None
             Returns:
                 det: A DataFrame with detection values used for logging and 
                     plotting
+            Note:
+                When the proportion of overlap is at 0 for all targetss, an 
+                error is raised.
         """
         # get proportion of detected marker genes
         if self._has_diff:
@@ -335,29 +338,30 @@ class targets(_differential):
             sys.exit(1)
         # draw the plot if filename is passed, otherwise only log and return df
         if filename or plt_show:
+            if filename:
+                filename, pp = util._open_file(filename)
             fig, ax = plt.subplots()
             ax.bar(np.arange(len(order)), det.proportion, edgecolor='k',
                    width=1, color=self.get_colors(order.get_level_values(1)))
             ax.hlines(config.DROP_TARGET_DETEC_THR, 0, len(self))
             ax.yaxis.grid(alpha=0.8, linestyle='dashed')
-            ax.set_xlabel(self.name, fontsize=4)
+            ax.set_xlabel(self.name+' (targets')
             if specific_target_labels:
                 xlbl = [lbl if lbl in specific_target_labels else '' 
                         for lbl in order]
                 ax.set_xticks(np.arange(len(xlbl)))
                 ax.set_xticklabels(xlbl, rotation=45, ha='right', 
                                 rotation_mode='anchor')
-            ax.set_ylabel('Proportion of detected marker genes', fontsize=4)
+            ax.set_ylabel('Proportion of detected marker genes in samples')
             tit = ('Proportion of detected {} marker genes in {}\nline = drop '
                    'threshold').format(self.name, samples.name)
             ax.set_title(tit, fontsize=6)
             if plt_show:
                 plt.show()
             if filename:
-                fig.savefig(fname=filename)
+                util._save_file(fig, filename, pp, close_pp=True)
                 logger.info('Plot saved at {}\n'
                             .format(os.path.abspath(filename)))
-            plt.close()
         return det
 
     def target_similarity_heatmap(self, 
@@ -365,7 +369,7 @@ class targets(_differential):
                                   samples, 
                                   metric = None, 
                                   differential = True,
-                                  display_similarity = 'mgs mean',
+                                  display_markergenes = 'mean',
                                   # data ordering
                                   cluster_targets = False,
                                   cluster_samples = False,
@@ -414,18 +418,16 @@ class targets(_differential):
                 input for samples and targets. 'intersect' will show the overlap 
                 between diff. sample genes and target marker genes requiring 
                 gene list input. 
-                When None, determine metric based on input data in targets 
+                When None, determine which based on input data in targets 
                 and samples. 
             differential (bool, optional): plot the differential (change in) 
                 similarity between samples and targets. Defaults to True. 
                 Requires a control to be passed for the 'euclid' metric. Cannot 
                 be False for 'intersect'-metric.
-            display_similarity (str, optional): specify the group of 
-                marker genes to display similarity for. . Defaults to 'mgs mean'. 
-                Valid options are 
-                'mgs mean', 'mgs up', 'mgs down'. Relevent when targets are 
-                initiated with 
-                down-marker genes.
+            display_markergenes (str, optional): specify the group of 
+                marker genes to display similarity for. Defaults to 'mean'. 
+                Valid options are 'mean', 'up', 'down'. Relevent when targets 
+                are initiated with down-marker genes.
 
             =================== data ordering options ===================
             cluster_targets (bool, optional): cluster targets using the 
@@ -527,16 +529,16 @@ class targets(_differential):
             nonlocal cluster_targets
             nonlocal reorder_to_distance_bar
             nonlocal hide_distance_bar
-            nonlocal display_similarity
+            nonlocal display_markergenes
             nonlocal distance_bar_range
 
             # check general basic input requirements
             r = util._check_args(self, samples, metric, differential, 
                                 hide_distance_bar, reorder_to_distance_bar,
                                 distance_bar_range, cluster_targets, 
-                                display_similarity)
+                                display_markergenes)
             metric, differential, hide_distance_bar, reorder_to_distance_bar, \
-            distance_bar_range, cluster_targets, display_similarity = r
+            distance_bar_range, cluster_targets, display_markergenes = r
                 
             config._update_consts(kwargs)
             spacer.info('')
@@ -549,8 +551,8 @@ class targets(_differential):
                                                  drop_ctrl= not hide_distance_bar)
             if ctrl_sim is None:
                 ctrl_sim =  pd.DataFrame(0, [0], sim.columns)
-            return [sim.xs(display_similarity, 1, 0), 
-                    ctrl_sim.xs(display_similarity, 1, 0)]
+            return [sim.xs(display_markergenes, 1, 0), 
+                    ctrl_sim.xs(display_markergenes, 1, 0)]
 
         # get plot lims
         def get_caps():
@@ -754,9 +756,7 @@ class targets(_differential):
         if plt_show:
                 plt.show()
         if filename:
-            util._save_file(fig, filename=filename, pp=pp)
-            if pp:
-                pp.close()
+            util._save_file(fig, filename=filename, pp=pp, close_pp=True)
             logger.info('Plot saved at {}/{}\n\n'
                         .format(os.path.abspath(os.curdir), filename))
         return fig, axes, data
@@ -907,7 +907,8 @@ class targets(_differential):
             title (bool, str, optional): the plot title to set. Defaults to 
                 True. For True, infer the title based on plot data inputs and 
                 targets/ samples name attribute. Text input will be set as 
-                the general title, False hides the title.
+                the general title, False hides the title. A list of str will be
+                set according to the list of plots.
             kwargs: modify the constants defined in config. This is used as an 
                 advanced adjustment of plot element sizes and the minimum 
                 required marker genes detection proportion. The heatmaps may be
@@ -1483,7 +1484,7 @@ class targets(_differential):
                                   samples,
                                   metric = None, 
                                   differential = True,
-                                  display_similarity = 'mgs mean',
+                                  display_markergenes = 'mean',
                                   n_targets = 16,
                                   display_negative = False,
                                   # data ordering
@@ -1524,18 +1525,16 @@ class targets(_differential):
                 input for samples and targets. 'intersect' will show the overlap 
                 between diff. sample genes and target marker genes requiring 
                 gene list input. 
-                When None, determine metric based on input data in targets 
+                When None, determine which based on input data in targets 
                 and samples.             
             differential (bool, optional): plot the differential (change in) 
                 similarity between samples and targets. Defaults to True. 
                 Requires a control to be passed for the 'euclid' metric. Cannot 
                 be False for'intersect'-metric.
-            display_similarity (str, optional): specify the group of 
-                marker genes to display similarity for. . Defaults to 'mgs mean'. 
-                Valid options are 
-                'mgs mean', 'mgs up', 'mgs down'. Relevent when targets are 
-                initiated with 
-                down-marker genes.
+            display_markergenes (str, optional): specify the group of 
+                marker genes to display similarity for. Defaults to 'mean'. 
+                Valid options are 'mean', 'up', 'down'. Relevent when targets 
+                are initiated with down-marker genes.
             n_targets (int, optional): the number of targets to display in each
                 plot. Defaults to 16. 
             display_negative (bool, optional): display the most negative values 
@@ -1565,10 +1564,11 @@ class targets(_differential):
                 positive ones in red. Defaults to False.
             spines (bool, optional): in addition to the bottom and left spines,
                 plot the top and right ones. Defaults to False.
-            title (bool, str, optional): the plot title to set. Defaults to 
+            title (bool, str, list optional): the plot title to set. Defaults to 
                 True. For True, infer the title based on plot data inputs and 
                 targets/ samples name attribute. Text input will be set as 
-                the general title, False hides the title.
+                the general title, False hides the title. A list of str will be
+                set according to the list of plots.
             kwargs: modify the constants defined in config. This is used as an 
                 advanced adjustment of plot element sizes and the minimum 
                 required marker genes detection proportion. The barplots may be
@@ -1599,12 +1599,12 @@ class targets(_differential):
             nonlocal metric
             nonlocal differential
             nonlocal n_targets
-            nonlocal display_similarity
+            nonlocal display_markergenes
 
             # check general basic input requirements
             r = util._check_args(self, samples, metric, differential,  
-                                 display_similarity=display_similarity)
-            metric, differential, _, _, _, _, display_similarity = r
+                                 display_markergenes=display_markergenes)
+            metric, differential, _, _, _, _, display_markergenes = r
             if not n_targets or n_targets > len(self):
                 n_targets = len(self)
                 logger.warning('The number of targets `n_targets` was None or '
@@ -1617,7 +1617,7 @@ class targets(_differential):
         def get_data():
             sim, ctrl_sim = self._get_similarity(samples, metric, 
                                                  differential=differential)
-            sim = sim.xs(display_similarity, 1, 0)
+            sim = sim.xs(display_markergenes, 1, 0)
             if rank_samples:
                 if differential:
                     order = sim.max(1).sort_values(ascending=False).index
@@ -1762,7 +1762,7 @@ class targets(_differential):
 
             # for absolute euclid sim., mark the untreated base if available
             if not differential and samples._ctrl and not hide_base_lines:
-                xs = ctrl_sim.loc[samples._ctrl, display_similarity]
+                xs = ctrl_sim.loc[samples._ctrl, display_markergenes]
                 xs = xs.reindex(ylbls, axis=1)
                 ax.vlines(xs, yts-.4, yts+.4, linewidth=.5)
                 xlbl += '\n(line = base)'

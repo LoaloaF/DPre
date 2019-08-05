@@ -95,7 +95,7 @@ preset_col_legend = {
 RdBu_bin = LinearSegmentedColormap.from_list('RdBu_binary', 
                                              [colors[18], '#f6f7f7', colors[14]], 
                                              3)
-                                             
+
 # dendrogram colors. By default set to all black.
 dendrogram_colors = ['#000000', '#000000', '#000000', '#000000']
 # dendrogram_colors = [colors[19], '#589909', '#0c9691', '#13bf63']

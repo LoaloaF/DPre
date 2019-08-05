@@ -36,9 +36,8 @@ def _do_target_sim(args):
      t.target_similarity_heatmap(
                     # plot data
                     samples = s, 
-                    which = args['which'], 
+                    metric = args['metric'], 
                     differential = args['absolute'],
-                    proportional = args['proportional'], 
                     display_similarity = args['display_similarity'],
                     # data ordering
                     cluster_targets = args['cluster_targets'],
@@ -73,9 +72,8 @@ def _do_gene_sim(args):
      t.gene_similarity_heatmap(
                     # plot data
                     samples = s,  
-                    which = args['which'],
+                    metric = args['metric'],
                     differential = args['absolute'],
-                    proportional = args['proportional'],
                     display_genes = args['display_genes'],
                     gene_number = args['gene_number'],
                     specific_genes = args['specific_genes'],
@@ -113,9 +111,8 @@ def _do_ranked_sim(args):
      t.ranked_similarity_barplot(
                     # plot data
                     samples = s,
-                    which = args['which'],
+                    metric = args['metric'],
                     differential = args['absolute'],
-                    proportional = args['proportional'],
                     display_similarity = args['display_similarity'],
                     n_targets = args['n_targets'],
                     display_negative = args['display_negative'],
@@ -140,7 +137,7 @@ d = ('DPre - visualizing transcriptional similarity between samples and targets'
 u = ('\n\n\n\n\n\nPass the input --> Choose the plot --> specify the plot:\n'
     '$ ./dpre.py <targets> <samples> <plot> <plot args> (optional)\nExample:\n'
      'python dpre.py -pt "h endoderm" -se "examples/example1_hsliver/hsliver_e'
-     'xpression.tsv" -c "Day00" target_sim -w "euclid"')
+     'xpression.tsv" -c "Day00" target_sim -m "euclid"')
 parser = argparse.ArgumentParser(description=d, usage=u, allow_abbrev=False,
                                  add_help=False)
 
@@ -166,7 +163,7 @@ trg_grp.add_argument('--targets_override_namematcher', '-to',
 trg_grp.add_argument('--species', '-s', type=str, default='mouse',
                      help='species of the target, default `mouse`')
 trg_grp.add_argument('--targets_slice', '-ts', action='append', type=str, 
-                     help='convenience slicer, pass the element names to keep')
+                     help='slicer, pass the element names to keep')
 
 # create a group from the parser for the samples data input
 smp_grp = parser.add_argument_group('samples', description='input data to '
@@ -185,7 +182,7 @@ smp_grp.add_argument('--samples_override_namematcher', '-so',
                      action='store_true', help='when both differential and '
                     'expression, ignore name mismatches')
 smp_grp.add_argument('--samples_slice', '-ss', action='append', type=str, 
-                     help='convenience slicer, pass the element names to keep')
+                     help='slicer, pass the element names to keep')
 
 # create a subparser of parser that specifies the plot to run
 # each plot is a parser of this subparser and implements its do_plot function
@@ -208,18 +205,16 @@ trg_sim_parser.set_defaults(func=_do_target_sim)
 trg_sim_parser.add_argument('--filename', '-f', type=str, default='target_'
                             'similarity_hm.png', help='filename for saving.' 
                             'If None plot is not saved, default: '
-                            'target_similarity_hm.png')
+                            'target_similarity_hm + config.SAVE_FORMAT')
 # add arguments for each argument group
 # plot data
 d = 'main parameters to control the presented similarity'
 dat_grp = trg_sim_parser.add_argument_group('Data options', description=d)
-dat_grp.add_argument('--which', '-w', type=str, choices=('euclid', 'intersect'),
+dat_grp.add_argument('--mhich', '-m', type=str, choices=('euclid', 'intersect'),
                      help='select the similarity metric')
 dat_grp.add_argument('--absolute', '-a', action='store_false', help='plot the '
                      'absolute similarity, `euclid` only. Will appear as '
                      'differential=False in logs.')
-dat_grp.add_argument('--proportional', '-p', action='store_true',
-                     help='plot the proportional changes in similarity')
 dat_grp.add_argument('--display_similarity', '-ds', default='mgs mean',
                      choices=['mgs mean', 'mgs up', 'mgs down'], help='Specify '
                      'up- or down markerene similarity, default mean')
@@ -258,7 +253,7 @@ genhm_grp.add_argument('--targetlabels_size', '-tas', type=float,
                        help='multiplier for targetlabels fontsize, default = 1')
 genhm_grp.add_argument('--samplelabels_size', '-sas', type=float, 
                        help='multiplier for samplelabels fontsize, default = 1')
-genhm_grp.add_argument('--title', '-t', default=True,
+genhm_grp.add_argument('--title', '-t', default=True, 
                        help='a custom title or hide title if `f`, `F`, ..')
 # show/ hide specific plot elements
 d = 'show/ hide subparts of the plot'
@@ -288,18 +283,16 @@ gene_sim_parser.set_defaults(func=_do_gene_sim)
 gene_sim_parser.add_argument('--filename', '-f', type=str, default='gene_'
                              'similarity_hm.pdf', help='filename for saving.' 
                              'If None plot is not saved, default: '
-                             'gene_similarity_hm.pdf')
+                             'gene_similarity_hm. + config.SAVE_FORMAT')
 # add arguments for each argument group
 # plot data
 d = 'main parameters to control the presented similarity'
 dat_grp = gene_sim_parser.add_argument_group('Data options', description=d)
-dat_grp.add_argument('--which', '-w', type=str, choices=('euclid', 'intersect'),
+dat_grp.add_argument('--mhich', '-m', type=str, choices=('euclid', 'intersect'),
                      help='select the similarity metric')
 dat_grp.add_argument('--absolute', '-a', action='store_false', help='plot the '
                      'absolute similarity, `euclid` only. Will appear as '
                      'differential=False in logs.')
-dat_grp.add_argument('--proportional', '-p', action='store_true',
-                     help='plot the proportional changes in similarity')
 dat_grp.add_argument('--display_genes', '-di', type=str, default='variant', 
                      choices=['variant', 'increasing', 'decreasing', 
                      'similar', 'distant'], help='Option 1: specify the group '
@@ -345,8 +338,9 @@ genhm_grp.add_argument('--genelabels_size', '-ges', type=float,
                        help='multiplier for genelabels fontsize, default = 1')
 genhm_grp.add_argument('--targetlabels_size', '-tas', type=float, 
                        help='multiplier for targetlabels fontsize, default = 1')
-genhm_grp.add_argument('--title', '-t', default=True, help='a custom title or '
-                       'hide title with {f, false, F, False}')
+genhm_grp.add_argument('--title', '-t', default=True, action='append', 
+                       help='a custom title or hide title with {`f`, `false`, '
+                       '`F`, `False`} or list of titles for each plot.')
 # show/ hide specific plot elements
 d = 'show/ hide subparts of the plot'
 elem_grp = gene_sim_parser.add_argument_group('Plot elements', description=d)
@@ -378,18 +372,16 @@ rank_sim_parser.set_defaults(func=_do_ranked_sim)
 rank_sim_parser.add_argument('--filename', '-f', type=str, default='ranked_'
                              'similarity_bp.pdf', help='filename for saving.' 
                              'If None plot is not saved, default: '
-                             'ranked_similarity_hm.png')
+                             'ranked_similarity_hm. + config.SAVE_FORMAT')
 # add arguments for each argument group
 # plot data
 d ='main parameters to control the presented similarity'
 dat_grp = rank_sim_parser.add_argument_group('Data options', description = d)
-dat_grp.add_argument('--which', '-w', type=str, choices=('euclid', 'intersect'),
+dat_grp.add_argument('--mhich', '-m', type=str, choices=('euclid', 'intersect'),
                      help='select the similarity metric')
 dat_grp.add_argument('--absolute', '-a', action='store_false', help='plot the '
                      'absolute similarity, `euclid` only. Will appear as '
                      'differential=False in logs.')
-dat_grp.add_argument('--proportional', '-p', action='store_true',
-                     help='plot the proportional changes in similarity')
 dat_grp.add_argument('--display_similarity', '-ds', default='mgs mean',
                      choices=['mgs mean', 'mgs up', 'mgs down'], help='Specify '
                      'up- or down markerene similarity, default mean')
@@ -419,8 +411,9 @@ genhm_grp.add_argument('--colored_bars', '-co', action='store_true',
                        help='color the bars according to the value')
 genhm_grp.add_argument('--spines', '-spi', action='store_true', 
                       help='additionally show spines on top and right')
-genhm_grp.add_argument('--title', '-t', default=True, help='a custom title or '
-                       'hide title with {f, false, F, False}')
+genhm_grp.add_argument('--title', '-t', default=True, action='append', 
+                       help='a custom title or hide title with {`f`, `false`, '
+                       '`F`, `False`} or list of titles for each plot.')
 # show/ hide specific plot elements
 d = 'show/ hide subparts of the plot'
 elem_grp = rank_sim_parser.add_argument_group('Plot elements', description=d)

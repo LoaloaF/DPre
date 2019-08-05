@@ -115,7 +115,7 @@ def _format_expr(expr, type_name, ctrl=None):
     """ Take user expression input validate and format
 
     If a TSV file is passed, read the expresion file as a DataFrame. Check
-    if the DataFrame has a valid format. If the control is passed,check if it's
+    if the DataFrame has a valid format. If the control is passed, check if it's
     found in expression. Finally, generate and add the log2- and z-transformed 
     data.
 

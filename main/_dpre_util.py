@@ -449,3 +449,25 @@ def plot_color_legend(labels, colors, ncolumns=1, filename='color_legend'):
 
     logger.info('Color legend generated and saved at {}/{}'
                 .format(os.path.abspath(os.curdir), filename))
+
+def add_diff_genes_from_z(samples, diff_z_threshold=2):
+    if not samples._ctrl:
+        logger.error('The samples `{}` were not initialized with a control.'
+                     'To generate a list of differential genes, a control is '
+                     'required.'.format(samples.name))
+        sys.exit(1)
+    expr = samples._expr.xs('z', 1, 1, False)
+    expr = expr.apply(lambda smp: smp - expr.loc(1)[(samples._ctrl, 'z')])
+
+    up = expr.mask(~(expr>diff_z_threshold), False).astype(bool)
+    up.columns = pd.MultiIndex.from_product([['up'], up.columns.unique(0)])
+    down = expr.mask(~(expr<-diff_z_threshold), False).astype(bool)
+    down.columns = pd.MultiIndex.from_product([['down'], down.columns.unique(0)])
+
+    samples._diff = pd.concat((up, down), axis=1)
+    samples._has_diff = True
+    spacer.info('\n')
+    n = samples._diff.sum().unstack(0).reindex(samples.names).to_string()
+    logger.info('Differential genes were added to the sample. Number of marker '
+                'genes:\n{}\n{}'.format(n, samples))
+

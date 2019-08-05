@@ -14,3 +14,4 @@ import main.config as config
 from .main._dpre_util import plot_color_legend
 from .main._dpre_util import annotate
 from .main._dpre_util import get_ensgs
+from .main._dpre_util import add_diff_genes_from_z

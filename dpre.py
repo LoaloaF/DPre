@@ -132,6 +132,7 @@ def _do_ranked_sim(args):
                     # show/ hide elements
                     hide_colorbar = args['hide_colorbar'],
                     hide_targetlabels = args['hide_targetlabels'],
+                    hide_base_lines = args['hide_base_lines'],
                     filename = args['filename'])
 
 # create the base parser
@@ -427,6 +428,9 @@ elem_grp.add_argument('--hide_targetlabels', '-hta', action='store_true',
                       help='do not show the target labels')
 elem_grp.add_argument('--hide_colorbar', '-hc', action='store_true', 
                       help='do not plot the targets colorbar')
+elem_grp.add_argument('--hide_base_lines', '-hb', action='store_true', 
+                      help='do not show the control base lines')
+
 
 args = vars(parser.parse_args())
 do_plot = args.pop('func')

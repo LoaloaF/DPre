@@ -322,7 +322,17 @@ class targets(_differential):
             logger.info('Detection of targets ({}) marker genes in samples data '
                         '({}): \n{}\nShown are the {} edge proportion values.'
                         .format(self.name, samples.name, df_edges, len(edges)))
-
+        if (det['detected in samples'] == 0).all():
+            trg_genes = ', '.join(self._detec_genes[:3])
+            smp_genes = ', '.join(samples._expr.index[:3]) if samples._has_expr \
+                        else ', '.join(samples._diff.index[:3])
+            msg = ('None of the targets marker genes were detected in the '
+                   'samples. This is likely due to non-matching indeces from a '
+                   'species-mismatch. Targets gene index: {} ... Samples gene '
+                   'index: {}. Check the input files.'
+                   .format(trg_genes, smp_genes))
+            logger.error(msg)
+            sys.exit(1)
         # draw the plot if filename is passed, otherwise only log and return df
         if filename or plt_show:
             fig, ax = plt.subplots()
@@ -349,102 +359,6 @@ class targets(_differential):
                             .format(os.path.abspath(filename)))
             plt.close()
         return det
-
-    # def _get_from_overlap(self, samples, metric, genes_diff=False, 
-    #                       genes_prop=False, genes_agg_diff=False, 
-    #                       genes_agg_prop=False, drop_ctrl=True, 
-    #                       inters_to_updown_not=True, log=True):
-    #     """Access and specifically process similarity data in overlap. Returns 
-    #         4 elements, single-gene similarity, aggregated similarity (mean for 
-    #         'euclid' metric, sum for 'intersect'), single-gene distance and 
-    #         aggregated distance. Option for differential and proportional 
-    #         similarities.
-    #     """
-    #     # check if overlap has already been computed, if not do overlap
-    #     try:
-    #         ovp = self._overlaps['{}-{}'.format(id(samples), metric)].copy()
-    #     except KeyError:
-    #         ovp = self._compute_similarity(samples, metric)
-    #         ovp = self._gene_sims['{}-{}'.format(id(samples), metric)].copy()
-
-    #     # make sure the overlap DataFrame has the correct ordering 
-    #     t_ord = ovp.columns.unique(1)
-    #     val_t_ord = pd.Index(self.names)
-    #     val_t_ord = val_t_ord.drop(val_t_ord.difference(t_ord))
-    #     if t_ord.tolist() != val_t_ord.tolist():
-    #         ovp = ovp.reindex(val_t_ord, level=1, axis=1)
-    #     s_ord = ovp.columns.unique(2)
-    #     val_s_ord = samples.names
-    #     if s_ord.tolist() != val_s_ord:
-    #         ovp = ovp.reindex(val_s_ord, level=2, axis=1)
-    #     if log:
-    #         logger.info('Selecting and processing overlap data...')
-    #     if metric == 'euclid':
-    #         # get single gene control ovp values and aggregate (absolute mean)
-    #         if samples._ctrl:
-    #             ctrl_genes = ovp.xs(samples._ctrl, 1, 2, False)
-    #             c_a = ctrl_genes.abs().mean().unstack().T
-    #             ctrl_agg = util._add_mgtmean(c_a.reindex(t_ord, axis=1, level=1))
-    #         else:
-    #             ctrl_genes = None
-    #             ctrl_agg = None
-
-    #         if not genes_diff:
-    #             genes = ovp
-    #         else:
-    #             def gene_diff(smp_ovp, alter=None):
-    #                 ctrl = smp_ovp.xs(samples._ctrl, 1, 2).iloc(1)[0]
-    #                 to_diff = lambda smp:  ctrl.abs() - smp.abs()
-    #                 diff = smp_ovp.apply(to_diff)
-    #                 if genes_prop:
-    #                     to_prop = lambda smp: smp / ctrl.abs()
-    #                     # make interpretable, 1 = 100% -1 = -100%
-    #                     prop_interpr = ((diff.apply(to_prop)-1).abs() *-1) +1
-    #                     # cap negative single gene proportional values
-    #                     return prop_interpr.mask(prop_interpr < -3, -3)
-    #                 return diff
-    #             genes = ovp.groupby(level=(0,1), axis=1, sort=False).apply(gene_diff)
-            
-    #         # aggregate the sample data
-    #         if not genes_agg_diff:
-    #             agg = ovp.abs().mean().unstack((0,1)).reindex(s_ord)
-    #             agg = util._add_mgtmean(agg)
-    #         else:
-    #             # get aggregated absolute mean effects
-    #             def agg_diff(smp_ovp):
-    #                 agg_mean = smp_ovp.abs().mean()
-    #                 ctrl_mean = agg_mean.xs(samples._ctrl, level=2).values
-    #                 if genes_agg_diff:
-    #                     agg_mean = ctrl_mean - agg_mean
-    #                     if genes_agg_prop:
-    #                         agg_mean /= ctrl_mean
-    #                 return agg_mean.unstack((0,1)).reindex(s_ord)
-    #             agg = ovp.groupby(level=(0,1), axis=1, sort=False).apply(agg_diff)
-    #             agg = util._add_mgtmean(agg.droplevel((0,1), axis=1))
-            
-    #         if samples._ctrl and drop_ctrl:
-    #             genes.drop(samples._ctrl, axis=1, level=2, inplace=True)
-    #             agg.drop(samples._ctrl, inplace=True)
-    #         return genes, agg, ctrl_genes, ctrl_agg
-        
-    #     elif metric == 'intersect':
-    #         # ovp stores matches (1) and mismatches (-1). This option is for 
-    #         # reverting that notation for down mgs, matches -1, mismatches 1
-    #         n_mgs = ovp.notna().sum().xs(s_ord[0], level=2)
-    #         n_mgs.index = util._add_level(n_mgs.index, 'n_mgs', at=2)
-    #         n_mgs = util._add_mgtmean(n_mgs.unstack((0,1))).astype(int)
-
-    #         agg = ovp.sum().unstack((0,1)).reindex(s_ord)
-    #         agg = util._add_mgtmean(agg)
-    #         if genes_agg_prop:
-    #             agg /= n_mgs.iloc[0]
-
-    #         if samples._ctrl and drop_ctrl:
-    #             ovp.drop(samples._ctrl, axis=1, level=2, inplace=True)
-    #             agg.drop(samples._ctrl, inplace=True)
-    #         if inters_to_updown_not and self._down_mgs:
-    #             ovp['down'] *= -1
-    #         return ovp, agg, None, n_mgs
 
     def target_similarity_heatmap(self, 
                                   # plot data

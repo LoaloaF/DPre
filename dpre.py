@@ -38,7 +38,7 @@ def _do_target_sim(args):
                     samples = s, 
                     metric = args['metric'], 
                     differential = args['absolute'],
-                    display_similarity = args['display_similarity'],
+                    display_markergenes = args['display_markergenes'],
                     # data ordering
                     cluster_targets = args['cluster_targets'],
                     cluster_samples = args['cluster_samples'],
@@ -113,7 +113,7 @@ def _do_ranked_sim(args):
                     samples = s,
                     metric = args['metric'],
                     differential = args['absolute'],
-                    display_similarity = args['display_similarity'],
+                    display_markergenes = args['display_markergenes'],
                     n_targets = args['n_targets'],
                     display_negative = args['display_negative'],
                     # data ordering
@@ -203,19 +203,19 @@ d = ('Plot the elementwise similarity of the samples and targets in a heatmap\n'
 trg_sim_parser = subparsers.add_parser('target_sim', description=d, usage=u)
 trg_sim_parser.set_defaults(func=_do_target_sim)
 trg_sim_parser.add_argument('--filename', '-f', type=str, default='target_'
-                            'similarity_hm.png', help='filename for saving.' 
+                            'similarity_hm', help='filename for saving.' 
                             'If None plot is not saved, default: '
                             'target_similarity_hm + config.SAVE_FORMAT')
 # add arguments for each argument group
 # plot data
 d = 'main parameters to control the presented similarity'
 dat_grp = trg_sim_parser.add_argument_group('Data options', description=d)
-dat_grp.add_argument('--mhich', '-m', type=str, choices=('euclid', 'intersect'),
+dat_grp.add_argument('--metric', '-m', type=str, choices=('euclid', 'intersect'),
                      help='select the similarity metric')
 dat_grp.add_argument('--absolute', '-a', action='store_false', help='plot the '
                      'absolute similarity, `euclid` only. Will appear as '
                      'differential=False in logs.')
-dat_grp.add_argument('--display_similarity', '-ds', default='mgs mean',
+dat_grp.add_argument('--display_markergenes', '-dm', default='mgs mean',
                      choices=['mgs mean', 'mgs up', 'mgs down'], help='Specify '
                      'up- or down markerene similarity, default mean')
 # data ordering
@@ -281,14 +281,14 @@ d = 'Plot the single-gene similarity of the samples with each target in a heatma
 gene_sim_parser = subparsers.add_parser('gene_sim', description=d, usage=u)
 gene_sim_parser.set_defaults(func=_do_gene_sim)
 gene_sim_parser.add_argument('--filename', '-f', type=str, default='gene_'
-                             'similarity_hm.pdf', help='filename for saving.' 
+                             'similarity_hm', help='filename for saving.' 
                              'If None plot is not saved, default: '
                              'gene_similarity_hm. + config.SAVE_FORMAT')
 # add arguments for each argument group
 # plot data
 d = 'main parameters to control the presented similarity'
 dat_grp = gene_sim_parser.add_argument_group('Data options', description=d)
-dat_grp.add_argument('--mhich', '-m', type=str, choices=('euclid', 'intersect'),
+dat_grp.add_argument('--metric', '-m', type=str, choices=('euclid', 'intersect'),
                      help='select the similarity metric')
 dat_grp.add_argument('--absolute', '-a', action='store_false', help='plot the '
                      'absolute similarity, `euclid` only. Will appear as '
@@ -370,19 +370,19 @@ d = 'Plot the ranked similarity of the samples with targets in a bar plot'
 rank_sim_parser = subparsers.add_parser('ranked_sim', description=d, usage=u)
 rank_sim_parser.set_defaults(func=_do_ranked_sim)
 rank_sim_parser.add_argument('--filename', '-f', type=str, default='ranked_'
-                             'similarity_bp.pdf', help='filename for saving.' 
+                             'similarity_bp', help='filename for saving.' 
                              'If None plot is not saved, default: '
                              'ranked_similarity_hm. + config.SAVE_FORMAT')
 # add arguments for each argument group
 # plot data
 d ='main parameters to control the presented similarity'
 dat_grp = rank_sim_parser.add_argument_group('Data options', description = d)
-dat_grp.add_argument('--mhich', '-m', type=str, choices=('euclid', 'intersect'),
+dat_grp.add_argument('--metric', '-m', type=str, choices=('euclid', 'intersect'),
                      help='select the similarity metric')
 dat_grp.add_argument('--absolute', '-a', action='store_false', help='plot the '
                      'absolute similarity, `euclid` only. Will appear as '
                      'differential=False in logs.')
-dat_grp.add_argument('--display_similarity', '-ds', default='mgs mean',
+dat_grp.add_argument('--display_markergenes', '-dm', default='mgs mean',
                      choices=['mgs mean', 'mgs up', 'mgs down'], help='Specify '
                      'up- or down markerene similarity, default mean')
 dat_grp.add_argument('--n_targets', '-nt', type=int, default=16,

@@ -397,7 +397,7 @@ class targets(_differential):
                                   show_samples_colorbar = False,
                                   # others
                                   plt_show = False,
-                                  filename = 'target_similarity_hm.png',
+                                  filename = 'target_similarity_hm',
                                   **kwargs):
         """Plot the similarity of the samples with the targets in a heatmap.
         
@@ -798,7 +798,7 @@ class targets(_differential):
                                 show_samples_dendrogram = False,
                                 show_samples_colorbar = False,
                                 # others
-                                filename = 'gene_similarity_hm.pdf',
+                                filename = 'gene_similarity_hm',
                                 plt_show = False,
                                 **kwargs):
         """Plot the single-gene similarities of the samples with the targets 
@@ -1502,7 +1502,7 @@ class targets(_differential):
                                   hide_colorbar = False,
                                   hide_base_lines = False,
                                   # others
-                                  filename = 'ranked_similarity_bp.pdf',
+                                  filename = 'ranked_similarity_bp',
                                   plt_show = False,
                                   **kwargs):
         """Plot the ranked similarity of the samples with the targets in a 

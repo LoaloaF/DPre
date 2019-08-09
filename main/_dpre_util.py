@@ -203,6 +203,7 @@ def _save_file(fig, filename=None, pp=None, close_pp=False):
         fig.savefig(pp, format='pdf')
         if close_pp:
             pp.close()
+            plt.close()
     elif filename:
         replace = ['$\\mathit{', '}$']
         for repl in replace:
@@ -353,11 +354,12 @@ def _check_args(trg, smp, metric, differential,
             elif not smp._has_expr:
                 logger.error(msg.format('samples', 'expression', metric))
                 sys.exit(1)
-            if diff and not smp._ctrl:
-                logger.error('To plot the changes in transcriptional similarity '
-                            'with metric = `{}`, the samples must be initiated '
-                            'with a control. For absolute, pass differential = ' 
-                            'False.'.format(metric))
+                if diff and not smp._ctrl:
+                    logger.error('To plot the changes in transcriptional similarity '
+                    'with metric = `{}`, the samples must be initiated '
+                    'with a control. For absolute, pass differential = ' 
+                    'False.'.format(metric))
+                    sys.exit(1)
         elif metric == 'intersect':
             if not trg._has_diff:
                 logger.error(msg.format('targets', 'merker gene', metric))
@@ -470,4 +472,3 @@ def add_diff_genes_from_z(samples, diff_z_threshold=2):
     n = samples._diff.sum().unstack(0).reindex(samples.names).to_string()
     logger.info('Differential genes were added to the sample. Number of marker '
                 'genes:\n{}\n{}'.format(n, samples))
-

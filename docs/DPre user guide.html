@@ -13117,10 +13117,10 @@ div#notebook {
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h1 id="User-Guide">User Guide<a class="anchor-link" href="#User-Guide">&#182;</a></h1><p>DPre is structured in three layers: initiate - overlap - visualize, but only initiation and visualization are controlled by the user. Once these two components are understood, DPre offers great utility for exploring differentiation experiments.<br> This guide covers the fundamentals behind DPre. After going through it, I suggest to run the examples.py scripts. The examples also have an interactive jupyter notebook which can be opened with <i>> jupyter notebook example_file.ipynb</i>.</p>
-<p><img src="images/DPre_schematic.png" alt="caption"></p>
+<p><img src="docs/images/DPre_schematic.svg" style="width:100%;"></p>
 <h2 id="The-Python--versus-command-line-interface">The Python- versus command line interface<a class="anchor-link" href="#The-Python--versus-command-line-interface">&#182;</a></h2><p>This user guide and also the documented examples largely focus on the Python interface of DPre. This is mainly due to the fact that the Python interface offers a few more features. Since the command line interface is built on top of the Python  implementation, the guide and examples are well suited for understanding the usage of the command line interface.
 In short, the Python implementation splits initiation and visualization while the command line interface combines everything in one expression: <i>python dpre.py &lt;samples input> &lt;targets input> plot &lt;plot arguments></i>.</p>
-<h2 id="Initiate-samples-and-targets">Initiate samples and targets<a class="anchor-link" href="#Initiate-samples-and-targets">&#182;</a></h2><p>As the schematic shows, the input for samples and targets initiation depends on which of the two similarity metrics 'euclid' and 'intersect' is used. 'euclid' relies on expression data, 'intersect' on lists of genes. Targets and samples overlap in regard to these two data inputs, but targets gene list input is referred to as <i>markergenes</i>, samples as <i>diff_genes</i>.</p>
+<h2 id="Initiate-samples-and-targets">Initiate samples and targets<a class="anchor-link" href="#Initiate-samples-and-targets">&#182;</a></h2><p>As the schematic shows, the input for samples and targets initiation depends on which of the four similarity metrics 'euclid', 'cosine' (default), 'pearson' and 'intersect' is used. The first three rely on expression data, 'intersect' on lists of genes. Targets and samples overlap in regard to these two data inputs, but targets gene list input is referred to as <i>markergenes</i>, samples as <i>diff_genes</i>.</p>
 <p><b>Valid expression input</b> can be a <b>TSV file</b> or a <b>pandas.DataFrame</b>. <br>
 DPre requires a TSV expression file to have a column labelled <i>ensg</i> or a first column listing ensg keys. Also, the data must be purely numerical and not include NAN values. If the TSV file includes the metadata columns <i>loc</i>, <i>name</i>, <i>tss_loc</i> and <i>strand</i>, these are automatically deleted. A pandas.DataFrame must have an ensg index and can contain precalculated log2- and z-transformed data if the columns are represented as a pandas.MultiIndex with the element names at level 0 and <i>'log2'</i> &amp; <i>'z'</i> at level 1 (compare pre-packaged targets input). <br>
 The normalized expression TSV file in example 1 is composited like this:</p>
@@ -13336,7 +13336,7 @@ In example 1, the samples diff_genes are initiated from an <i>up</i>- and <i>dow
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>When creating an instance with <b>both gene list- and expression data</b>, care must be taken that the order of elements in the two inputs is the same. Gene list input from a list of files will always be alphabetically sorted, thus the expression data should adapt to this. DPre will raise an error if the element names don't perfectly match. If the element names align but only the naming differs, <i><b>override_namematcher</b></i> can be passed to override the gene list names. Check the logs carefully to avoid mislabelling the data. If the gene list data has an element less then expression and a control was passed, DPre will append an empty control element to the gene list data to align the inputs. Again, the logs should be checked in this case.</p>
+<p>When creating an instance with <b>both gene list- and expression data</b>, care must be taken that the order of elements in the two inputs is the same. Gene list input from a list of files will always be alphabetically sorted, thus the expression data should adapt to this. DPre will raise an error if the element names don't perfectly match. If the actual samples align but only the naming differs, <i><b>override_namematcher</b></i> can be passed to override the gene list names. Check the logs carefully to avoid mislabelling the data. If the gene list data has an element less then expression and a control was passed, DPre will append an empty control element to the gene list data to align the inputs. Again, the logs should be checked in this case.</p>
 
 </div>
 </div>
@@ -13344,7 +13344,8 @@ In example 1, the samples diff_genes are initiated from an <i>up</i>- and <i>dow
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Besides the data inputs, samples and targets may be initiated with a <b><i>name</i></b> that will appear in logs and plot annotations, and the above mentioned <i>override_namematcher</i>. Samples take a <b><i>ctrl</i></b> argument that specifies the name of the control in the samples. A control is required for computing the differential similarity with the 'euclid' metric. <br> Targets additionally implement the <b><i>ignore_down_mgs</i></b> argument, which drops the <i>down markergenes</i> when found in the input (for example for DEseq2 input). <br>
+<p>Besides the data inputs, samples and targets may be initiated with a <b>name</b> that will appear in logs and plot annotations, and the above mentioned override_namematcher. Samples take a <b>ctrl</b> argument that specifies the name of the control in the samples. A control is required for computing the differential similarity metric (which is also the default). 
+Targets additionally implement the <b>ignore_down_mgs argument</b>, which drops the <code>down</code> markergenes when found in the input (for example for DEseq2 input). If you are interested in how similarity looks for genes specifically down regulated in the targets, set this to False. 
 In example 1, the samples are initiated like this:</p>
 
 </div>
@@ -13381,7 +13382,7 @@ In example 1, the samples are initiated like this:</p>
 <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span>python ../../dpre.py --preset_targets <span class="s2">&quot;human&quot;</span> --samples_expression <span class="s2">&quot;hsliver_expression.tsv&quot;</span> --samples_diff_genes <span class="s2">&quot;./up_genelists&quot;</span> --samples_diff_genes <span class="s2">&quot;./down_genelists&quot;</span> --control <span class="s2">&quot;Day00&quot;</span>  --samples_name <span class="s2">&quot;in vitro hepatic differentiated hESCs&quot;</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span>python ../../dpre.py --samples_expression <span class="s2">&quot;hsliver_expression.tsv&quot;</span> --samples_diff_genes <span class="s2">&quot;./up_genelists&quot;</span> --samples_diff_genes <span class="s2">&quot;./down_genelists&quot;</span> --control <span class="s2">&quot;Day00&quot;</span>  --samples_name <span class="s2">&quot;in vitro hepatic differentiated hESCs&quot;</span>
 </pre></div>
 
     </div>
@@ -13402,7 +13403,7 @@ In example 1, the samples are initiated like this:</p>
 <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span>python ../../dpre.py -pt <span class="s2">&quot;human&quot;</span> -se <span class="s2">&quot;hsliver_expression.tsv&quot;</span> -sd <span class="s2">&quot;./up_genelists&quot;</span> -sd <span class="s2">&quot;./down_genelists&quot;</span> -c <span class="s2">&quot;Day00&quot;</span>  -sn <span class="s2">&quot;in vitro hepatic differentiated hESCs&quot;</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span>python ../../dpre.py -se <span class="s2">&quot;hsliver_expression.tsv&quot;</span> -sd <span class="s2">&quot;./up_genelists&quot;</span> -sd <span class="s2">&quot;./down_genelists&quot;</span> -c <span class="s2">&quot;Day00&quot;</span>  -sn <span class="s2">&quot;in vitro hepatic differentiated hESCs&quot;</span>
 </pre></div>
 
     </div>
@@ -13435,7 +13436,7 @@ In example 1, the samples are initiated like this:</p>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Additional-functionalities">Additional functionalities<a class="anchor-link" href="#Additional-functionalities">&#182;</a></h2><p>A hand full of methods are provided to <b>modify a targets or samples instance</b>.<br>
+<h2 id="Additional-functionalities">Additional functionalities<a class="anchor-link" href="#Additional-functionalities">&#182;</a></h2><p>A hand full of methods are provided to <b>modify a targets or samples instance</b>.<br> All the methods below are called from the samples or targets instance, for example <i>targets.names = 'sample2', 'sample3'</i>, sample'5'<br><br>
 Get the current element names. Supports assignment of new names in a list or dictionary:</p>
 
 </div>
@@ -13457,7 +13458,7 @@ Get the current element names. Supports assignment of new names in a list or dic
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Reorder the element names:</p>
+<p>Reorder the element names inplace:</p>
 
 </div>
 </div>
@@ -13612,10 +13613,8 @@ Get the current element names. Supports assignment of new names in a list or dic
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>All of the three visualization functions share four core arguments that define the presented similarity:<br>
 <b>samples</b><br>The samples to explore similarity for<br>
-<b>which</b><br>The similarity metric to use, either 'euclid' or 'intersect'. 'euclid' requires expression input for targets and samples, 'intersect' requires gene list data. If this is <i>None</i>, DPre will choose a metric based on the data in, defaulting to 'euclid'. <br>
-<b>differential</b><br>Display the changes in similarity, defaults to <i>True</i>. For the 'euclid' metric, the samples must include a control to display differential similarity. When differential = False, the absolute similarity, i.e. cell type classification, is shown. This is only available for the 'euclid' metric. On the command line, the equivalent argument is <i>absolute</i> which defaults to False. <br>
-<b>proportional</b><br>
-Display the proportional differential similarity. <i>differential</i> is required to be <i>True</i>. While for 'euclid', the differential similarity is divided by the absolute similarity of the control, 'intersect' similarities are divided by the number of target <i>markergenes</i>. In both cases, the value can be understood as the proportion of adapted cell type identity. In the single gene heatmap, <i>proportional</i> is only valid for the 'euclid' metric.</p>
+<b>metric</b><br>The similarity metric to use, either 'euclid', 'cosine', 'pearson' or 'intersect'. The first three require expression input for targets and samples, 'intersect' requires gene list data. If this is <i>None</i>, DPre will pick a metric based on the data input (expression vs. genelist), defaulting to 'cosine' and 'intersect', respectively. <br>
+<b>differential</b><br>Display the changes in similarity, defaults to <i>True</i>. For the 'euclid', 'cosine', and ''pearson', metric, the samples must include a control to display differential similarity. When differential = False, the absolute similarity, i.e. cell type classification, is shown. This is only available for expression based metrics. On the command line, the argument is reversed due to easier calling: instead of the default differenital=True, the keyword <i>absolute</i> is used (which defaults to False)<br></p>
 <p>All <b>plots return <i>figure, axes, data</i></b> to further process the data or modify the plot.</p>
 <p>For details on how to use the plots to visualize the results, have a look at the 3 examples. For an extensive reference, check the DPre/docs/documentation folder.</p>
 

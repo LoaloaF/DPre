@@ -1,104 +1,110 @@
-from DPre import samples
+import DPre
 from DPre import preset_targets
 from DPre import plot_color_legend
 from DPre import config
 
-# initiate samples
-s = samples(expression = 'hsliver_expression.tsv',     # expression input data
-            diff_genes = ('./up_genelists', 
-                          './down_genelists'),    # differential gene list directories
-            ctrl = 'Day00',     # name of the control in the data
-            name = 'in vitro hepatic differentiated hESCs'    # name of the samples instance
+# initiate samples 
+s = DPre.samples(expression = 'hsliver_expression.tsv',     # expression input data
+                 diff_genes = None,    # differential gene are loaded in the next step
+                 ctrl = 'Day00',     # name of the control in the data
+                 name = 'in vitro hepatic differentiated hESCs'    # name of the samples instance
 )
+DPre.add_diff_genes_from_z(s)
+
 # initiate targets
-t = preset_targets('human')
+t = preset_targets('human')     # initiate one of the pre-packaged targets, here the human reference
 
-# command 
-# 'python ../../dpre.py -pt "human" -se "hsliver_expression.tsv" -sd "./up_genelists" -sd "./down_genelists" -c "Day00"  -sn "in vitro hepatic differentiated hESCs"'
+# equivalent command line (this one doesn't run because the plot argument misses)
+# !python ../../dpre.py --preset_targets "human" --samples_expression "hsliver_expression.tsv" --samples_diff_genes "./up_genelists" --samples_diff_genes "./down_genelists" --control "Day00"  --samples_name "in vitro hepatic differentiated hESCs"
+# !python ../../dpre.py -pt "human" -se "hsliver_expression.tsv" -sd "./up_genelists" -sd "./down_genelists" -c "Day00"  -sn "in vitro hepatic differentiated hESCs"
 
-# reverse element order
-rev_order = list(reversed(s.names))
-s.reorder(rev_order)
+# set new names
+s.names = ['Day 0', 'Day 1', 'Day 2', 'Day 3', 'Day 5', 'Day 7', 'Day 9', 'Day 11', 'Day 13', 'Day 21']
 
-# plot euclid target similarity
+# target similarity heatmap
+hm = t.target_similarity_heatmap(samples = s,     # the samples to check similarity for
+                                 metric = 'intersect',     # the metric to use for computing similarity
+                                 filename = None,     # don't save this initial plot
+                                )
+hm = t.target_similarity_heatmap(samples = s,
+                                 metric = 'intersect',    
+                                 heatmap_width = .14, 
+                                 specific_target_labels = ['Hepatocyte', 'Liver adult', 'Liver fetal'],       # only print a specifc target label instead of all
+                                 targetlabels_space = .1,     # size in inches under the heatmap
+#                                  filename = None,
+                                )
 hm = t.target_similarity_heatmap(samples = s, 
-                                 which = 'euclid',     # the metric to use for computing similarity
-                                 heatmap_width = .08,
-                                 hide_targetlabels = True,
-                                 targetlabels_space=.1,
-                                 hide_targets_colorbar = False,      # show the colorbar indicating target domains
+                                 metric = 'intersect',  
+                                 heatmap_width = .14,
+                                 specific_target_labels = ['Hepatocyte'],
+                                 targetlabels_space = .4,
                                  hide_distance_bar = True,      # hide the distance bar, for intersect n marker genes
-                                 samplelabels_space = .3,
-                                 title = None,
-                                 pivot = True,
-                                 filename = 'target_sim_euclid.png',     # filename for saving
-                                )
-# command
-# 'python ../../dpre.py -pt "human" -se "hsliver_expression.tsv" -sd "./up_genelists" -sd "./down_genelists" -c "Day00"  -sn "in vitro hepatic differentiated hESCs" target_sim -w "euclid" -hw 0.08 -hta -ta 0.1 -htc -hd -sa 0.3 -t "most similarity increasing genes" -pi -f "target_sim_euclid.png" '
-
-# plot proportional intersect target similarity
-hm = t.target_similarity_heatmap(samples = s, 
-                                 which = 'intersect',
-                                 proportional = True,     # devide score by the number of markeregenes
-                                 heatmap_width = .08,
-                                 hide_targetlabels = True,
-                                 targetlabels_space=.1,
-                                 hide_targets_colorbar = False,
-                                 hide_distance_bar = True,
-                                 samplelabels_space = .3,
-                                 title = None,
-                                 pivot = True,
-                                 filename = 'target_sim_intersect.png',
+                                 cluster_targets = True,          # emphasize peak samples and targets
+                                 hide_targets_dendrogram = True,  # don't show the dendrogram to save space
+                                 samplelabels_space = .4,       # save some space on the left
+                                 title = None,                  # remove the title to increase clarity
+#                                  filename = None,             # when not passed the default filename is used
                                 )
 
-# subset targets to the hepatocyte target
+# equivalent command line
+# !python ../../dpre.py -pt "human" -se "hsliver_expression.tsv" -sd "./up_genelists" -sd "./down_genelists" -c "Day00"  -sn "in vitro hepatic differentiated hESCs" target_sim -m "intersect" -hw 0.14 -st "Hepatocyte" -ta 0.4 -hd -ct -htd -sa 0.3 -t "False"
+
+# ## Plotting single gene transcriptional similarity
 hep = t.slice_elements(['Hepatocyte'], name='Hepatocyte')
+hm = hep.gene_similarity_heatmap(samples = s,              # we don't need to pass metric here, 'euclid' is the default
+                                 filename = None,
+                                 )
 
-# create the list of genes to analyze and prepare the colorbar input
+# prepare the colorbar
 hep_bl = ['PITX2', 'KRT19', 'AFP', 'DAB2', 'FOXP4', 'SMAD3', 'FOXA1', 'HES4', 'HNF1B']
 hep_cy = ['ALB', 'MXD1', 'TTR']
-plot_color_legend(['heptoblast', 'heptocytes'], 
+plot_color_legend(['Hepatoblast', 'Hepatocytes'], 
                   [config.colors[11], config.colors[12]],
-                  filename='hepato_markers_legend.png'
-                  )
+                  filename='hepato_markers_legend.png',
+                  ncolumns = 1,
+                 )
 # set up the colors for the colorbar
 colorbar_cols = {**dict.fromkeys(hep_bl, config.colors[11]), 
                  **dict.fromkeys(hep_cy, config.colors[12])}
+print(colorbar_cols)
 
-# plot the 'euclid' similarity changes of the markergenes
+# gene list similarity heatmap - predefined genes
 hm = hep.gene_similarity_heatmap(samples = s,    # the sampels to explore similarity for
                                  custom_target_genelist = hep_bl+hep_cy,    # the list of genes to be visualized
                                  heatmap_range = [-6, 6],     # range heatmap values
-                                 pivot = True,
-                                 heatmap_width = .7, 
+                                 heatmap_width = .8, 
                                  heatmap_height = .9, 
-                                 genelabels_space = .3, 
-                                 samplelabels_space_left = .4, 
-                                 title = 'hepatoblast & heptocytes markergenes',
+                                 genelabels_space = .5, 
+                                 samplelabels_space = .1, 
+                                 title = None,
+                                 hide_distance_bar = True, 
                                  show_genes_colorbar = colorbar_cols,    # the colorbar dictionary created above
-                                 hide_distance_bar = True,
+                                 pivot = True,          # rotate the plot
+                                 hide_samplelabels = True,         # in the final plot, shared with the previous plot
                                  hide_sum_plot = True,     # do not plot the summerizing plot on the right
                                  filename = 'hsliver_marker_genes.png',
                                 )
-# command
-# 'python ../../dpre.py -pt "human" -ts "Hepatocyte" -se "./hsliver_expression.tsv" -sd "./up_genelists" -sd "./down_genelists" -c "Day00"  -sn "in vitro hepatic differentiated hESCs" gene_sim -cu "PITX2" -cu "KRT19" -cu "AFP" -cu "DAB2" -cu "FOXP4" -cu "SMAD3" -cu "FOXA1" -cu "HES4" -cu "HNF1B" -cu "ALB" -cu "MXD1" -cu "TTR" -hr -6 -hr 6 -pi -hw 0.7 -hh 0.9 -gls 0.3 -sa 0.4 -t "hepatoblast & heptocytes markergenes" -hd -hs -f "hsliver_marker_genes.png"'
 
-# plot the similarity changes of the most increasing genes
+# equivalent command line
+# !python ../../dpre.py -pt "human" -ts "Hepatocyte" -se "hsliver_expression.tsv" -sd "./up_genelists" -sd "./down_genelists" -c "Day00"  -sn "in vitro hepatic differentiated hESCs" gene_sim -cu "PITX2" -cu "KRT19" -cu "AFP" -cu "DAB2" -cu "FOXP4" -cu "SMAD3" -cu "FOXA1" -cu "HES4" -cu "HNF1B" -cu "ALB" -cu "MXD1" -cu "TTR" -hr -6 -hr 6 -pi -hw 0.8 -hh 0.9 -ge 0.3 -sa 0.1 -ge .5  -t "false" -hd -hsa -hs -f "hsliver_marker_genes.png"
+
+# gene similarity heatmap - most increasing
 hm = hep.gene_similarity_heatmap(samples = s, 
                                  display_genes = 'increasing',      # the genes with peak positve similarity values
                                  gene_number = 10,        # the number of genes to extract and display
                                  heatmap_range = [-6, 6],
                                  pivot = True,
-                                 heatmap_width = .7, 
+                                 heatmap_width = .65, 
                                  heatmap_height = .9, 
-                                 genelabels_space = .3, 
-                                 samplelabels_space_left = .4, 
-                                 title = 'most similarity increasing genes',
+                                 genelabels_space = .5, 
+                                 samplelabels_space = .4, 
+                                 title = 'Most similarity\nincreasing genes',
                                  hide_distance_bar = True,
-                                 hide_samplelabels = True,     # the label with be shared with the marker genes plot above
-                                 hide_sum_plot = False,     # show the summary plot
-                                 G_HM_SUMPLOT_SIZE = .65,        # adjust the size constant defined in the config module
+                                 hide_samplelabels = True,     
+                                 hide_sum_plot = True,     
+                                 HM_TOP = .7,                      # the space in inches above the heatmap
                                  filename = 'hsliver_increasing_genes.png',
                                 )
-# command 
-# 'python ../../dpre.py -pt "human" -ts "Hepatocyte" -se "hsliver_expression.tsv" -sd "./up_genelists" -sd "./down_genelists" -c "Day00"  -sn "in vitro hepatic differentiated hESCs" gene_sim -di "increasing" -ge 10 -hr -6 -hr 6 -pi -hw 0.7 -hh 0.9 -gls 0.3 -sa 0.4 -t "most similarity increasing genes" -hd -hsa -f "hsliver_increasing_genes.png"'
+
+# equivalent command line
+# !python ../../dpre.py -pt "human" -ts "Hepatocyte" -se "hsliver_expression.tsv" -sd "./up_genelists" -sd "./down_genelists" -c "Day00"  -sn "in vitro hepatic differentiated hESCs" gene_sim -gn 10 -di "increasing" -hr -6 -hr 6 -pi -hw 0.8 -hh 0.9 -ge 0.3 -sa 0.1 -ge .5  -t "Most similarity\\nincreasing genes" -hd -hs -hsa -hs -f "hsliver_marker_genes.png"

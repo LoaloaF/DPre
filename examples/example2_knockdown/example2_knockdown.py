@@ -14,37 +14,37 @@ s = samples(diff_genes = './knockdown_deseq_res',
 # Create the 'mouse' reference targets instance:
 t = preset_targets('mouse', preset_colors=True)
 
-# euclid overview heatmap
+# # euclid overview heatmap
 t.target_similarity_heatmap(s, 
-                            which = 'euclid', 
+                            metric = 'euclid', 
                             hide_targetlabels = True,
-                            heatmap_width = .16,
-                            targetlabels_space = .6,
+                            heatmap_width = .09,
+                            targetlabels_space=.8,
                             pivot=True,
                             filename =  'target_sim_euclid.png',
                             )
 # command
-# python ../../dpre.py -pt "mouse" -sd "./knockdown_deseq_res" -se "knockdown_expression.tsv" -c "shLuc" -sn "sh knockdown in mESCs" -so target_sim -hta -hw 0.16 -ta 0.6 -pi -f "target_sim_euclid.png"
+# python ../../dpre.py -pt "mouse" -sd "./knockdown_deseq_res" -se "knockdown_expression.tsv" -c "shLuc" -sn "sh knockdown in mESCs" -so target_sim -hta -hw 0.09 -ta 0.8 -pi -f "target_sim_euclid.png"
 # intersect overview heatmap
-t.target_similarity_heatmap(s, 
-                            which = 'intersect', 
+t.target_similarity_heatmap(s,
+                            metric = 'intersect', 
                             hide_targetlabels = True,
-                            heatmap_width = .16,
-                            targetlabels_space= .6,
+                            heatmap_width = .09,
                             pivot = True,
+                            targetlabels_space=.8,
                             filename = 'target_sim_intersect.png',
                             )
 
 # draw the ranked similarity bar plot
 bp = t.ranked_similarity_barplot(samples = s, 
-                                 which = 'euclid',
+                                 metric = 'euclid',
                                  display_negative = True,
                                  pivot = True,
                                  filename =  'ranked_sim_eucl.pdf')
 # command
 # python ../../dpre.py -pt "mouse" -sd "./knockdown_deseq_res" -se "knockdown_expression.tsv" -c "shLuc" -sn "sh knockdown in mESCs" -so ranked_sim -pi -din -f "ranked_sim_eucl.pdf"
 bp = t.ranked_similarity_barplot(samples = s, 
-                                 which = 'intersect',
+                                 metric = 'intersect',
                                  display_negative = True,
                                  pivot = True,
                                  filename =  'ranked_sim_intersect.pdf')
@@ -58,7 +58,7 @@ mcrs4 = s.slice_elements(['shMcrs1', 'shLuc'])
 
 # run the plot without saving to get the returned plot dictionary
 gene_sim_plt = t_eryth.gene_similarity_heatmap(mcrs4, 
-                                               which = 'euclid',
+                                               metric = 'euclid',
                                                display_genes = 'increasing', 
                                                gene_number = 80,
                                                filename = None,
@@ -100,15 +100,16 @@ plot_color_legend(('Hist1', 'Hist2', 'Hist3', 'Hist4'), config.colors[10:14],
 
 # plot the most increasing genes and save
 data = t_eryth.gene_similarity_heatmap(mcrs4, 
-                                       which = 'euclid',
+                                       metric = 'euclid',
                                        display_genes = 'increasing',
                                        gene_number = 80,
-                                       pivot = True,
                                        heatmap_width = .9,
                                        genelabels_size = .7,
-                                       genelabels_space = .7,
+                                       genelabels_space = .5,
                                        show_genes_colorbar = genes_cb,
-                                       filename = 'gene_sim_incr.pdf'
+                                       filename = 'gene_sim_incr.pdf',
+                                       HM_WSPACE = .1,           # size constant defining the size between plots (left/right)
+                                       plt_show = False,
                                       )
 # command
-# python ../../dpre.py -pt "mouse" -ts "Basophilic erythroblast" -ts "Erythroblast" -ts "Orthochromatic erythroblast" -ts "Polychromatic erythroblast" -ts "Proerythroblast" -sd "./knockdown_deseq_res" -se "knockdown_expression.tsv" -c "shLuc" -sn "sh knockdown in mESCs" -so -ss "shMcrs1" -ss "shLuc" gene_sim -di "increasing" -gn 80 -pi -hw 0.9 -ges 0.7 -ge 0.7 -f "gene_sim_incr.pdf"
+#python ../../dpre.py -pt "mouse" -ts "Basophilic erythroblast" -ts "Erythroblast" -ts "Orthochromatic erythroblast" -ts "Polychromatic erythroblast" -ts "Proerythroblast" -sd "./knockdown_deseq_res" -se "knockdown_expression.tsv" -c "shLuc" -sn "sh knockdown in mESCs" -so -ss "shMcrs1" -ss "shLuc" gene_sim -di "increasing" -gn 80 -hw 0.9 -ges 0.7 -ge 0.7 -f "gene_sim_incr.pdf"

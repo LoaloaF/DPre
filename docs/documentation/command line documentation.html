@@ -13056,6 +13056,19 @@ ul.typeahead-list  > li > a.pull-right {
 .ansi-bold { font-weight: bold; }
 
     </style>
+<style type="text/css">
+    /*This file contains any manual css for this page that needs to override the global styles.
+This is only required when different pages style the same element differently. This is just
+a hack to deal with our current css styles and no new styling should be added in this file.*/
+
+#ipython-main-app {
+    position: relative;
+}
+#jupyter-main-app {
+    position: relative;
+}
+
+    </style>
 
 
 <style type="text/css">
@@ -13146,6 +13159,8 @@ div#notebook {
 
 Pass the input --&gt; Choose the plot --&gt; specify the plot:
 $ ./dpre.py &lt;targets&gt; &lt;samples&gt; &lt;plot&gt; &lt;plot args&gt; (optional)
+Example:
+python dpre.py -pt &#34;h endoderm&#34; -se &#34;examples/example1_hsliver/hsliver_expression.tsv&#34; -c &#34;Day00&#34; target_sim -m &#34;euclid&#34;
 
 DPre - visualizing transcriptional similarity between samples and targets
 
@@ -13170,7 +13185,7 @@ targets:
   --species SPECIES, -s SPECIES
                         species of the target, default `mouse`
   --targets_slice TARGETS_SLICE, -ts TARGETS_SLICE
-                        convenience slicer, pass the element names to keep
+                        slicer, pass the element names to keep
 
 samples:
   input data to explore similarity for, pass `targets_diff_genes` and/or
@@ -13189,7 +13204,7 @@ samples:
                         when both differential and expression, ignore name
                         mismatches
   --samples_slice SAMPLES_SLICE, -ss SAMPLES_SLICE
-                        convenience slicer, pass the element names to keep
+                        slicer, pass the element names to keep
 
 Plots:
   one of 3 plots for similarity visualization, for details run &lt;plot&gt; -h
@@ -13239,6 +13254,8 @@ optional arguments:
 
 Pass the input --&gt; Choose the plot --&gt; specify the plot:
 $ ./dpre.py &lt;targets&gt; &lt;samples&gt; &lt;plot&gt; &lt;plot args&gt; (optional)
+Example:
+python dpre.py -pt &#34;h endoderm&#34; -se &#34;examples/example1_hsliver/hsliver_expression.tsv&#34; -c &#34;Day00&#34; target_sim -m &#34;euclid&#34;
 
 Plot the elementwise similarity of the samples and targets in a heatmap
 target_similarity_heatmap specific args:
@@ -13247,17 +13264,16 @@ optional arguments:
   -h, --help            show this help message and exit
   --filename FILENAME, -f FILENAME
                         filename for saving.If None plot is not saved,
-                        default: target_similarity_hm.png
+                        default: target_similarity_hm + config.SAVE_FORMAT
 
 Data options:
   main parameters to control the presented similarity
 
-  --which {euclid,intersect}, -w {euclid,intersect}
+  --metric {euclid,intersect}, -m {euclid,intersect}
                         select the similarity metric
-  --absolut, -a         plot the absolut similarity, `euclid` only. Will
+  --absolute, -a        plot the absolute similarity, `euclid` only. Will
                         appear as differential=False in logs.
-  --proportional, -p    plot the proportional changes in similarity
-  --display_similarity {mgs mean,mgs up,mgs down}, -ds {mgs mean,mgs up,mgs down}
+  --display_markergenes {mgs mean,mgs up,mgs down}, -dm {mgs mean,mgs up,mgs down}
                         Specify up- or down markerene similarity, default mean
 
 Data order options:
@@ -13268,8 +13284,8 @@ Data order options:
   --cluster_samples, -cs
                         cluster samples (y axis)
   --reorder_to_distance_bar, -re
-                        reorder the targets according to the required effect
-                        for specific target identification
+                        reorder the targets according to the distance bar for
+                        specific target identification
 
 General heatmap options:
   parameters to control general visual options
@@ -13283,6 +13299,8 @@ General heatmap options:
                         range of heatmap values, (lower, upper)
   --distance_bar_range DISTANCE_BAR_RANGE, -dr DISTANCE_BAR_RANGE
                         range of distance bar values, (lower, upper)
+  --specific_target_labels SPECIFIC_TARGET_LABELS, -st SPECIFIC_TARGET_LABELS
+                        plot specific set of target labels
   --targetlabels_space TARGETLABELS_SPACE, -ta TARGETLABELS_SPACE
                         space reserved for targetlabels in inches
   --samplelabels_space SAMPLELABELS_SPACE, -sa SAMPLELABELS_SPACE
@@ -13300,7 +13318,7 @@ Plot elements:
   --hide_colorbar_legend, -hco
                         do not plot the heatmap legend
   --hide_distance_bar, -hd
-                        do not plot the required effect bar
+                        do not plot the distance bar
   --hide_targetlabels, -hta
                         do not show the targetlabels
   --hide_targets_dendrogram, -htd
@@ -13354,6 +13372,8 @@ Plot elements:
 
 Pass the input --&gt; Choose the plot --&gt; specify the plot:
 $ ./dpre.py &lt;targets&gt; &lt;samples&gt; &lt;plot&gt; &lt;plot args&gt; (optional)
+Example:
+python dpre.py -pt &#34;h endoderm&#34; -se &#34;examples/example1_hsliver/hsliver_expression.tsv&#34; -c &#34;Day00&#34; target_sim -m &#34;euclid&#34;
 
 Plot the single-gene similarity of the samples with each target in a heatmap
 
@@ -13361,17 +13381,16 @@ optional arguments:
   -h, --help            show this help message and exit
   --filename FILENAME, -f FILENAME
                         filename for saving.If None plot is not saved,
-                        default: gene_similarity_hm.pdf
+                        default: gene_similarity_hm. + config.SAVE_FORMAT
 
 Data options:
   main parameters to control the presented similarity
 
-  --which {euclid,intersect}, -w {euclid,intersect}
+  --metric {euclid,intersect}, -m {euclid,intersect}
                         select the similarity metric
-  --absolut, -a         plot the absolut similarity, `euclid` only. Will
+  --absolute, -a        plot the absolute similarity, `euclid` only. Will
                         appear as differential=False in logs.
-  --proportional, -p    plot the proportional changes in similarity
-  --display_genes {variant,greatest,increasing,decreasing,similar,distant}, -di {variant,greatest,increasing,decreasing,similar,distant}
+  --display_genes {variant,increasing,decreasing,similar,distant}, -di {variant,increasing,decreasing,similar,distant}
                         Option 1: specify the group of genes to extract,
                         default `variant`
   --gene_number GENE_NUMBER, -gn GENE_NUMBER
@@ -13388,8 +13407,8 @@ Data order options:
   --cluster_samples, -cs
                         cluster samples (y axis)
   --reorder_to_distance_bar, -re
-                        reorder the genes according to the required effect,
-                        i.e the base gene similarity
+                        reorder the genes according to the distance bar, i.e
+                        the base gene similarity
 
 General heatmap options:
   parameters to control general visual options
@@ -13407,16 +13426,15 @@ General heatmap options:
                         range of sum plot values, (lower, upper)
   --genelabels_space GENELABELS_SPACE, -ge GENELABELS_SPACE
                         space reserved for genelabels in inches
-  --samplelabels_space_left SAMPLELABELS_SPACE_LEFT, -sa SAMPLELABELS_SPACE_LEFT
+  --samplelabels_space SAMPLELABELS_SPACE, -sa SAMPLELABELS_SPACE
                         space reserved for samplelabels on left in inches
-  --samplelabels_space_right SAMPLELABELS_SPACE_RIGHT, -sar SAMPLELABELS_SPACE_RIGHT
-                        space reserved for samplelabels on right in inches
   --genelabels_size GENELABELS_SIZE, -ges GENELABELS_SIZE
                         multiplier for genelabels fontsize, default = 1
   --targetlabels_size TARGETLABELS_SIZE, -tas TARGETLABELS_SIZE
                         multiplier for targetlabels fontsize, default = 1
   --title TITLE, -t TITLE
-                        a custom title or hide title with {f, false, F, False}
+                        a custom title or hide title with {`f`, `false`, `F`,
+                        `False`}
 
 Plot elements:
   show/ hide subparts of the plot
@@ -13424,10 +13442,8 @@ Plot elements:
   --hide_colorbar_legend, -hco
                         do not plot the legend for the heatmap
   --hide_distance_bar, -hd
-                        do not plot the required effect bar
+                        do not plot the distance bar
   --hide_sum_plot, -hs  do not plot the sum plot on the right
-  --show_samplelabels_sum_plot, -ssa
-                        additionally show samplelabels on the right
   --hide_genelabels, -hge
                         do not show the genelabels
   --hide_genes_dendrogram, -hgd
@@ -13481,6 +13497,8 @@ Plot elements:
 
 Pass the input --&gt; Choose the plot --&gt; specify the plot:
 $ ./dpre.py &lt;targets&gt; &lt;samples&gt; &lt;plot&gt; &lt;plot args&gt; (optional)
+Example:
+python dpre.py -pt &#34;h endoderm&#34; -se &#34;examples/example1_hsliver/hsliver_expression.tsv&#34; -c &#34;Day00&#34; target_sim -m &#34;euclid&#34;
 
 Plot the ranked similarity of the samples with targets in a bar plot
 
@@ -13488,17 +13506,16 @@ optional arguments:
   -h, --help            show this help message and exit
   --filename FILENAME, -f FILENAME
                         filename for saving.If None plot is not saved,
-                        default: ranked_similarity_hm.png
+                        default: ranked_similarity_hm. + config.SAVE_FORMAT
 
 Data options:
   main parameters to control the presented similarity
 
-  --which {euclid,intersect}, -w {euclid,intersect}
+  --metric {euclid,intersect}, -m {euclid,intersect}
                         select the similarity metric
-  --absolut, -a         plot the absolut similarity, `euclid` only. Will
+  --absolute, -a        plot the absolute similarity, `euclid` only. Will
                         appear as differential=False in logs.
-  --proportional, -p    plot the proportional changes in similarity
-  --display_similarity {mgs mean,mgs up,mgs down}, -ds {mgs mean,mgs up,mgs down}
+  --display_markergenes {mgs mean,mgs up,mgs down}, -dm {mgs mean,mgs up,mgs down}
                         Specify up- or down markerene similarity, default mean
   --n_targets N_TARGETS, -nt N_TARGETS
                         specify number of targets to show
@@ -13523,7 +13540,8 @@ General barplot options:
   --colored_bars, -co   color the bars according to the value
   --spines, -spi        additionally show spines on top and right
   --title TITLE, -t TITLE
-                        a custom title or hide title with {f, false, F, False}
+                        a custom title or hide title with {`f`, `false`, `F`,
+                        `False`} or list of titles for each plot.
 
 Plot elements:
   show/ hide subparts of the plot
@@ -13531,6 +13549,8 @@ Plot elements:
   --hide_targetlabels, -hta
                         do not show the target labels
   --hide_colorbar, -hc  do not plot the targets colorbar
+  --hide_base_lines, -hb
+                        do not show the control base lines
 </pre>
 </div>
 </div>

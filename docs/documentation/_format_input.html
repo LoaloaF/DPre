@@ -32,7 +32,8 @@ from DPre.main._logger import logger, spacer
 import DPre.main.config as config
 import DPre.main._dpre_util as util
 
-def preset_targets(get, sort=False, preset_colors=True):
+def preset_targets(get, sort=False, preset_colors=True, 
+                   color_legend_filename=True, color_legend_ncols=1):
     &#34;&#34;&#34;Generate one of the predefined targets instances and return it. 
     
         Pick a reference dataset for comparison. Mouse (Hutchins et al. 2017, 
@@ -53,6 +54,13 @@ def preset_targets(get, sort=False, preset_colors=True):
         preset_colors (bool, optional): Tries to initiate the targets with preset 
             colors either from colors.tsv in the respective preset directory or 
             when not found from config.preset_targets_colors. Defaults to True.
+        color_legend_filename (bool, str, optional): The filename when a preset
+            color legend is drawn from config.preset_col_legend. When True, a
+            filename is inferred from the targets name and config.SAVE_FORMAT, 
+            a str is set as the filename. Defaults to True. When None, the color
+            legend is not drawn.
+        color_legend_ncols (int, optional): Number of columns in the color 
+            legend. Defaults to 1.
     
     Returns:
         t: the preset targets instance
@@ -120,16 +128,18 @@ def preset_targets(get, sort=False, preset_colors=True):
                 logger.warning(&#39;No colors found for preset targets {}&#39;
                                .format(get))
         # draw a colorlegend if defined in config
-        if get in config.preset_col_legend:
+        if get in config.preset_col_legend and color_legend_filename:
+            filename = get+&#39;_color_legend&#39; if color_legend_filename == True \
+                       else color_legend_filename
             util.plot_color_legend(*config.preset_col_legend[get], 
-                                   filename=get+&#39;_color_legend.png&#39;)
+                                   ncolumns=color_legend_ncols, filename=filename)
     return t
 
 def _format_expr(expr, type_name, ctrl=None):
     &#34;&#34;&#34; Take user expression input validate and format
 
     If a TSV file is passed, read the expresion file as a DataFrame. Check
-    if the DataFrame has a valid format. If the control is passed,check if it&#39;s
+    if the DataFrame has a valid format. If the control is passed, check if it&#39;s
     found in expression. Finally, generate and add the log2- and z-transformed 
     data.
 
@@ -347,7 +357,7 @@ def _format_diff_genes(diff_genes_dir, genelists_mgtype=&#39;up&#39;, type_name=
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="_format_input.preset_targets"><code class="name flex">
-<span>def <span class="ident">preset_targets</span></span>(<span>get, sort=False, preset_colors=True)</span>
+<span>def <span class="ident">preset_targets</span></span>(<span>get, sort=False, preset_colors=True, color_legend_filename=True, color_legend_ncols=1)</span>
 </code></dt>
 <dd>
 <section class="desc"><p>Generate one of the predefined targets instances and return it. </p>
@@ -373,6 +383,15 @@ Defaults to False.</dd>
 <dd>Tries to initiate the targets with preset
 colors either from colors.tsv in the respective preset directory or
 when not found from config.preset_targets_colors. Defaults to True.</dd>
+<dt><strong><code>color_legend_filename</code></strong> :&ensp;<code>bool</code>, <code>str</code>, optional</dt>
+<dd>The filename when a preset
+color legend is drawn from config.preset_col_legend. When True, a
+filename is inferred from the targets name and config.SAVE_FORMAT,
+a str is set as the filename. Defaults to True. When None, the color
+legend is not drawn.</dd>
+<dt><strong><code>color_legend_ncols</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>Number of columns in the color
+legend. Defaults to 1.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
@@ -381,7 +400,8 @@ when not found from config.preset_targets_colors. Defaults to True.</dd>
 </dl></section>
 <details class="source">
 <summary>Source code</summary>
-<pre><code class="python">def preset_targets(get, sort=False, preset_colors=True):
+<pre><code class="python">def preset_targets(get, sort=False, preset_colors=True, 
+                   color_legend_filename=True, color_legend_ncols=1):
     &#34;&#34;&#34;Generate one of the predefined targets instances and return it. 
     
         Pick a reference dataset for comparison. Mouse (Hutchins et al. 2017, 
@@ -402,6 +422,13 @@ when not found from config.preset_targets_colors. Defaults to True.</dd>
         preset_colors (bool, optional): Tries to initiate the targets with preset 
             colors either from colors.tsv in the respective preset directory or 
             when not found from config.preset_targets_colors. Defaults to True.
+        color_legend_filename (bool, str, optional): The filename when a preset
+            color legend is drawn from config.preset_col_legend. When True, a
+            filename is inferred from the targets name and config.SAVE_FORMAT, 
+            a str is set as the filename. Defaults to True. When None, the color
+            legend is not drawn.
+        color_legend_ncols (int, optional): Number of columns in the color 
+            legend. Defaults to 1.
     
     Returns:
         t: the preset targets instance
@@ -469,9 +496,11 @@ when not found from config.preset_targets_colors. Defaults to True.</dd>
                 logger.warning(&#39;No colors found for preset targets {}&#39;
                                .format(get))
         # draw a colorlegend if defined in config
-        if get in config.preset_col_legend:
+        if get in config.preset_col_legend and color_legend_filename:
+            filename = get+&#39;_color_legend&#39; if color_legend_filename == True \
+                       else color_legend_filename
             util.plot_color_legend(*config.preset_col_legend[get], 
-                                   filename=get+&#39;_color_legend.png&#39;)
+                                   ncolumns=color_legend_ncols, filename=filename)
     return t</code></pre>
 </details>
 </dd>

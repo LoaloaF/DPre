@@ -53,7 +53,7 @@ def _add_mg_types(data, down):
     data.columns = _add_level(data.columns, updown_idx)
     return data.reindex(orig_order, axis=1, level=1)
 
-def _diff_to_int_updown_notation(_diff, trans_updown):
+def _bool_to_int_genes(_diff, trans_updown=True, return_merged=False):
     &#34;&#34;&#34;Take _diff input and convert up-genes to +1, down-genes to -1, optionally 
        transfer up- and down values to each other makeing up- and down subframes
        equal&#34;&#34;&#34;
@@ -63,7 +63,10 @@ def _diff_to_int_updown_notation(_diff, trans_updown):
     if trans_updown and &#39;down&#39; in _diff.columns.unique(0):
         int_diff[&#39;up&#39;] = int_diff[&#39;up&#39;].mask(_diff[&#39;down&#39;], -1)
         int_diff[&#39;down&#39;] = int_diff[&#39;down&#39;].mask(_diff[&#39;up&#39;], 1)
-    return int_diff
+    if not return_merged:
+        return int_diff
+    else:
+        return int_diff.xs(&#39;up&#39;, 1, 0)
 
 def _add_mgtmean(agg):
     &#34;&#34;&#34;Prodcue the mean between aggregated up- and down mg similarity values&#34;&#34;&#34;
@@ -202,23 +205,35 @@ def _init_figure(fig_widths, fig_heights, nplts, spacers):
     return fig, axes
 
 def _open_file(filename):
-    &#34;&#34;&#34;Open a .pdf or .png file based on the filename ending or if not present
-       on config.SAVE_FORMAT&#34;&#34;&#34;
-    if not (filename.endswith(&#39;.png&#39;) or filename.endswith(&#39;.pdf&#39;)):
-        filename += &#39;.&#39;+config.SAVE_FORMAT
+    &#34;&#34;&#34;Open a file based on the filename ending or if not present
+       on config.SAVE_FORMAT. Must be supporte by matplotlib.&#34;&#34;&#34;
+    valid = plt.figure().canvas.get_supported_filetypes()
+    if not any([filename.endswith(val_format) for val_format in valid]):
+        if config.SAVE_FORMAT in valid:
+            filename += &#39;.&#39; + config.SAVE_FORMAT
+        else:
+            logger.error(&#39;The value for config.SAVE_FORMAT `{}` is not &#39;
+                         &#39;supported by matplotlib. Valid formats are:\n{}&#39;
+                         .format(config.SAVE_FORMAT, &#39;, &#39;.join(list(valid.keys()))))
+            sys.exit(1)
+        
     if filename.endswith(&#39;.pdf&#39;):
         return filename, PdfPages(filename)
     else:
         return filename, None
-def _save_file(fig, filename=None, pp=None):
-    &#34;&#34;&#34;Save pdf if pp is passed, otherwise use filename to save a .png&#34;&#34;&#34;
+def _save_file(fig, filename=None, pp=None, close_pp=False):
+    &#34;&#34;&#34;Save pdf if pp is passed, otherwise use filename to save as 
+       config.SAVE_FORMAT&#34;&#34;&#34;
     if pp:
         fig.savefig(pp, format=&#39;pdf&#39;)
+        if close_pp:
+            pp.close()
+            plt.close(fig)
     elif filename:
         replace = [&#39;$\\mathit{&#39;, &#39;}$&#39;]
         for repl in replace:
             filename = filename.replace(repl, &#39;&#39;)
-        fig.savefig(filename, format=&#39;png&#39;)
+        fig.savefig(filename)
         plt.close(fig)
 
 def _clean_axes(axes):
@@ -230,24 +245,34 @@ def _clean_axes(axes):
                        labelleft=False)
     return axes
 
-def _make_title(differential, proportional, which, el1, el2, pref=&#39;&#39;, postf=&#39;&#39;):
+def _make_title(differential, metric, el1, el2, pref=&#39;&#39;, postf=&#39;&#39;):
     &#34;&#34;&#34;Produce the plot title based on plot parmaters, pref and posf are used
        for plot specific adjustments; return the title string&#34;&#34;&#34;
-    which_title = &#39;(Euclidean)&#39; if which == &#39;euclid&#39; else &#39;(intersection)&#39;
+
+    metric_title = &#39;metric: &#39;
+    if metric == &#39;euclid&#39;:
+        metric_title += &#39;L1 Euclidean distance&#39;
+    elif metric == &#39;pearson&#39;:
+        metric_title += &#39;Pearson correlation&#39; 
+    elif metric == &#39;cosine&#39;:
+        metric_title += &#39;cosine similarity&#39; 
+    elif metric == &#39;intersect&#39;:
+         metric_title += &#39;marker gene intersect&#39;
+
     if differential:
         dtype = &#39;Change in &#39;
-        if proportional:
-            dtype = &#39;Proportional &#39; + dtype.lower()
-    elif which == &#39;euclid&#39; and not differential:
+    else:
         dtype = &#39;Absolute &#39;
-        which_title = &#39;&#39;
-    title = &#39;{}{}{}transcriptional similarity {}\nof {} &amp; {}&#39;
-    return title.format(pref, dtype, postf, which_title, el1, el2)
+    if pref:
+        dtype = dtype.lower()
+    title = (&#39;{}{}{}transcriptional similarity \nof {} &amp; {}\n{}&#39;
+              .format(pref, dtype, postf, el1, el2, metric_title))
+    return title[0].upper() + title[1:]
 
-def _heatmap_cluster(dat, where, ax, which):
+def _heatmap_cluster(dat, where, ax, metric):
     &#34;&#34;&#34;Cluster the columns or index with scipy; return the new order&#34;&#34;&#34;
     ax.set_visible(True)
-    d = dat.T if which == &#39;columns&#39; else dat 
+    d = dat.T if metric == &#39;columns&#39; else dat 
     Y = pdist(d, metric=&#39;euclidean&#39;)
     Z = linkage(Y, method=&#39;complete&#39;, metric=&#39;euclidean&#39;)
     order = dendrogram(Z,
@@ -257,7 +282,7 @@ def _heatmap_cluster(dat, where, ax, which):
                         labels = d.index, 
                         above_threshold_color = config.dendrogram_colors[0],
                         ax = ax)[&#39;ivl&#39;]
-    if which == &#39;rows&#39;:
+    if metric == &#39;rows&#39;:
         # for some reason reversed?
         order = order[::-1]
     return order
@@ -302,10 +327,10 @@ def _setup_heatmap_xy(x_y, ax, lbls, pivot, hide_lbls, lbl_size, colors):
             fs = lbl_size*config.FONTS if lbl_size else config.FONTS
             if not pivot:
                 ax.set_xticklabels(lbls, rotation=45, ha=&#39;right&#39;, fontsize=fs, 
-                                   rotation_mode=&#39;anchor&#39;, y=.5)
+                                   rotation_mode=&#39;anchor&#39;, y=-.5)
             else:
                 ax.set_xticklabels(lbls, rotation=90, ha=&#39;right&#39;, va=&#39;center&#39;, 
-                                   fontsize=fs, rotation_mode=&#39;anchor&#39;, y=.5)
+                                   fontsize=fs, rotation_mode=&#39;anchor&#39;, y=-.5)
         if colors:
             ax.bar(ticks, 1, 1, color=colors)
     
@@ -318,65 +343,71 @@ def _setup_heatmap_xy(x_y, ax, lbls, pivot, hide_lbls, lbl_size, colors):
             if not pivot:
                 ax.set_yticklabels(lbls, x=.5, fontsize=fs)
             else:
-                ax.set_yticklabels(lbls, rotation=45, ha=&#39;right&#39;, x=.5,
+                ax.set_yticklabels(lbls, rotation=45, ha=&#39;right&#39;, x=1,
                                    fontsize=fs, rotation_mode=&#39;anchor&#39;)
         if colors:
-            ax.bar(0, 1, color=colors, bottom=np.arange(len(lbls)))
+            ax.bar(0, 1, width=1, color=colors, bottom=np.arange(len(lbls)))
 
-def _check_args(trg, smp, which, differential, proportional, 
+def _check_args(trg, smp, metric, differential, 
                 hide_distance_bar=None, reorder_to_distance_bar=None,
-                cluster_hmx=None, display_similarity=False):
+                distance_bar_range=None, cluster_hmx=None, 
+                display_markergenes=False):
     &#34;&#34;&#34;General purpose plot argument checker; returns (modified) input values&#34;&#34;&#34;
-    def check_which(which, trg, smp, diff):
+    def check_metric(metric, trg, smp, diff):
         # check if the samples and targets have equivalent data to compare
-        if which is None:
+        if smp._type_name != &#39;samples&#39;:
+            logger.error(&#39;The passed `samples` are not of type DPre.smaples.&#39;)
+            sys.exit(1)
+        if metric is None:
             if trg._has_expr and smp._has_expr:
-                which = &#39;euclid&#39;
+                metric = &#39;cosine&#39;
             elif trg._has_diff and smp._has_diff:
-                which = &#39;intersect&#39;
+                metric = &#39;intersect&#39;
             else:
                 logger.error(&#39;Either initiate targets and samples with &#39;
                              &#39;expression or with markergenes and diff genes.&#39;)
                 sys.exit(1)
         msg = &#39;The {} were initiated without {} data. Cannot use `{}` similarity.&#39;
-        if which not in (&#39;euclid&#39;, &#39;intersect&#39;):
-            logger.error(&#39;Invalid `which` input: `{}`. Valid are `euclid` and &#39;
-                        &#39;`intersect`&#39;.format(which))
-        elif (which == &#39;euclid&#39;) and not trg._has_expr:
-            logger.error(msg.format(&#39;targets&#39;, &#39;expression&#39;, &#39;euclid&#39;))
-        elif (which == &#39;euclid&#39;) and not smp._has_expr:
-            logger.error(msg.format(&#39;samples&#39;, &#39;expression&#39;, &#39;euclid&#39;))
-        elif (which == &#39;intersect&#39;) and not trg._has_diff:
-            logger.error(msg.format(&#39;targets&#39;, &#39;merker gene&#39;, &#39;intersect&#39;))
-        elif (which == &#39;intersect&#39;) and not smp._has_diff:
-            logger.error(msg.format(&#39;samples&#39;, &#39;diff genes&#39;, &#39;intersect&#39;))
-        elif which == &#39;euclid&#39; and diff and not smp._ctrl:
-            logger.error(&#39;To plot the changes in transcriptional similarity &#39;
-                         &#39;with which = `euclid`, the samples must be initiated &#39;
-                         &#39;with a control.&#39;)
-        else:
-            # valid which
-            return which
-        # invalid which
-        sys.exit(1)
+        if metric not in (&#39;euclid&#39;, &#39;cosine&#39;, &#39;pearson&#39;, &#39;intersect&#39;):
+            logger.error(&#39;Invalid `metric` input: `{}`. Valid are `euclid` and &#39;
+                        &#39;`intersect`&#39;.format(metric))
+            sys.exit(1)
+        if metric in [&#39;euclid&#39;, &#39;cosine&#39;, &#39;pearson&#39;]:
+            if not trg._has_expr:
+                logger.error(msg.format(&#39;targets&#39;, &#39;expression&#39;, metric))
+                sys.exit(1)
+            elif not smp._has_expr:
+                logger.error(msg.format(&#39;samples&#39;, &#39;expression&#39;, metric))
+                sys.exit(1)
+                if diff and not smp._ctrl:
+                    logger.error(&#39;To plot the changes in transcriptional similarity &#39;
+                    &#39;with metric = `{}`, the samples must be initiated &#39;
+                    &#39;with a control. For absolute, pass differential = &#39; 
+                    &#39;False.&#39;.format(metric))
+                    sys.exit(1)
+        elif metric == &#39;intersect&#39;:
+            if not trg._has_diff:
+                logger.error(msg.format(&#39;targets&#39;, &#39;merker gene&#39;, metric))
+                sys.exit(1)
+            elif not smp._has_diff:
+                logger.error(msg.format(&#39;samples&#39;, &#39;diff genes&#39;, metric))
+                sys.exit(1)
+        
+        return metric
 
     # checks for all plots
-    which = check_which(which, trg, smp, differential)
-    if which == &#39;intersect&#39; and not differential:
+    metric = check_metric(metric, trg, smp, differential)
+    if metric == &#39;intersect&#39; and not differential:
         differential = True
         logger.warning(&#39;For the `intersect` similarity metric, &#39;
                        &#39;differential cannot be False. Was set to True.&#39;)
-    if proportional and not differential:
-                    proportional = False
-                    logger.warning(&#39;`proportional` can only be used if &#39;
-                                   &#39;`differential` is True aswell. Set to False.&#39;)
 
     # checks for 2 heatmaps
-    if which == &#39;euclid&#39; and not hide_distance_bar and not smp._ctrl:
+    if metric != &#39;intersect&#39; and not hide_distance_bar and not smp._ctrl:
         hide_distance_bar = True
-        logger.warning(&#39;`hide_distance_bar` cannot be False &#39;
-                    &#39;for which = `euclid` if the samples data is &#39;
-                    &#39;initialized without a control. Set to True.&#39;)
+        logger.warning(&#39;`hide_distance_bar` must be True &#39;
+                    &#39;for metric = `{}` if the samples data is &#39;
+                    &#39;initialized without a control. Set to True.&#39;.format(metric))
     if reorder_to_distance_bar and hide_distance_bar:
         reorder_to_distance_bar = False
         logger.warning(&#39;When `reorder_to_distance_bar` is True, &#39;
@@ -387,27 +418,31 @@ def _check_args(trg, smp, which, differential, proportional,
         logger.warning(&#39;Both `reorder_to_distance_bar` and &#39;
                         &#39;`cluster_genes` were set as True. &#39;
                         &#39;`cluster_genes` will be ignored.&#39;)                    
-
-    if display_similarity is not False:
+    if not differential and distance_bar_range is not None:
+        distance_bar_range = None
+        logger.warning(&#39;The argument `distance_bar_range` is invalid &#39;
+                       &#39;and ignored when differential = False. To apply&#39;
+                       &#39; a custom range, please use &#34;heatmap_range&#34;.&#39;)
+            
+    if display_markergenes is not False:
         # checks for target_sim and ranked_sim plots
-        val = [&#39;mgs mean&#39;, &#39;mgs up&#39;, &#39;mgs down&#39;]
-        if display_similarity not in val:
-            logger.warning(&#39;Invalid input for display_similarity: `{}`. &#39; 
-                               &#39;Valid are {}. Set to default `{}`&#39;
-                               .format(display_similarity, val, val[0]))
-            display_similarity = val[0] 
+        val = [&#39;mean&#39;, &#39;up&#39;, &#39;down&#39;]
+        if display_markergenes not in val:
+            logger.warning(&#39;Invalid input for display_markergenes: `{}`. &#39; 
+                           &#39;Valid are {}. Set to default `{}`&#39;
+                           .format(display_markergenes, val, val[0]))
+            display_markergenes = val[0] 
 
-        if display_similarity == val[2] and not trg._down_mgs: 
+        if display_markergenes == val[2] and not trg._down_mgs: 
             logger.error(&#39;Cannot display down markergene similarity because&#39;
                          &#39; the targets were not initiated with down &#39;
                          &#39;markergenes.&#39;)
             sys.exit(1)
-        display_similarity = display_similarity[4:]
 
-    return which, differential, proportional, hide_distance_bar, \
-           reorder_to_distance_bar, cluster_hmx, display_similarity
+    return metric, differential, hide_distance_bar, reorder_to_distance_bar, \
+           distance_bar_range, cluster_hmx, display_markergenes
 
-def plot_color_legend(labels, colors, ncolumns=1, filename=&#39;color_legend.png&#39;):
+def plot_color_legend(labels, colors, ncolumns=1, filename=&#39;color_legend&#39;):
     &#34;&#34;&#34;Plot a custom color legend.
     
        Takes a list of labels and colors and links them to produce a color 
@@ -419,7 +454,7 @@ def plot_color_legend(labels, colors, ncolumns=1, filename=&#39;color_legend.png
             must be interpretable by matplotlib: for example, &#39;w&#39;, #ffffff, 
             (1,1,1) all refer to white.
         filename (str, optional): the filename to save the legend. Defaults to
-            &#39;./color_legend.png&#39;
+            &#39;./color_legend.&#39; + config.SAVE_FORMAT
         ncolumns (int, optional): the number of columns in the legend. Defaults 
             to 1.
     &#34;&#34;&#34;
@@ -430,14 +465,36 @@ def plot_color_legend(labels, colors, ncolumns=1, filename=&#39;color_legend.png
         logger.error(&#39;The following colors are not recognized as colors by &#39;
                      &#39;matplotlib: {}&#39;.format(inv_cols))
         sys.exit(1)
-    fig, ax = plt.subplots(1, 1, figsize=(2, 2))
+    filename, pp = _open_file(filename)
+    fig, ax = plt.subplots(1, 1, figsize=(4, 4))
     _clean_axes(np.array([ax]))
     ax.legend(handles=[Patch(color=colors[i], label=labels[i]) 
                 for i in range(len(colors))], loc=&#39;center&#39;, ncol=ncolumns)
-    fig.savefig(filename)
-    plt.close()
+    _save_file(fig, filename=filename, pp=pp, close_pp=True)
+
     logger.info(&#39;Color legend generated and saved at {}/{}&#39;
-                .format(os.path.abspath(os.curdir), filename))</code></pre>
+                .format(os.path.abspath(os.curdir), filename))
+
+def add_diff_genes_from_z(samples, diff_z_threshold=2):
+    if not samples._ctrl:
+        logger.error(&#39;The samples `{}` were not initialized with a control.&#39;
+                     &#39;To generate a list of differential genes, a control is &#39;
+                     &#39;required.&#39;.format(samples.name))
+        sys.exit(1)
+    expr = samples._expr.xs(&#39;z&#39;, 1, 1, False)
+    expr = expr.apply(lambda smp: smp - expr.loc(1)[(samples._ctrl, &#39;z&#39;)])
+
+    up = expr.mask(~(expr&gt;diff_z_threshold), False).astype(bool)
+    up.columns = pd.MultiIndex.from_product([[&#39;up&#39;], up.columns.unique(0)])
+    down = expr.mask(~(expr&lt;-diff_z_threshold), False).astype(bool)
+    down.columns = pd.MultiIndex.from_product([[&#39;down&#39;], down.columns.unique(0)])
+
+    samples._diff = pd.concat((up, down), axis=1)
+    samples._has_diff = True
+    spacer.info(&#39;\n&#39;)
+    n = samples._diff.sum().unstack(0).reindex(samples.names).to_string()
+    logger.info(&#39;Differential genes were added to the sample. Number of marker &#39;
+                &#39;genes:\n{}\n{}&#39;.format(n, samples))</code></pre>
 </details>
 </section>
 <section>
@@ -447,6 +504,35 @@ def plot_color_legend(labels, colors, ncolumns=1, filename=&#39;color_legend.png
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
+<dt id="_dpre_util.add_diff_genes_from_z"><code class="name flex">
+<span>def <span class="ident">add_diff_genes_from_z</span></span>(<span>samples, diff_z_threshold=2)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def add_diff_genes_from_z(samples, diff_z_threshold=2):
+    if not samples._ctrl:
+        logger.error(&#39;The samples `{}` were not initialized with a control.&#39;
+                     &#39;To generate a list of differential genes, a control is &#39;
+                     &#39;required.&#39;.format(samples.name))
+        sys.exit(1)
+    expr = samples._expr.xs(&#39;z&#39;, 1, 1, False)
+    expr = expr.apply(lambda smp: smp - expr.loc(1)[(samples._ctrl, &#39;z&#39;)])
+
+    up = expr.mask(~(expr&gt;diff_z_threshold), False).astype(bool)
+    up.columns = pd.MultiIndex.from_product([[&#39;up&#39;], up.columns.unique(0)])
+    down = expr.mask(~(expr&lt;-diff_z_threshold), False).astype(bool)
+    down.columns = pd.MultiIndex.from_product([[&#39;down&#39;], down.columns.unique(0)])
+
+    samples._diff = pd.concat((up, down), axis=1)
+    samples._has_diff = True
+    spacer.info(&#39;\n&#39;)
+    n = samples._diff.sum().unstack(0).reindex(samples.names).to_string()
+    logger.info(&#39;Differential genes were added to the sample. Number of marker &#39;
+                &#39;genes:\n{}\n{}&#39;.format(n, samples))</code></pre>
+</details>
+</dd>
 <dt id="_dpre_util.annotate"><code class="name flex">
 <span>def <span class="ident">annotate</span></span>(<span>ensgs, species)</span>
 </code></dt>
@@ -546,7 +632,7 @@ for</dd>
 </details>
 </dd>
 <dt id="_dpre_util.plot_color_legend"><code class="name flex">
-<span>def <span class="ident">plot_color_legend</span></span>(<span>labels, colors, ncolumns=1, filename='color_legend.png')</span>
+<span>def <span class="ident">plot_color_legend</span></span>(<span>labels, colors, ncolumns=1, filename='color_legend')</span>
 </code></dt>
 <dd>
 <section class="desc"><p>Plot a custom color legend.</p>
@@ -563,14 +649,14 @@ must be interpretable by matplotlib: for example, 'w', #ffffff,
 (1,1,1) all refer to white.</dd>
 <dt><strong><code>filename</code></strong> :&ensp;<code>str</code>, optional</dt>
 <dd>the filename to save the legend. Defaults to
-'./color_legend.png'</dd>
+'./color_legend.' + config.SAVE_FORMAT</dd>
 <dt><strong><code>ncolumns</code></strong> :&ensp;<code>int</code>, optional</dt>
 <dd>the number of columns in the legend. Defaults
 to 1.</dd>
 </dl></section>
 <details class="source">
 <summary>Source code</summary>
-<pre><code class="python">def plot_color_legend(labels, colors, ncolumns=1, filename=&#39;color_legend.png&#39;):
+<pre><code class="python">def plot_color_legend(labels, colors, ncolumns=1, filename=&#39;color_legend&#39;):
     &#34;&#34;&#34;Plot a custom color legend.
     
        Takes a list of labels and colors and links them to produce a color 
@@ -582,7 +668,7 @@ to 1.</dd>
             must be interpretable by matplotlib: for example, &#39;w&#39;, #ffffff, 
             (1,1,1) all refer to white.
         filename (str, optional): the filename to save the legend. Defaults to
-            &#39;./color_legend.png&#39;
+            &#39;./color_legend.&#39; + config.SAVE_FORMAT
         ncolumns (int, optional): the number of columns in the legend. Defaults 
             to 1.
     &#34;&#34;&#34;
@@ -593,12 +679,13 @@ to 1.</dd>
         logger.error(&#39;The following colors are not recognized as colors by &#39;
                      &#39;matplotlib: {}&#39;.format(inv_cols))
         sys.exit(1)
-    fig, ax = plt.subplots(1, 1, figsize=(2, 2))
+    filename, pp = _open_file(filename)
+    fig, ax = plt.subplots(1, 1, figsize=(4, 4))
     _clean_axes(np.array([ax]))
     ax.legend(handles=[Patch(color=colors[i], label=labels[i]) 
                 for i in range(len(colors))], loc=&#39;center&#39;, ncol=ncolumns)
-    fig.savefig(filename)
-    plt.close()
+    _save_file(fig, filename=filename, pp=pp, close_pp=True)
+
     logger.info(&#39;Color legend generated and saved at {}/{}&#39;
                 .format(os.path.abspath(os.curdir), filename))</code></pre>
 </details>
@@ -616,6 +703,7 @@ to 1.</dd>
 <ul id="index">
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
+<li><code><a title="_dpre_util.add_diff_genes_from_z" href="#_dpre_util.add_diff_genes_from_z">add_diff_genes_from_z</a></code></li>
 <li><code><a title="_dpre_util.annotate" href="#_dpre_util.annotate">annotate</a></code></li>
 <li><code><a title="_dpre_util.get_ensgs" href="#_dpre_util.get_ensgs">get_ensgs</a></code></li>
 <li><code><a title="_dpre_util.plot_color_legend" href="#_dpre_util.plot_color_legend">plot_color_legend</a></code></li>

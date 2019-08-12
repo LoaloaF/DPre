@@ -48,6 +48,9 @@ class targets(_differential):
             'marker genes' and 'expression' are expected to match perfectly.
         name (str, optional): Name label of the targets. Defaults to 'Targets'. 
             Used in logging and plot annotations.
+        species (str, optinoal): Species of the targets instance. Can be 'mouse'
+            or 'human'. Defaults to None. This is required when genes are 
+            annotated for the gene_similarity_heatmap function.
         log: (bool, optional): Log the targets initiation. Defaults to True.
         
     Note:
@@ -63,7 +66,7 @@ class targets(_differential):
         super().__init__(diff_genes=markergenes, expression=expression, 
                          name=name, override_namematcher=override_namematcher, 
                          log=log)
-        # define if down marker genes are used, metric species and the overlap
+        # define if down marker genes are used
         self._down_mgs = not ignore_down_mgs
         self._species = species 
 
@@ -124,13 +127,11 @@ class targets(_differential):
 
     def _compute_similarity(self, samples, metric, log=True):
         """Core function computing the similarity between samples and targets
-        
-            This function outputs either the euclidean distance similarity for 
-            metric = 'euclid' or the marker gene & diff. gene intersect for metric 
-            = 'intersect'. Returns a similarity matrix that is also stored in
-            the targets dictionary '_overlaps' with the id(samples) as the key.
+            for metrics 'euclid', 'intersect' 'cosine' and 'pearson'. A 
+            similarity matrix with the respective samples is stored in trg_sims 
+            and gene_sim.
         """
-        # check marker gene detection before overlapping
+        # check marker gene detection before computing similarity
         det = self.plot_detec_mgs_prop(samples, filename=None, log=log)
         det = det.reindex(self.names, level=1)
         keep = det[det.proportion >config.DROP_TARGET_DETEC_THR].index.unique(1)
@@ -175,10 +176,7 @@ class targets(_differential):
                     gene_sims.append(smp_d.apply(lambda smp: abs(smp-trg)))
                     return gene_sims[-1].abs().mean()
                 elif metric == 'intersect':
-                    # mg_inters = lambda smp_d: abs(smp_d + trg) -1
-                    # def mg_inters(smp_d):
-                    #     m = abs(smp_d + trg)
-                    #     return m.mask(m == 2, 1).mask(m == 1, 0).mask(m == 0, -1)
+                    # this returns a matric representing matches and mismatches
                     gene_sims.append(smp_d.apply(lambda smp_d: abs(smp_d+trg) -1))
                     return gene_sims[-1].mean()
         if metric in ['euclid', 'intersect']:
@@ -192,21 +190,18 @@ class targets(_differential):
             self._gene_sims['{}-{}'.format(id(samples), metric)] = gene_sim
         else:
             trg_sim = trg_data.apply(compute_trg_sim)
-
         trg_sim = util._add_mgtmean(trg_sim)
         self._trg_sims['{}-{}'.format(id(samples), metric)] = trg_sim
-
-
 
     def _get_similarity(self, samples, metric, which_sim='target_sim', 
                           differential=False, drop_ctrl=True, 
                           inters_to_updown_not=False, log=True):
-        """Access and specifically process similarity data in overlap. Returns 
-            2 elements, either target similarity and ctrl target similarity or 
-            per gene similarity and per gene control similarity. Option for 
-            differential and absolute similarities.
+        """Specifically access target similarity (trg_sims) and gene similarity 
+            (gene_sims) data. Returns 2 elements, either target similarity and 
+            ctrl target similarity or per gene similarity and per gene control 
+            similarity. Option for differential and absolute similarities.
         """
-        # check if overlap has already been computed, if not do overlap
+        # check if similarity has already been computed, if not do similarity
         try:
             key = '{}-{}'.format(id(samples), metric)
             trg_sim = self._trg_sims[key].copy()
@@ -214,9 +209,9 @@ class targets(_differential):
             self._compute_similarity(samples, metric, log=log)
             trg_sim = self._trg_sims[key].copy()
         if log:
-            logger.info('Selecting and processing overlap data...')
+            logger.info('Selecting and processing similarity data...')
 
-        # ensure the overlap DataFrame has the correct ordering 
+        # ensure the similarity matrix has the correct ordering 
         t_ord = trg_sim.columns.unique(1)
         val_t_ord = pd.Index(self.names)
         val_t_ord = val_t_ord.drop(val_t_ord.difference(t_ord))
@@ -227,7 +222,7 @@ class targets(_differential):
         if s_ord.tolist() != val_s_ord:
             trg_sim = trg_sim.reindex(val_s_ord)
 
-        # return target similarity, i.e. the aggregated per gene similarities
+        # return target similarity
         if which_sim == 'target_sim':
             sim = trg_sim
             # expression based metrics
@@ -278,8 +273,7 @@ class targets(_differential):
                 return sim, None
             
     def plot_detec_mgs_prop(self, samples, plt_show=False, 
-                            filename='detec_mgs_prop', 
-                            specific_target_labels=None, log=True):
+                            filename=None, specific_target_labels=None, log=True):
         """Show the proportion of detected marker genes in logs and a histogram.
 
             Useful for adjusting the DROP_TARGET_DETEC_THR value.
@@ -298,7 +292,7 @@ class targets(_differential):
                 det: A DataFrame with detection values used for logging and 
                     plotting
             Note:
-                When the proportion of overlap is at 0 for all targetss, an 
+                When the proportion of detection is at 0 for all targetss, an 
                 error is raised.
         """
         # get proportion of detected marker genes
@@ -345,7 +339,7 @@ class targets(_differential):
                    width=1, color=self.get_colors(order.get_level_values(1)))
             ax.hlines(config.DROP_TARGET_DETEC_THR, 0, len(self))
             ax.yaxis.grid(alpha=0.8, linestyle='dashed')
-            ax.set_xlabel(self.name+' (targets')
+            ax.set_xlabel(self.name+' (targets)')
             if specific_target_labels:
                 xlbl = [lbl if lbl in specific_target_labels else '' 
                         for lbl in order]
@@ -362,6 +356,8 @@ class targets(_differential):
                 util._save_file(fig, filename, pp, close_pp=True)
                 logger.info('Plot saved at {}\n'
                             .format(os.path.abspath(filename)))
+            else:
+                plt.close()
         return det
 
     def target_similarity_heatmap(self, 
@@ -402,28 +398,30 @@ class targets(_differential):
         """Plot the similarity of the samples with the targets in a heatmap.
         
         This gives a compact insight on transcriptional similarity with the 
-        targets. Two different metrics can be picked to assess similarity: 
-        'euclid' for expression inputs or 'intersect' for comparison based 
-        on diff. genes/ marker genes. Differential and absolute 
-        similarity values are available options for investigating the change 
-        in similarity.
+        targets. Four different metrics can be picked to assess similarity: 
+        'euclid', 'cosine' and 'pearson' for expression inputs or 'intersect' 
+        for comparison based on diff. genes/ marker genes. Differential and 
+        absolute similarity values are available options for investigating the 
+        change or state in similarity with the targets.
 
         Args:
             =================== Plot data options ===================
             samples (samples): the data to rate similarity for.
             metric (str, optional): the similarity metric to use. Valid 
-                options are 'euclid' and 'intersect'. Defaults to None.
-                'euclid' shows the mean euclidean distance towards the 
+                options are 'euclid', 'intersect', 'cosine', 'pearson'. Defaults 
+                to None.'euclid' shows the mean euclidean distance towards the 
                 target marker genes expression levels and requires `expression` 
                 input for samples and targets. 'intersect' will show the overlap 
                 between diff. sample genes and target marker genes requiring 
-                gene list input. 
-                When None, determine which based on input data in targets 
-                and samples. 
-            differential (bool, optional): plot the differential (change in) 
-                similarity between samples and targets. Defaults to True. 
-                Requires a control to be passed for the 'euclid' metric. Cannot 
-                be False for 'intersect'-metric.
+                gene list input. 'cosine' will compute the cosine similarity, 
+                'pearson' the Pearson correlation coefficient. More details in
+                publication. When None, set to 'cosine' when expression input 
+                was passed, or 'intersect' when gene list data was passed.
+            differential (bool, optional): plot the differential (change in)
+                similarity from the untreated-,/ base-sample, or. the control 
+                to other samples. Defaults to True. Requires a control to be 
+                passed for the expression-based metrics. Cannot be False for 
+                'intersect'-metric.
             display_markergenes (str, optional): specify the group of 
                 marker genes to display similarity for. Defaults to 'mean'. 
                 Valid options are 'mean', 'up', 'down'. Relevent when targets 
@@ -489,10 +487,10 @@ class targets(_differential):
                 legend. Defaults to False. Applies for all colorbar_legends.
             hide_distance_bar (bool, optional): Do not plot the distance 
                 bar on top of the heatmap. Defaults to False. When True, the 
-                control will appear in the main heatmap. For the 'euclid' 
-                metric, this bar visualizes the absolute similarity of the 
-                control with the targets. For the 'intersect' metric, the number 
-                of target marker genes is shown. Defaults to False.
+                control will appear in the main heatmap. For the expression-
+                based metrics, this bar visualizes the absolute similarity of 
+                the control with the targets. For the 'intersect' metric, the 
+                number of target marker genes is shown. Defaults to False.
             hide_targetlabels (bool, optional): Do not plot the target 
                 labels at the bottom. Defaults to False.
             hide_targets_dendrogram (bool, optional): Do not plot the 
@@ -544,7 +542,7 @@ class targets(_differential):
             spacer.info('')
             logger.info('Arguments passed. Getting data now ...')
 
-        # get the specific overlap data, plot the mean of up and down mgs
+        # get the specific similarity data, plot the mean of up and down mgs
         def get_data():
             sim, ctrl_sim = self._get_similarity(samples, metric, 
                                                  differential=differential,
@@ -634,9 +632,7 @@ class targets(_differential):
             sim, ctrl_sim = data
 
             # set plot title
-            if title in ('None', 'none', 'False', 'false', 'F', 'f'):
-                this_t = False
-            if title:
+            if title and title not in ('None', 'none', 'False', 'false', 'F', 'f'):
                 if title and type(title) is not str:
                     this_t = util._make_title(differential, metric, 
                                               samples.name, self.name)
@@ -754,11 +750,13 @@ class targets(_differential):
             filename, pp = util._open_file(filename)
         fig, axes, data = do_plot()
         if plt_show:
-                plt.show()
+            plt.show()
         if filename:
             util._save_file(fig, filename=filename, pp=pp, close_pp=True)
             logger.info('Plot saved at {}/{}\n\n'
                         .format(os.path.abspath(os.curdir), filename))
+        else:
+            plt.close(fig)
         return fig, axes, data
         
 
@@ -817,20 +815,22 @@ class targets(_differential):
 
         Args:
             =================== Plot data options ===================
-            samples (samples): the data to rate similariity for.
+            samples (samples): the data to rate similarity for.
             metric (str, optional): the similarity metric to use. Valid 
-                options are 'euclid' and 'intersect'. Defaults to None.
-                'euclid' shows the mean euclidean distance towards the 
+                options are 'euclid', 'intersect', 'cosine', 'pearson'. Defaults 
+                to None.'euclid' shows the mean euclidean distance towards the 
                 target marker genes expression levels and requires `expression` 
                 input for samples and targets. 'intersect' will show the overlap 
                 between diff. sample genes and target marker genes requiring 
-                gene list input. 
-                When None, determine metric based on input data in targets 
-                and samples. 
-            differential (bool, optional): plot the differential (change in) 
-                gene similarity with the targets. Defaults to True. 
-                Requires a control to be passed for the 'euclid' metric. 
-                Cannot be False for 'intersect'-metric. 
+                gene list input. 'cosine' will compute the cosine similarity, 
+                'pearson' the Pearson correlation coefficient. More details in
+                publication. When None, set to 'cosine' when expression input 
+                was passed, or 'intersect' when gene list data was passed.
+            differential (bool, optional): plot the differential (change in)
+                similarity from the untreated-,/ base-sample, or. the control 
+                to other samples. Defaults to True. Requires a control to be 
+                passed for the expression-based metrics. Cannot be False for 
+                'intersect'-metric.
             display_genes (str, optional): Extract a specific set of 
                 marker genes to display for each target. Defaults to 'variant'. 
                 Valid options are 'variant', 'increasing', 'decreasing' when 
@@ -925,15 +925,15 @@ class targets(_differential):
                 legend. Defaults to False. Applies for all colorbar_legends.
             hide_distance_bar (bool, optional): Do not plot the distance 
                 bar on top of the heatmap. Defaults to False. When True, the 
-                control will appear in the main heatmap. For the 'euclid' 
-                metric, this bar visualizes the absolute similarity of the 
-                control with the gene. When using the intersect metric, the 
-                distance bar is never displayed.
+                control will appear in the main heatmap. For the expression-
+                based metrics, this bar visualizes the absolute similarity of 
+                the control with the targets. For the 'intersect' metric, the 
+                number of target marker genes is shown. Defaults to False.
             hide_sum_plot (bool, optional): Do not generate the summary plot on
-                the left visualizing the aggregated samples. Defualts to False.
-                This plot relies on the sample methad as the target similarity 
-                measurement, but instead of using all target marker genes, only 
-                the displayed genes are used.  
+                the right visualizing the samples genes. Defualts to False.
+                This plot shows the summarized similarity of all genes. It 
+                computes like the target similarty, but limited to the displayed
+                genes.
             hide_genelabels (bool, optional): Do not plot the gene 
                 labels at the bottom. Defaults to False.
             hide_genes_dendrogram (bool, optional): Do not plot the 
@@ -1283,9 +1283,7 @@ class targets(_differential):
                 [ax.set_visible(False) for ax in axes[4, :]]
 
             # set plot title
-            if title in ('None', 'none', 'False', 'false', 'F', 'f'):
-                this_t = False
-            if title:
+            if title and title not in ('None', 'none', 'False', 'false', 'F', 'f'):
                 if title == True:
                     this_t = util._make_title(differential, metric,
                                               samples.name, t_name, 
@@ -1519,18 +1517,20 @@ class targets(_differential):
             =================== Plot data options ===================
             samples (samples): the data to rank similariity for.
             metric (str, optional): the similarity metric to use. Valid 
-                options are 'euclid' and 'intersect'. Defaults to None.
-                'euclid' shows the mean euclidean distance towards the 
+                options are 'euclid', 'intersect', 'cosine', 'pearson'. Defaults 
+                to None.'euclid' shows the mean euclidean distance towards the 
                 target marker genes expression levels and requires `expression` 
                 input for samples and targets. 'intersect' will show the overlap 
                 between diff. sample genes and target marker genes requiring 
-                gene list input. 
-                When None, determine which based on input data in targets 
-                and samples.             
-            differential (bool, optional): plot the differential (change in) 
-                similarity between samples and targets. Defaults to True. 
-                Requires a control to be passed for the 'euclid' metric. Cannot 
-                be False for'intersect'-metric.
+                gene list input. 'cosine' will compute the cosine similarity, 
+                'pearson' the Pearson correlation coefficient. More details in
+                publication. When None, set to 'cosine' when expression input 
+                was passed, or 'intersect' when gene list data was passed.
+            differential (bool, optional): plot the differential (change in)
+                similarity from the untreated-,/ base-sample, or. the control 
+                to other samples. Defaults to True. Requires a control to be 
+                passed for the expression-based metrics. Cannot be False for 
+                'intersect'-metric.
             display_markergenes (str, optional): specify the group of 
                 marker genes to display similarity for. Defaults to 'mean'. 
                 Valid options are 'mean', 'up', 'down'. Relevent when targets 
@@ -1613,10 +1613,11 @@ class targets(_differential):
             config._update_consts(kwargs)            
             logger.info('Arguments passed. Getting data now ...')
 
-        # get the aggregated overlap data for plotting, pick the targets
+        # get the target similarity data for plotting, pick the targets
         def get_data():
             sim, ctrl_sim = self._get_similarity(samples, metric, 
-                                                 differential=differential)
+                                                 differential=differential,
+                                                 drop_ctrl=differential)
             sim = sim.xs(display_markergenes, 1, 0)
             if rank_samples:
                 if differential:
@@ -1629,10 +1630,10 @@ class targets(_differential):
             drop = slice(int(n_targets/2), -int(n_targets/2)) if display_negative \
                    else slice(-1, n_targets-1, -1)
             
-            ascend = True if metric == 'euclid' else False
+            asc = True if metric == 'euclid' and not differential else False
             data = dict.fromkeys(sim.index, None)
             def sel_trgs(smp_row):                
-                trgs = smp_row.iloc[0].sort_values(ascending=ascend)
+                trgs = smp_row.iloc[0].sort_values(ascending=asc)
                 data[trgs.name] = trgs.drop(trgs.index[drop])
             sim.groupby(level=0).apply(sel_trgs)
             return data, ctrl_sim
@@ -1681,9 +1682,7 @@ class targets(_differential):
                 ax.spines['top'].set_visible(True)
 
             # set plot title
-            if title in ('None', 'none', 'False', 'false', 'F', 'f'):
-                this_t = False
-            if title:
+            if title and title not in ('None', 'none', 'False', 'false', 'F', 'f'):
                 if title == True:
                     this_t = util._make_title(differential, metric, s_name, 
                                               self.name, pref='ranked ')

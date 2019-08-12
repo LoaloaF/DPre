@@ -106,7 +106,6 @@ def preset_targets(get, sort=False, preset_colors=True,
         if get in config.preset_col_legend and color_legend_filename:
             filename = get+'_color_legend' if color_legend_filename == True \
                        else color_legend_filename
-            print(filename)
             util.plot_color_legend(*config.preset_col_legend[get], 
                                    ncolumns=color_legend_ncols, filename=filename)
     return t

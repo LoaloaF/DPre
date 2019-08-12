@@ -203,7 +203,7 @@ def _save_file(fig, filename=None, pp=None, close_pp=False):
         fig.savefig(pp, format='pdf')
         if close_pp:
             pp.close()
-            plt.close()
+            plt.close(fig)
     elif filename:
         replace = ['$\\mathit{', '}$']
         for repl in replace:
@@ -302,7 +302,7 @@ def _setup_heatmap_xy(x_y, ax, lbls, pivot, hide_lbls, lbl_size, colors):
             fs = lbl_size*config.FONTS if lbl_size else config.FONTS
             if not pivot:
                 ax.set_xticklabels(lbls, rotation=45, ha='right', fontsize=fs, 
-                                   rotation_mode='anchor', y=.5)
+                                   rotation_mode='anchor', y=-.5)
             else:
                 ax.set_xticklabels(lbls, rotation=90, ha='right', va='center', 
                                    fontsize=fs, rotation_mode='anchor', y=-.5)
@@ -440,14 +440,12 @@ def plot_color_legend(labels, colors, ncolumns=1, filename='color_legend'):
         logger.error('The following colors are not recognized as colors by '
                      'matplotlib: {}'.format(inv_cols))
         sys.exit(1)
-    if filename:
-        filename, pp = _open_file(filename)
+    filename, pp = _open_file(filename)
     fig, ax = plt.subplots(1, 1, figsize=(4, 4))
     _clean_axes(np.array([ax]))
     ax.legend(handles=[Patch(color=colors[i], label=labels[i]) 
                 for i in range(len(colors))], loc='center', ncol=ncolumns)
-    if filename:
-        _save_file(fig, filename=filename, pp=pp, close_pp=True)
+    _save_file(fig, filename=filename, pp=pp, close_pp=True)
 
     logger.info('Color legend generated and saved at {}/{}'
                 .format(os.path.abspath(os.curdir), filename))

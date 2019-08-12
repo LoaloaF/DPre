@@ -56,7 +56,6 @@ class _differential:
         self.name = name if name else self._type_name.capitalize()
         self._colors = {}
 
-
     @property
     def names(self):
         """Get the element names
@@ -202,9 +201,6 @@ class _differential:
                                     for key, col in self._colors.items()])
             logger.info('Colors set for `{}`:\n\t{}'.format(self.name, 
                                                             str_cols)) 
-                    
-
-
 
     def reorder(self, order):
         """Reorder the elements in targets/samples inplace
@@ -385,7 +381,6 @@ class _differential:
                        len(self._detec_genes), n_diff_descr, diffmgs, 
                        self._has_diff, self._has_expr, trg_smp_arg))
         logger.info(msg)
-
 
     def _update_data_columns(self, names, func_name='reindex'):
         """Reindexer and renamer of the main datatypes

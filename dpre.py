@@ -215,7 +215,7 @@ dat_grp.add_argument('--metric', '-m', type=str, choices=('euclid', 'intersect')
 dat_grp.add_argument('--absolute', '-a', action='store_false', help='plot the '
                      'absolute similarity, `euclid` only. Will appear as '
                      'differential=False in logs.')
-dat_grp.add_argument('--display_markergenes', '-dm', default='mgs mean',
+dat_grp.add_argument('--display_markergenes', '-dm', default='mean',
                      choices=['mgs mean', 'mgs up', 'mgs down'], help='Specify '
                      'up- or down markerene similarity, default mean')
 # data ordering
@@ -338,9 +338,9 @@ genhm_grp.add_argument('--genelabels_size', '-ges', type=float,
                        help='multiplier for genelabels fontsize, default = 1')
 genhm_grp.add_argument('--targetlabels_size', '-tas', type=float, 
                        help='multiplier for targetlabels fontsize, default = 1')
-genhm_grp.add_argument('--title', '-t', default=True, action='append', 
+genhm_grp.add_argument('--title', '-t', default=True, type=str, 
                        help='a custom title or hide title with {`f`, `false`, '
-                       '`F`, `False`} or list of titles for each plot.')
+                       '`F`, `False`}')
 # show/ hide specific plot elements
 d = 'show/ hide subparts of the plot'
 elem_grp = gene_sim_parser.add_argument_group('Plot elements', description=d)
@@ -382,7 +382,7 @@ dat_grp.add_argument('--metric', '-m', type=str, choices=('euclid', 'intersect')
 dat_grp.add_argument('--absolute', '-a', action='store_false', help='plot the '
                      'absolute similarity, `euclid` only. Will appear as '
                      'differential=False in logs.')
-dat_grp.add_argument('--display_markergenes', '-dm', default='mgs mean',
+dat_grp.add_argument('--display_markergenes', '-dm', default='mean',
                      choices=['mgs mean', 'mgs up', 'mgs down'], help='Specify '
                      'up- or down markerene similarity, default mean')
 dat_grp.add_argument('--n_targets', '-nt', type=int, default=16,
@@ -411,7 +411,7 @@ genhm_grp.add_argument('--colored_bars', '-co', action='store_true',
                        help='color the bars according to the value')
 genhm_grp.add_argument('--spines', '-spi', action='store_true', 
                       help='additionally show spines on top and right')
-genhm_grp.add_argument('--title', '-t', default=True, action='append', 
+genhm_grp.add_argument('--title', '-t', default=True, type=str,
                        help='a custom title or hide title with {`f`, `false`, '
                        '`F`, `False`} or list of titles for each plot.')
 # show/ hide specific plot elements

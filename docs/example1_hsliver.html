@@ -13056,6 +13056,19 @@ ul.typeahead-list  > li > a.pull-right {
 .ansi-bold { font-weight: bold; }
 
     </style>
+<style type="text/css">
+    /*This file contains any manual css for this page that needs to override the global styles.
+This is only required when different pages style the same element differently. This is just
+a hack to deal with our current css styles and no new styling should be added in this file.*/
+
+#ipython-main-app {
+    position: relative;
+}
+#jupyter-main-app {
+    position: relative;
+}
+
+    </style>
 
 
 <style type="text/css">
@@ -13134,7 +13147,7 @@ div#notebook {
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h1 id="Example-1:-successive-differentiation-of-hESCs-to-hepatocytes">Example 1: successive differentiation of hESCs to hepatocytes<a class="anchor-link" href="#Example-1:-successive-differentiation-of-hESCs-to-hepatocytes">&#182;</a></h1><p>In this experiment human embryonic stem cells were treated with a selection of stimuli to differentiate into hepatocytes/ liver tissue. Within the a period of 3 weeks, 10 samples were taken and sequenced on different days. This example goes into samples and targets initiation and basic plotting.</p>
-<h2 id="Initializing-samples-and-targets">Initializing samples and targets<a class="anchor-link" href="#Initializing-samples-and-targets">&#182;</a></h2><p>To <b>initiate the samples instance</b>, we pass a TSV expression file and gene list data. Since there are no replicates in this data, we cannot identify significant differential genes with DESeq2 (of which DPre accepts the output). Instead, in this analysis, differential genes were defined as those with an absolute Z-score &gt;2. Since this is not to uncommon, DPre implements the function <i>add_diff_genes_from_z()</i> to add differential genes based on Z-scores.
+<h2 id="Initializing-samples-and-targets">Initializing samples and targets<a class="anchor-link" href="#Initializing-samples-and-targets">&#182;</a></h2><p>To <b>initiate the samples instance</b>, we pass a TSV expression file and gene list data. Since there are no replicates in this data, we cannot identify significant differential genes with DESeq2 (of which DPre accepts the output). Instead, in this analysis, differential genes were defined as those with a differential Z-score &gt;2; &lt;-2. Since this is not to uncommon, DPre implements the function <i>add_diff_genes_from_z()</i> to add differential genes based on Z-scores.
 Additionally, we pass the name of the control to the <i>ctrl</i> argument to later plot differential effects. We also set a <i>name</i> that will appear in logs and plot annotations.</p>
 
 </div>

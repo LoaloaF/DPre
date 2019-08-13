@@ -12,11 +12,12 @@ def preset_targets(get, sort=False, preset_colors=True,
     """Generate one of the predefined targets instances and return it. 
     
         Pick a reference dataset for comparison. Mouse (Hutchins et al. 2017, 
-        NAR) and Human (FANTOM5 project, Nature 2014) are included. Specific 
-        doamins can be picked for both species references. If the targets are 
-        initiated with 'preset_colors', a color legend is generated and saved 
-        in the current working directory. Custom presets can be created by 
-        adding a folder (with an 'm' or 'h' prefix) to DPre/preset_targets. 
+        NAR) and Human (Abugessaisa et al. 2017, FANTOM5 project) are included. 
+        Specific doamins can be picked for both species references. If the 
+        targets are initiated with 'preset_colors', a color legend is generated 
+        and saved in the current working directory. Custom presets can be 
+        created by adding a folder (with an 'm' or 'h' prefix) to 
+        DPre/preset_targets. 
 
     Args:
         get (str): the desired preset. Valid options are 'mouse', 'human', 

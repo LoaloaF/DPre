@@ -469,4 +469,4 @@ def add_diff_genes_from_z(samples, diff_z_threshold=2):
     spacer.info('\n')
     n = samples._diff.sum().unstack(0).reindex(samples.names).to_string()
     logger.info('Differential genes were added to the sample. Number of marker '
-                'genes:\n{}\n{}'.format(n, samples))
+                'genes:\n{}\n'.format(n))

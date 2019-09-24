@@ -344,8 +344,8 @@ def _check_args(trg, smp, metric, differential,
                 sys.exit(1)
         msg = 'The {} were initiated without {} data. Cannot use `{}` similarity.'
         if metric not in ('euclid', 'cosine', 'pearson', 'intersect'):
-            logger.error('Invalid `metric` input: `{}`. Valid are `euclid` and '
-                        '`intersect`'.format(metric))
+            logger.error('Invalid `metric` input: `{}`. Valid are `euclid`, '
+                         '`cosine`, `pearson`, and `intersect`'.format(metric))
             sys.exit(1)
         if metric in ['euclid', 'cosine', 'pearson']:
             if not trg._has_expr:

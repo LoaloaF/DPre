@@ -98,6 +98,6 @@ Author: Simon Steffens<br>
 Publication: https://doi.org/10.1093/bioinformatics/btz789<br>
 
 Citation: Simon Steffens, Xiuling Fu, Fangfang He, Yuhao Li, Isaac A Babarinde, Andrew P Hutchins,<br> 
-          DPre: Computational identification of differentiation bias and genes underlying cell type <br>
-          conversions, Bioinformatics, , btz789<br>
+          <t><t>DPre: Computational identification of differentiation bias and genes underlying cell type <br>
+          <t><t>conversions, Bioinformatics, , btz789<br>
 
